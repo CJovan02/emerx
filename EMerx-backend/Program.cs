@@ -11,7 +11,21 @@
 //exception - constructor/create/mapping
 //automapper?
 
+using EMerx_backend.Infrastructure.MongoDb;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<MongoDbSettings>(settings =>
+    {
+        settings.ConnectionString =
+            Environment.GetEnvironmentVariable("MONGO_EMERX_CONNECTION_STRING") ??
+            throw new Exception("MONGO_EMERX_CONNECTION_STRING not found");
+        settings.DatabaseName = "EMerx";
+        //settings.TestConnectionWithPing = builder.Environment.IsDevelopment();
+    }
+);
+
+builder.Services.AddSingleton<MongoDbContext>();
 
 builder.Services.AddOpenApi();
 

@@ -1,5 +1,5 @@
-using EMerx_backend.configuration;
 using EMerx_backend.Entities;
+using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
