@@ -7,32 +7,35 @@ namespace EMerx_backend.Infrastructure.MongoDb;
 
 public class MongoDbContext
 {
-    private IMongoDatabase Database { get; }
-
-    public MongoDbContext(IOptions<MongoDbSettings> settings)
+    private readonly IMongoDatabase _database;
+    private readonly MongoClient _client;
+    public MongoDbContext(IOptions<MongoDbSettings> options)
     {
-        var mongoSettings = MongoClientSettings.FromConnectionString(settings.Value.ConnectionString);
+        var settings = options.Value;
+
+        var mongoSettings = MongoClientSettings.FromConnectionString(settings.ConnectionString);
         mongoSettings.ServerApi = new ServerApi(ServerApiVersion.V1);
-        var client = new MongoClient(mongoSettings);
+        _client = new MongoClient(mongoSettings);
 
-        if (settings.Value.TestConnectionWithPing)
-        {
-            try
-            {
-                client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
-                Console.WriteLine("Pinged your deployment. You successfully connected to MongoDB!");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-
-        Database = client.GetDatabase(settings.Value.DatabaseName);
+        _database = _client.GetDatabase(settings.DatabaseName);
     }
 
-    public IMongoCollection<Product> Products => Database.GetCollection<Product>(nameof(Product) + 's');
-    public IMongoCollection<User> Users => Database.GetCollection<User>(nameof(User) + 's');
-    public IMongoCollection<Review> Reviews => Database.GetCollection<Review>(nameof(Review) + 's');
-    public IMongoCollection<Order> Orders => Database.GetCollection<Order>(nameof(Order) + 's');
+    public async Task PingAsync()
+    {
+        try
+        {
+            await _client.GetDatabase("admin").RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1));
+            Console.WriteLine("✅ Pinged your deployment. You successfully connected to MongoDB!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("❌ MongoDb connection could not be established.");
+            Console.WriteLine(ex);
+        }
+    }
+
+    public IMongoCollection<Product> Products => _database.GetCollection<Product>(nameof(Product) + 's');
+    public IMongoCollection<User> Users => _database.GetCollection<User>(nameof(User) + 's');
+    public IMongoCollection<Review> Reviews => _database.GetCollection<Review>(nameof(Review) + 's');
+    public IMongoCollection<Order> Orders => _database.GetCollection<Order>(nameof(Order) + 's');
 }

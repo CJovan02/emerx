@@ -25,6 +25,7 @@ builder.Services.Configure<MongoDbSettings>(settings =>
             Environment.GetEnvironmentVariable("MONGO_EMERX_CONNECTION_STRING") ??
             throw new Exception("MONGO_EMERX_CONNECTION_STRING not found");
         settings.DatabaseName = "EMerx";
+        settings.TestConnectionWithPing = true;
         //settings.TestConnectionWithPing = builder.Environment.IsDevelopment();
     }
 );
@@ -39,6 +40,9 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+var mongoContext = app.Services.GetRequiredService<MongoDbContext>();
+await mongoContext.PingAsync();
 
 if (app.Environment.IsDevelopment())
 {
