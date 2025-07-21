@@ -11,31 +11,26 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
 
     public async Task<IEnumerable<Product>> GetProducts()
     {
-        throw new NotImplementedException();
+        return await _products.Find(product => true).ToListAsync();
     }
 
     public async Task<Product> GetProductById(ObjectId id)
     {
-        throw new NotImplementedException();
+        return await _products.Find(product => product.Id == id).FirstOrDefaultAsync();
     }
 
     public async Task CreateProduct(Product product)
     {
-        throw new NotImplementedException();
+        await _products.InsertOneAsync(product);
     }
 
     public async Task UpdateProduct(Product product)
     {
-        throw new NotImplementedException();
+        await _products.ReplaceOneAsync(p => p.Id == product.Id, product);
     }
 
     public async Task DeleteProduct(ObjectId id)
     {
-        throw new NotImplementedException();
-    }
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
+        await _products.DeleteOneAsync(product => product.Id == id);
     }
 }

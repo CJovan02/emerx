@@ -11,31 +11,31 @@ public class ReviewRepository(MongoDbContext context) : IReviewRepository
 
     public async Task<IEnumerable<Review>> GetReviews()
     {
-        throw new NotImplementedException();
+        return await _reviews.Find(r => true).ToListAsync();
     }
 
     public async Task<IEnumerable<Review>> GetReviewsForProduct(ObjectId productId)
     {
-        throw new NotImplementedException();
+        return await _reviews.Find(r => r.ProductId == productId).ToListAsync();
     }
 
     public async Task<Review> GetReviewById(ObjectId id)
     {
-        throw new NotImplementedException();
+        return await _reviews.Find(r => r.ProductId == id).FirstOrDefaultAsync();
     }
 
     public async Task CreateReview(Review review)
     {
-        throw new NotImplementedException();
+        await _reviews.InsertOneAsync(review);
     }
 
     public async Task UpdateReview(Review review)
     {
-        throw new NotImplementedException();
+        await _reviews.ReplaceOneAsync(r => r.ProductId == review.ProductId, review);
     }
 
     public async Task DeleteReview(ObjectId id)
     {
-        throw new NotImplementedException();
+        await _reviews.DeleteOneAsync(r => r.ProductId == id);
     }
 }

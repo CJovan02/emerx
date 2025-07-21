@@ -2,7 +2,7 @@
 
 namespace EMerx_backend.Entities;
 
-public class Order
+public class Order : BaseEntity
 {
     public ObjectId UserId { get; set; }
     public ObjectId ProductId { get; set; }

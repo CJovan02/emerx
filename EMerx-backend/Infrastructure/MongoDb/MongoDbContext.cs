@@ -34,8 +34,8 @@ public class MongoDbContext
         }
     }
 
-    public IMongoCollection<Product> Products => _database.GetCollection<Product>(nameof(Product) + 's');
-    public IMongoCollection<User> Users => _database.GetCollection<User>(nameof(User) + 's');
-    public IMongoCollection<Review> Reviews => _database.GetCollection<Review>(nameof(Review) + 's');
-    public IMongoCollection<Order> Orders => _database.GetCollection<Order>(nameof(Order) + 's');
+    public IMongoCollection<Product> Products => _database.GetCollection<Product>("products");
+    public IMongoCollection<User> Users => _database.GetCollection<User>("users");
+    public IMongoCollection<Review> Reviews => _database.GetCollection<Review>("reviews");
+    public IMongoCollection<Order> Orders => _database.GetCollection<Order>("orders");
 }

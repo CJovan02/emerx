@@ -11,6 +11,7 @@
 //exception - constructor/create/mapping
 //automapper?
 
+using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using EMerx_backend.Repositories.OrderRepository;
 using EMerx_backend.Repositories.ProductRepository;
@@ -25,8 +26,6 @@ builder.Services.Configure<MongoDbSettings>(settings =>
             Environment.GetEnvironmentVariable("MONGO_EMERX_CONNECTION_STRING") ??
             throw new Exception("MONGO_EMERX_CONNECTION_STRING not found");
         settings.DatabaseName = "EMerx";
-        settings.TestConnectionWithPing = true;
-        //settings.TestConnectionWithPing = builder.Environment.IsDevelopment();
     }
 );
 
@@ -36,11 +35,11 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// Ping test to see if everything is connected
 var mongoContext = app.Services.GetRequiredService<MongoDbContext>();
 await mongoContext.PingAsync();
 
