@@ -6,5 +6,5 @@ namespace EMerx_backend.Entities;
 public abstract class BaseEntity
 {
     [BsonId]
-    public required ObjectId Id { get; init; }
+    public ObjectId Id { get; } = ObjectId.Empty;
 }

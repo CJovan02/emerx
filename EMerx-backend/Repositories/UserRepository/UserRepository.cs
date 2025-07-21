@@ -1,5 +1,5 @@
-using EMerx_backend.configuration;
 using EMerx_backend.Entities;
+using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -11,31 +11,31 @@ public class UserRepository(MongoDbContext context) : IUserRepository
 
     public async Task<IEnumerable<User>> GetUsers()
     {
-        throw new NotImplementedException();
+        return await _users.Find(u => true).ToListAsync();
     }
 
     public async Task<User> GetUserByEmail(string email)
     {
-        throw new NotImplementedException();
+        return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
     }
 
     public async Task<User> GetUserById(ObjectId id)
     {
-        throw new NotImplementedException();
+        return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
     }
 
     public async Task CreateUser(User user)
     {
-        throw new NotImplementedException();
+        await _users.InsertOneAsync(user);
     }
 
     public async Task UpdateUser(User user)
     {
-        throw new NotImplementedException();
+        await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
     }
 
     public async Task DeleteUser(ObjectId id)
     {
-        throw new NotImplementedException();
+        await  _users.DeleteOneAsync(u => u.Id == id);
     }
 }

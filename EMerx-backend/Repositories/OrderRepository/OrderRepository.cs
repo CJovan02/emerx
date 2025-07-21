@@ -1,5 +1,5 @@
-using EMerx_backend.configuration;
 using EMerx_backend.Entities;
+using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -11,36 +11,36 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
 
     public async Task<IEnumerable<Order>> GetOrders()
     {
-        throw new NotImplementedException();
+        return await _orders.Find(order => true).ToListAsync();
     }
 
     public async Task<IEnumerable<Order>> GetOrdersForProduct(ObjectId productId)
     {
-        throw new NotImplementedException();
+        return await _orders.Find(order => order.ProductId == productId).ToListAsync();
     }
 
     public async Task<IEnumerable<Order>> GetOrdersForUser(ObjectId userId)
     {
-        throw new NotImplementedException();
+        return await _orders.Find(order => order.UserId == userId).ToListAsync();
     }
 
     public async Task<Order> GetOrderById(ObjectId id)
     {
-        throw new NotImplementedException();
+        return await _orders.Find(o => o.Id == id).FirstOrDefaultAsync();
     }
 
     public async Task CreateOrder(Order order)
     {
-        throw new NotImplementedException();
+        await _orders.InsertOneAsync(order);
     }
 
     public async Task UpdateOrder(Order order)
     {
-        throw new NotImplementedException();
+        await _orders.ReplaceOneAsync(o => o.Id == order.Id, order);
     }
 
     public async Task DeleteOrder(Order order)
     {
-        throw new NotImplementedException();
+        await _orders.DeleteOneAsync(o => o.Id == order.Id);
     }
 }
