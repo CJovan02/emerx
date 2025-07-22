@@ -1,3 +1,4 @@
+using EMerx_backend.Dto.Product;
 using EMerx_backend.Entities;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -10,5 +11,6 @@ public interface IProductRepository
     Task<Product> GetProductById(ObjectId id);
     Task CreateProduct(Product product);
     Task UpdateProduct(Product product);
+    Task PatchProduct(PatchProductDto patchProductDto);
     Task DeleteProduct(ObjectId id);
 }

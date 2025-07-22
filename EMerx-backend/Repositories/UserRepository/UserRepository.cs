@@ -1,7 +1,9 @@
+using EMerx_backend.Dto.User;
 using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using ZstdSharp.Unsafe;
 
 namespace EMerx_backend.Repositories.UserRepository;
 
@@ -32,6 +34,25 @@ public class UserRepository(MongoDbContext context) : IUserRepository
     public async Task UpdateUser(User user)
     {
         await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
+    }
+
+    public async Task PatchUser(PatchUserDto patchUserDto)
+    {
+        var updates = new List<UpdateDefinition<User>>();
+
+        if (patchUserDto.Name != null)
+            updates.Add(Builders<User>.Update.Set(u => u.Name, patchUserDto.Name));
+        if (patchUserDto.Surname != null)
+            updates.Add(Builders<User>.Update.Set(u => u.Surname, patchUserDto.Surname));
+        if (patchUserDto.Address != null)
+            updates.Add(Builders<User>.Update.Set(u => u.Address, patchUserDto.Address));
+
+        if (updates.Count == 0)
+            return;
+
+        var updateDef = Builders<User>.Update.Combine(updates);
+
+        await _users.UpdateOneAsync(user => user.Id == patchUserDto.Id, updateDef);
     }
 
     public async Task DeleteUser(ObjectId id)

@@ -1,3 +1,4 @@
+using EMerx_backend.Dto.User;
 using EMerx_backend.Entities;
 using MongoDB.Bson;
 
@@ -9,6 +10,7 @@ public interface IUserRepository
     Task<User> GetUserByEmail(string email);
     Task<User> GetUserById(ObjectId id);
     Task CreateUser(User user);
+    Task PatchUser(PatchUserDto patchUserDto);
     Task UpdateUser(User user);
     Task DeleteUser(ObjectId id);
 }
