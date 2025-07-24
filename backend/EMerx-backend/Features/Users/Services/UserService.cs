@@ -13,9 +13,10 @@ public class UserService
     
     public UserService(IUserRepository userRepository) => _userRepository = userRepository;
 
-    public async Task<Result<IEnumerable<User>>> GetAllUsers()
+    public async Task<Result<IEnumerable<UserDto>>> GetUsers()
     {
-        return Result.Ok(await _userRepository.GetUsers());
+        return Result.Ok((await _userRepository.GetUsers())
+            .Adapt<IEnumerable<UserDto>>());
     }
 
     public async Task<Result<User>> GetUserById(ObjectId id)

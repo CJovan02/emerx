@@ -1,4 +1,6 @@
-﻿namespace EMerx_backend.Entities;
+﻿using EMerx_backend.Shared;
+
+namespace EMerx_backend.Features.Products;
 
 public class Product : BaseEntity
 {

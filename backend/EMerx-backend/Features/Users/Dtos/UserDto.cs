@@ -1,4 +1,4 @@
-﻿using EMerx_backend.Entities;
+﻿using EMerx_backend.Shared;
 using MongoDB.Bson;
 
 namespace EMerx_backend.Features.Users.Dtos;

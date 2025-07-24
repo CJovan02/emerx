@@ -1,4 +1,6 @@
-﻿using EMerx_backend.Entities;
+﻿using EMerx_backend.Features.Orders;
+using EMerx_backend.Features.Reviews;
+using EMerx_backend.Shared;
 
 namespace EMerx_backend.Features.Users;
 public class User : BaseEntity

@@ -1,9 +1,8 @@
-using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace EMerx_backend.Repositories.ProductRepository;
+namespace EMerx_backend.Features.Products.Repositories;
 
 public class ProductRepository(MongoDbContext context) : IProductRepository
 {
@@ -14,7 +13,7 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
         return await _products.Find(product => true).ToListAsync();
     }
 
-    public async Task<Product> GetProductById(ObjectId id)
+    public async Task<Product?> GetProductById(ObjectId id)
     {
         return await _products.Find(product => product.Id == id).FirstOrDefaultAsync();
     }

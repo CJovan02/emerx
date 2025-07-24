@@ -1,9 +1,8 @@
-using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace EMerx_backend.Repositories.OrderRepository;
+namespace EMerx_backend.Features.Orders.Repositories;
 
 public class OrderRepository(MongoDbContext context) : IOrderRepository
 {
@@ -24,7 +23,7 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
         return await _orders.Find(order => order.UserId == userId).ToListAsync();
     }
 
-    public async Task<Order> GetOrderById(ObjectId id)
+    public async Task<Order?> GetOrderById(ObjectId id)
     {
         return await _orders.Find(o => o.Id == id).FirstOrDefaultAsync();
     }

@@ -1,6 +1,7 @@
-﻿using MongoDB.Bson;
+﻿using EMerx_backend.Shared;
+using MongoDB.Bson;
 
-namespace EMerx_backend.Entities;
+namespace EMerx_backend.Features.Orders;
 
 public class Order : BaseEntity
 {
@@ -8,4 +9,5 @@ public class Order : BaseEntity
     public ObjectId ProductId { get; set; }
     public required Address Address { get; set; }
     public int Quantity  { get; set; }
+    public DateTime PlacedAt { get; init; } =  DateTime.Now;
 }

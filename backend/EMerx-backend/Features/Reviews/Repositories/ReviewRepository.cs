@@ -1,9 +1,8 @@
-using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace EMerx_backend.Repositories.ReviewRepository;
+namespace EMerx_backend.Features.Reviews.Repositories;
 
 public class ReviewRepository(MongoDbContext context) : IReviewRepository
 {

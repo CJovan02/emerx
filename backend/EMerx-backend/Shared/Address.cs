@@ -1,4 +1,4 @@
-﻿namespace EMerx_backend.Entities;
+﻿namespace EMerx_backend.Shared;
 
 public class Address
 {

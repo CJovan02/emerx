@@ -1,21 +1,8 @@
-//Product - id, price, name, category, image
-//Review - id, userid, productid, rating, ...
-//Order - id, quantity, productid, userid, address, ... 
-
-//result
-//error<list>
-//isokay
-//iserror
-//ierror
-//error - features/users/errors/
-//exception - constructor/create/mapping
-//automapper?
-
+using EMerx_backend.Features.Orders.Repositories;
+using EMerx_backend.Features.Products.Repositories;
+using EMerx_backend.Features.Reviews.Repositories;
+using EMerx_backend.Features.Users.Repositories;
 using EMerx_backend.Infrastructure.MongoDb;
-using EMerx_backend.Repositories.OrderRepository;
-using EMerx_backend.Repositories.ProductRepository;
-using EMerx_backend.Repositories.ReviewRepository;
-using EMerx_backend.Repositories.UserRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 

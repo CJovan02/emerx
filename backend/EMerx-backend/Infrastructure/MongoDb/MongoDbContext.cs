@@ -1,4 +1,6 @@
-using EMerx_backend.Entities;
+using EMerx_backend.Features.Orders;
+using EMerx_backend.Features.Products;
+using EMerx_backend.Features.Reviews;
 using EMerx_backend.Features.Users;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
