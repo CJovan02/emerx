@@ -1,9 +1,8 @@
-using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace EMerx_backend.Repositories.UserRepository;
+namespace EMerx_backend.Features.Users.Repositories;
 
 public class UserRepository(MongoDbContext context) : IUserRepository
 {
@@ -14,12 +13,12 @@ public class UserRepository(MongoDbContext context) : IUserRepository
         return await _users.Find(u => true).ToListAsync();
     }
 
-    public async Task<User> GetUserByEmail(string email)
+    public async Task<User?> GetUserByEmail(string email)
     {
         return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
     }
 
-    public async Task<User> GetUserById(ObjectId id)
+    public async Task<User?> GetUserById(ObjectId id)
     {
         return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
     }

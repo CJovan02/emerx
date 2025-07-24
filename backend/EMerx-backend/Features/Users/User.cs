@@ -1,5 +1,6 @@
-﻿namespace EMerx_backend.Entities;
+﻿using EMerx_backend.Entities;
 
+namespace EMerx_backend.Features.Users;
 public class User : BaseEntity
 {
     public required string Name { get; set; }

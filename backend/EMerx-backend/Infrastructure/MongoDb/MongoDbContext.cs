@@ -1,4 +1,5 @@
 using EMerx_backend.Entities;
+using EMerx_backend.Features.Users;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;

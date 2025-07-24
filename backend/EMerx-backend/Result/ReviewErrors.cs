@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 
-namespace EMerx_backend.Result;
 
 public static class ReviewErrors
 {

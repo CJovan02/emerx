@@ -11,7 +11,6 @@
 //exception - constructor/create/mapping
 //automapper?
 
-using EMerx_backend.Entities;
 using EMerx_backend.Infrastructure.MongoDb;
 using EMerx_backend.Repositories.OrderRepository;
 using EMerx_backend.Repositories.ProductRepository;
@@ -35,7 +34,9 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-builder.Services.AddOpenApi();
+builder.Services
+    .AddOpenApi()
+    .AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -43,12 +44,14 @@ var app = builder.Build();
 var mongoContext = app.Services.GetRequiredService<MongoDbContext>();
 await mongoContext.PingAsync();
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 
 app.Run();
