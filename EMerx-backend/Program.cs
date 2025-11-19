@@ -11,12 +11,10 @@
 //exception - constructor/create/mapping
 //automapper?
 
-using EMerx_backend.Entities;
+using EMerx_backend.Infrastructure;
 using EMerx_backend.Infrastructure.MongoDb;
-using EMerx_backend.Repositories.OrderRepository;
-using EMerx_backend.Repositories.ProductRepository;
-using EMerx_backend.Repositories.ReviewRepository;
-using EMerx_backend.Repositories.UserRepository;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,11 +28,13 @@ builder.Services.Configure<MongoDbSettings>(settings =>
 );
 
 builder.Services.AddSingleton<MongoDbContext>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("firebase.json")
+});
+
+builder.Services.AddRepository();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

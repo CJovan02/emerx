@@ -4,7 +4,9 @@
 ## Get latest from `dotnet new gitignore`
 
 # jetbrains ide
-.idea
+#.idea
+#.idea/
+.idea*
 
 # dotenv files
 .env
@@ -485,3 +487,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Auth api key
+/firebase.json
