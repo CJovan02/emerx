@@ -54,4 +54,13 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
 
         return Result.Success();
     }
+    
+    public async Task<Result<User>> GetUserById(ObjectId id)
+    {
+        var user = await userRepository.GetUserById(id);
+        if (user is null)
+            return Result<User>.Failure(UserErrors.NotFound(id));
+
+        return Result<User>.Success(user);
+    }
 }

@@ -7,6 +7,8 @@ namespace EMerx.Services.UserService;
 
 public interface IUserService
 {
+    Task<Result<User>> GetUserById(ObjectId id);
+    
     Task<Result<User>> RegisterAsync(RegisterUserDto registerUserDto);
 
     Task<Result> DeleteUserAsync(ObjectId userId);
