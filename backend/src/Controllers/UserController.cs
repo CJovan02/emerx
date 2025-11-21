@@ -10,7 +10,7 @@ namespace EMerx.Controllers;
 [Route("[controller]")]
 public class UserController(IUserService userService) : ControllerBase
 {
-    [HttpGet("get/{id}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetUser(string id)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -37,7 +37,7 @@ public class UserController(IUserService userService) : ControllerBase
         return result.ToActionResult();
     }
 
-    [HttpDelete("delete/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {
         if (!ObjectId.TryParse(id, out var objectId))
@@ -45,6 +45,6 @@ public class UserController(IUserService userService) : ControllerBase
 
         var result = await userService.DeleteUserAsync(objectId);
 
-        return  result.ToActionResult();
+        return result.ToActionResult();
     }
 }
