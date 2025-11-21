@@ -1,6 +1,6 @@
-﻿namespace EMerx.DTOs.Users;
+﻿namespace EMerx.DTOs.Users.Request;
 
-public sealed record RegisterUserDto(
+public sealed record RegisterUser(
     string Name,
     string Surname,
     string Email,

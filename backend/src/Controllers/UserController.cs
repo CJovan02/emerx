@@ -1,4 +1,4 @@
-using EMerx.DTOs.Users;
+using EMerx.DTOs.Users.Request;
 using EMerx.ResultPattern;
 using EMerx.Services.UserService;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +30,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
+    public async Task<IActionResult> Register([FromBody] RegisterUser dto)
     {
         var result = await userService.RegisterAsync(dto);
 

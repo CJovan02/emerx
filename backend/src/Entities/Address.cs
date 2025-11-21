@@ -1,5 +1,6 @@
 ﻿namespace EMerx.Entities;
 
+// Change to record
 public class Address
 {
     public required string City { get; set; }

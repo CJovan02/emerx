@@ -1,4 +1,4 @@
-using EMerx.DTOs.Users;
+using EMerx.DTOs.Users.Request;
 using EMerx.Entities;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.UserRepository;
@@ -28,17 +28,17 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<User>.Success(user);
     }
 
-    public async Task<Result<User>> RegisterAsync(RegisterUserDto registerUserDto)
+    public async Task<Result<User>> RegisterAsync(RegisterUser registerUser)
     {
         // calls the auth repository to try and create firebase auth account
-        var uid = await authRepository.RegisterAsync(registerUserDto.Email, registerUserDto.Password);
+        var uid = await authRepository.RegisterAsync(registerUser.Email, registerUser.Password);
 
         // if it's successful, we also create the dabatase entry
         var user = new User
         {
-            Email = registerUserDto.Email,
-            Name = registerUserDto.Name,
-            Surname = registerUserDto.Surname,
+            Email = registerUser.Email,
+            Name = registerUser.Name,
+            Surname = registerUser.Surname,
             FirebaseUid = uid,
         };
 

@@ -1,4 +1,5 @@
 using EMerx.DTOs.Users;
+using EMerx.DTOs.Users.Request;
 using EMerx.Entities;
 using EMerx.ResultPattern;
 using MongoDB.Bson;
@@ -11,7 +12,7 @@ public interface IUserService
     
     Task<Result<User>> GetUserByFirebaseUid(string firebaseUid);
     
-    Task<Result<User>> RegisterAsync(RegisterUserDto registerUserDto);
+    Task<Result<User>> RegisterAsync(RegisterUser registerUser);
 
     Task<Result> DeleteUserAsync(ObjectId userId);
 }

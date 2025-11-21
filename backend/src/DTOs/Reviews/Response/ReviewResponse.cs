@@ -1,8 +1,8 @@
 ﻿using MongoDB.Bson;
 
-namespace EMerx.DTOs.Reviews;
+namespace EMerx.DTOs.Reviews.Response;
 
-public sealed record ReviewRequestDto(
+public sealed record ReviewResponse(
     ObjectId Id,
     ObjectId UserId,
     ObjectId ProductId,
