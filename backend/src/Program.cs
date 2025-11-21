@@ -13,6 +13,7 @@
 
 using EMerx.Infrastructure;
 using EMerx.Infrastructure.MongoDb;
+using EMerx.Services.UserService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 
@@ -36,6 +37,9 @@ FirebaseApp.Create(new AppOptions
 });
 
 builder.Services.AddRepository();
+builder.Services.AddServices();
+
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -48,6 +52,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(); 
+    app.MapControllers();
     app.MapOpenApi();
 }
 

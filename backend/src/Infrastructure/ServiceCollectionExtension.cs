@@ -3,6 +3,7 @@ using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.ReviewRepository;
 using EMerx.Repositories.UserRepository;
+using EMerx.Services.UserService;
 
 namespace EMerx.Infrastructure;
 
@@ -16,5 +17,11 @@ public static class ServiceCollectionExtension
             .AddScoped<IReviewRepository, ReviewRepository>()
             .AddScoped<IOrderRepository, OrderRepository>()
             .AddScoped<IAuthRepository, AuthRepository>();
+    }
+
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        return services
+            .AddScoped<IUserService, UserService>();
     }
 }

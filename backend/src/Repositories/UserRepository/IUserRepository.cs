@@ -9,6 +9,8 @@ public interface IUserRepository
     
     Task<User?> GetUserByEmail(string email);
     
+    Task<User?> GetUserByFirebaseUid(string firebaseUid);
+    
     Task<User?> GetUserById(ObjectId id);
     
     Task CreateUser(User user);

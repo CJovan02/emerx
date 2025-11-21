@@ -19,6 +19,11 @@ public class UserRepository(MongoDbContext context) : IUserRepository
         return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
     }
 
+    public async Task<User?> GetUserByFirebaseUid(string firebaseUid)
+    {
+        return await _users.Find(u => u.FirebaseUid == firebaseUid).FirstOrDefaultAsync();
+    }
+
     public async Task<User?> GetUserById(ObjectId id)
     {
         return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
