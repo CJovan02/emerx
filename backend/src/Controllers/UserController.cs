@@ -21,6 +21,14 @@ public class UserController(IUserService userService) : ControllerBase
         return result.ToActionResult();
     }
 
+    [HttpGet("getByFirebaseUid/{firebaseUid}")]
+    public async Task<IActionResult> GetUserByFirebaseUid(string firebaseUid)
+    {
+        var result = await userService.GetUserByFirebaseUid(firebaseUid);
+
+        return result.ToActionResult();
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
     {

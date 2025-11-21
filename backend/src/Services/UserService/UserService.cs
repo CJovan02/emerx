@@ -10,6 +10,24 @@ namespace EMerx.Services.UserService;
 
 public class UserService(IUserRepository userRepository, IAuthRepository authRepository) : IUserService
 {
+    public async Task<Result<User>> GetUserById(ObjectId id)
+    {
+        var user = await userRepository.GetUserById(id);
+        if (user is null)
+            return Result<User>.Failure(UserErrors.NotFound(id));
+
+        return Result<User>.Success(user);
+    }
+    
+    public async Task<Result<User>> GetUserByFirebaseUid(string firebaseUid)
+    {
+        var user = await userRepository.GetUserByFirebaseUid(firebaseUid);
+        if (user is null)
+            return Result<User>.Failure(UserErrors.NotFound(firebaseUid));
+
+        return Result<User>.Success(user);
+    }
+
     public async Task<Result<User>> RegisterAsync(RegisterUserDto registerUserDto)
     {
         // calls the auth repository to try and create firebase auth account
@@ -53,14 +71,5 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         await userRepository.DeleteUser(userId);
 
         return Result.Success();
-    }
-    
-    public async Task<Result<User>> GetUserById(ObjectId id)
-    {
-        var user = await userRepository.GetUserById(id);
-        if (user is null)
-            return Result<User>.Failure(UserErrors.NotFound(id));
-
-        return Result<User>.Success(user);
     }
 }
