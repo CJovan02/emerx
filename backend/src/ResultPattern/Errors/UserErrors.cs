@@ -1,7 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace EMerx.Result;
-
+namespace EMerx.ResultPattern.Errors;
 public static class UserErrors
 {
     public static Error NotFound(ObjectId id) => new(StatusCodes.NotFound, $"User with id {id} not found.");

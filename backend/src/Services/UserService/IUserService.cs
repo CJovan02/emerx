@@ -1,0 +1,13 @@
+using EMerx.DTOs.Users;
+using EMerx.Entities;
+using EMerx.ResultPattern;
+using MongoDB.Bson;
+
+namespace EMerx.Services.UserService;
+
+public interface IUserService
+{
+    Task<Result<User>> RegisterAsync(RegisterUserDto registerUserDto);
+
+    Task<Result> DeleteUserAsync(ObjectId userId);
+}

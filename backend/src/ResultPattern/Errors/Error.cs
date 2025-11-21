@@ -1,4 +1,4 @@
-﻿namespace EMerx.Result;
+﻿namespace EMerx.ResultPattern.Errors;
 
 public record Error(int Code, string Description)
 {

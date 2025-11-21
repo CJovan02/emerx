@@ -17,4 +17,9 @@ public class AuthRepository : IAuthRepository
         var userRecord = await _firebaseAuth.CreateUserAsync(userArgs);
         return userRecord.Uid;
     }
+
+    public async Task DeleteUserAsync(string uid)
+    {
+        await _firebaseAuth.DeleteUserAsync(uid);
+    }
 }
