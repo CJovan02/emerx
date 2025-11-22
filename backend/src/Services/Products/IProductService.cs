@@ -7,11 +7,11 @@ namespace EMerx.Services.Products;
 
 public interface IProductService
 {
-    Task<Result<IEnumerable<ProductResponse>>> GetAllProductsAsync();
+    Task<Result<IEnumerable<ProductResponse>>> GetAllAsync();
 
-    Task<Result<ProductResponse>> GetProductByIdAsync(IdRequest request);
+    Task<Result<ProductResponse>> GetByIdAsync(IdRequest request);
 
-    Task<Result<ProductResponse>> CreateProductAsync(ProductRequest request);
+    Task<Result<ProductResponse>> CreateAsync(ProductRequest request);
 
-    Task<Result> DeleteProductAsync(IdRequest request);
+    Task<Result> DeleteAsync(IdRequest request);
 }

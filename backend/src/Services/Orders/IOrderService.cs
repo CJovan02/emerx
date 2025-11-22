@@ -8,11 +8,11 @@ namespace EMerx.Services.Orders;
 public interface IOrderService
 {
     //Order Response Currently only gets id that can be changed
-    Task<Result<IEnumerable<OrderResponse>>> GetAllOrdersAsync();
+    Task<Result<IEnumerable<OrderResponse>>> GetAllAsync();
 
-    Task<Result<OrderResponse>> GetOrderAsync(IdRequest request);
+    Task<Result<OrderResponse>> GetByIdAsync(IdRequest request);
 
-    Task<Result<OrderResponse>> CreateOrderAsync(OrderRequest request);
+    Task<Result<OrderResponse>> CreateAsync(OrderRequest request);
 
-    Task<Result> DeleteOrderAsync(IdRequest request);
+    Task<Result> DeleteAsync(IdRequest request);
 }

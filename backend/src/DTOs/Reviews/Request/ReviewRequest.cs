@@ -3,8 +3,7 @@
 namespace EMerx.DTOs.Reviews.Request;
 
 public sealed record ReviewRequest(
-    ObjectId Id,
-    ObjectId UserId,
-    ObjectId ProductId,
+    string UserId,
+    string ProductId,
     double Rating,
     string Description);

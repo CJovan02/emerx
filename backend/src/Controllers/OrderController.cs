@@ -13,9 +13,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
-    public async Task<IActionResult> GetOrders()
+    public async Task<IActionResult> GetAll()
     {
-        return (await orderService.GetAllOrdersAsync()).ToActionResult();
+        return (await orderService.GetAllAsync()).ToActionResult();
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -23,9 +23,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetOrderById([FromRoute] IdRequest request)
+    public async Task<IActionResult> GetById([FromRoute] IdRequest request)
     {
-        return(await orderService.GetOrderAsync(request)).ToActionResult();
+        return(await orderService.GetByIdAsync(request)).ToActionResult();
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -33,9 +33,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
-    public async Task<IActionResult> CreateOrder([FromBody] OrderRequest request)
+    public async Task<IActionResult> Create([FromBody] OrderRequest request)
     {
-        return (await orderService.CreateOrderAsync(request)).ToActionResult();
+        return (await orderService.CreateAsync(request)).ToActionResult();
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -43,8 +43,8 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOrder([FromRoute] IdRequest request)
+    public async Task<IActionResult> Delete([FromRoute] IdRequest request)
     {
-        return (await orderService.DeleteOrderAsync(request)).ToActionResult();
+        return (await orderService.DeleteAsync(request)).ToActionResult();
     }
 }

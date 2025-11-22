@@ -16,14 +16,14 @@ public class OrderService(
     IUserRepository userRepository,
     IProductRepository productRepository) : IOrderService
 {
-    public async Task<Result<IEnumerable<OrderResponse>>> GetAllOrdersAsync()
+    public async Task<Result<IEnumerable<OrderResponse>>> GetAllAsync()
     {
         return (await orderRepository.GetOrders())
             .Select(order => order.ToResponse())
             .ToList();
     }
 
-    public async Task<Result<OrderResponse>> GetOrderAsync(IdRequest request)
+    public async Task<Result<OrderResponse>> GetByIdAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
         var order = await orderRepository.GetOrderById(objectId);
@@ -36,7 +36,7 @@ public class OrderService(
         return Result<OrderResponse>.Success(order.ToResponse());
     }
 
-    public async Task<Result<OrderResponse>> CreateOrderAsync(OrderRequest request)
+    public async Task<Result<OrderResponse>> CreateAsync(OrderRequest request)
     {
         var userId = ObjectId.Parse(request.UserId);
         var user = await userRepository.GetUserById(userId);
@@ -57,7 +57,7 @@ public class OrderService(
         return Result<OrderResponse>.Success(order.ToResponse());
     }
 
-    public async Task<Result> DeleteOrderAsync(IdRequest request)
+    public async Task<Result> DeleteAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
         var order = await orderRepository.GetOrderById(objectId);

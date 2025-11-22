@@ -11,7 +11,7 @@ namespace EMerx.Services.Products;
 
 public class ProductService(IProductRepository productRepository) : IProductService
 {
-    public async Task<Result<IEnumerable<ProductResponse>>> GetAllProductsAsync()
+    public async Task<Result<IEnumerable<ProductResponse>>> GetAllAsync()
     {
         var products = await productRepository.GetProducts();
         var productsList = products
@@ -21,7 +21,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return Result<IEnumerable<ProductResponse>>.Success(productsList);
     }
 
-    public async Task<Result<ProductResponse>> GetProductByIdAsync(IdRequest request)
+    public async Task<Result<ProductResponse>> GetByIdAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
         var product = await productRepository.GetProductById(objectId);
@@ -32,14 +32,14 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return Result<ProductResponse>.Success(product.ToResponse());
     }
 
-    public async Task<Result<ProductResponse>> CreateProductAsync(ProductRequest request)
+    public async Task<Result<ProductResponse>> CreateAsync(ProductRequest request)
     {
         var product = request.ToDomain();
         await productRepository.CreateProduct(product);
         return Result<ProductResponse>.Success(product.ToResponse());
     }
 
-    public async Task<Result> DeleteProductAsync(IdRequest request)
+    public async Task<Result> DeleteAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
         await productRepository.DeleteProduct(objectId);

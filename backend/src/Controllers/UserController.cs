@@ -1,6 +1,7 @@
+using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.ResultPattern;
-using EMerx.Services.UserService;
+using EMerx.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
@@ -11,20 +12,17 @@ namespace EMerx.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetUser(string id)
+    public async Task<IActionResult> GetById(IdRequest request)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest(new { error = "Invalid Id" });
-
-        var result = await userService.GetUserById(objectId);
-
-        return result.ToActionResult();
+        return  (await userService.GetById(request)).ToActionResult();
     }
 
+    //And think about should we convert to ObjectId here or in service
+    //Do validation for this
     [HttpGet("getByFirebaseUid/{firebaseUid}")]
-    public async Task<IActionResult> GetUserByFirebaseUid(string firebaseUid)
+    public async Task<IActionResult> GetByFirebaseUid(string firebaseUid)
     {
-        var result = await userService.GetUserByFirebaseUid(firebaseUid);
+        var result = await userService.GetByFirebaseUid(firebaseUid);
 
         return result.ToActionResult();
     }
@@ -38,12 +36,9 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUser(string id)
+    public async Task<IActionResult> Delete([FromRoute] IdRequest request)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest(new { error = "Invalid Id" });
-
-        var result = await userService.DeleteUserAsync(objectId);
+        var result = await userService.DeleteAsync(request);
 
         return result.ToActionResult();
     }
