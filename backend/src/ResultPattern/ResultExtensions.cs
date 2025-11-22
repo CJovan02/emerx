@@ -7,8 +7,10 @@ public static class ResultExtensions
     public static IActionResult ToActionResult<T>(this Result<T> result)
     {
         if (result.IsSuccess)
+        {
             return new OkObjectResult(result.Value);
-
+        }
+        
         return result.Error.Code switch
         {
             404 => new NotFoundObjectResult(result.Error.Description),
@@ -20,7 +22,7 @@ public static class ResultExtensions
             _ => new BadRequestObjectResult(result.Error)
         };
     }
-    
+
     public static IActionResult ToActionResult(this Result result)
     {
         if (result.IsSuccess)
@@ -34,7 +36,7 @@ public static class ResultExtensions
             403 => new ForbidResult(),
             409 => new ConflictObjectResult(result.Error.Description),
 
-            _   => new BadRequestObjectResult(result.Error)
+            _ => new BadRequestObjectResult(result.Error)
         };
     }
 }

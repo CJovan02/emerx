@@ -1,8 +1,8 @@
 ﻿using MongoDB.Bson;
 
-namespace EMerx.DTOs.Products;
+namespace EMerx.DTOs.Products.Response;
 
-public sealed record ProductResponseDto(
+public sealed record ProductResponse(
     ObjectId Id,
     string Name,
     string Category,

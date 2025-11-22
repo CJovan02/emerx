@@ -41,6 +41,6 @@ public class UserRepository(MongoDbContext context) : IUserRepository
 
     public async Task DeleteUser(ObjectId id)
     {
-        await  _users.DeleteOneAsync(u => u.Id == id);
+        await _users.DeleteOneAsync(u => u.Id == id);
     }
 }

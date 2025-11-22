@@ -1,4 +1,5 @@
-using EMerx.DTOs.Users;
+using EMerx.DTOs.Id;
+using EMerx.DTOs.Users.Request;
 using EMerx.Entities;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.UserRepository;
@@ -6,20 +7,21 @@ using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
 using MongoDB.Bson;
 
-namespace EMerx.Services.UserService;
+namespace EMerx.Services.Users;
 
 public class UserService(IUserRepository userRepository, IAuthRepository authRepository) : IUserService
 {
-    public async Task<Result<User>> GetUserById(ObjectId id)
+    public async Task<Result<User>> GetById(IdRequest request)
     {
-        var user = await userRepository.GetUserById(id);
+        var objectId = ObjectId.Parse(request.Id);
+        var user = await userRepository.GetUserById(objectId);
         if (user is null)
-            return Result<User>.Failure(UserErrors.NotFound(id));
+            return Result<User>.Failure(UserErrors.NotFound(objectId));
 
         return Result<User>.Success(user);
     }
 
-    public async Task<Result<User>> GetUserByFirebaseUid(string firebaseUid)
+    public async Task<Result<User>> GetByFirebaseUid(string firebaseUid)
     {
         var user = await userRepository.GetUserByFirebaseUid(firebaseUid);
         if (user is null)
@@ -28,17 +30,17 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<User>.Success(user);
     }
 
-    public async Task<Result<User>> RegisterAsync(RegisterUserDto registerUserDto)
+    public async Task<Result<User>> RegisterAsync(RegisterUser registerUser)
     {
         // calls the auth repository to try and create firebase auth account
-        var uid = await authRepository.RegisterAsync(registerUserDto.Email, registerUserDto.Password);
+        var uid = await authRepository.RegisterAsync(registerUser.Email, registerUser.Password);
 
         // if it's successful, we also create the dabatase entry
         var user = new User
         {
-            Email = registerUserDto.Email,
-            Name = registerUserDto.Name,
-            Surname = registerUserDto.Surname,
+            Email = registerUser.Email,
+            Name = registerUser.Name,
+            Surname = registerUser.Surname,
             FirebaseUid = uid,
         };
 
@@ -48,7 +50,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
 
             return Result<User>.Success(user);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await authRepository.DeleteUserAsync(user.FirebaseUid);
             return Result<User>.Failure(GeneralErrors.DatabaseError());
@@ -62,21 +64,22 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
     /// It could be faster if we had the same id for the firebase auth user and databse user id, but delete user is not
     /// a common operation, and it's usually slow because it also deletes all data connected to that user
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
-    public async Task<Result> DeleteUserAsync(ObjectId userId)
+    public async Task<Result> DeleteAsync(IdRequest request)
     {
         // We find the user with the specified id
-        var dbUser = await userRepository.GetUserById(userId);
+        var objectId = ObjectId.Parse(request.Id);
+        var dbUser = await userRepository.GetUserById(objectId);
 
         if (dbUser is null)
-            return Result.Failure(UserErrors.NotFound(userId));
+            return Result.Failure(UserErrors.NotFound(objectId));
 
         // We delete the user with extracted firebaseId
         await authRepository.DeleteUserAsync(dbUser.FirebaseUid);
 
         // Then we delete user and user data
-        await userRepository.DeleteUser(userId);
+        await userRepository.DeleteUser(objectId);
 
         return Result.Success();
     }

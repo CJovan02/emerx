@@ -5,7 +5,7 @@ namespace EMerx.Repositories.AuthRepository;
 public class AuthRepository : IAuthRepository
 {
     private readonly FirebaseAuth _firebaseAuth = FirebaseAuth.DefaultInstance;
-    
+
     public async Task<string> RegisterAsync(string email, string password)
     {
         var userArgs = new UserRecordArgs

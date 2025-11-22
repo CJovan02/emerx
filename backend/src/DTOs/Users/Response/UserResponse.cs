@@ -1,9 +1,9 @@
 ﻿using EMerx.Entities;
 using MongoDB.Bson;
 
-namespace EMerx.DTOs.Users;
+namespace EMerx.DTOs.Users.Response;
 
-public sealed record UserResponseDto(
+public sealed record UserResponse(
     ObjectId Id,
     string Name,
     string Surname,
