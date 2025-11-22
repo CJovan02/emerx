@@ -1,46 +1,30 @@
-//Product - id, price, name, category, image
-//Review - id, userid, productid, rating, ...
-//Order - id, quantity, productid, userid, address, ... 
-
-//result
-//error<list>
-//isokay
-//iserror
-//ierror
-//error - features/users/errors/
-//exception - constructor/create/mapping
-//automapper?
-
+using EMerx.DTOs.Users.Request;
 using EMerx.Infrastructure;
 using EMerx.Infrastructure.MongoDb;
-using EMerx.Services.UserService;
 using FirebaseAdmin;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<MongoDbSettings>(settings =>
-    {
-        settings.ConnectionString =
-            Environment.GetEnvironmentVariable("MONGO_EMERX_CONNECTION_STRING") ??
-            throw new Exception("MONGO_EMERX_CONNECTION_STRING not found");
-        settings.DatabaseName = "EMerx";
-    }
-);
-
+builder.Services.AddDatabase();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<MongoDbContext>();
 
 FirebaseApp.Create(new AppOptions
 {
     Credential = GoogleCredential.FromFile("firebase.json")
 });
 
-builder.Services.AddRepository();
-builder.Services.AddServices();
+builder.Services
+    .AddRepository()
+    .AddServices();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 

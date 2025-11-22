@@ -48,7 +48,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
 
             return Result<User>.Success(user);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await authRepository.DeleteUserAsync(user.FirebaseUid);
             return Result<User>.Failure(GeneralErrors.DatabaseError());

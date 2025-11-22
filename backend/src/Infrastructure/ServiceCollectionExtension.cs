@@ -1,3 +1,6 @@
+using EMerx.Common;
+using EMerx.Common.Exceptions;
+using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
@@ -23,5 +26,18 @@ public static class ServiceCollectionExtension
     {
         return services
             .AddScoped<IUserService, UserService>();
+    }
+
+    public static IServiceCollection AddDatabase(this IServiceCollection services)
+    {
+        services.Configure<MongoDbSettings>(settings =>
+        {
+            settings.ConnectionString = Environment.GetEnvironmentVariable(Constants.EnvVariables.Database) ??
+                                        throw new EnvVariableNotFoundException(Constants.EnvVariables.Database);
+        });
+        
+        services.AddSingleton<MongoDbContext>();
+
+        return services;
     }
 }
