@@ -29,6 +29,16 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
         await _products.ReplaceOneAsync(p => p.Id == product.Id, product);
     }
 
+    public async Task UpdateProductReviewAsync(ObjectId productId, double averageRating, int reviewsCount)
+    {
+        var filter = Builders<Product>.Filter.Eq(p => p.Id, productId);
+        var update = Builders<Product>.Update
+            .Set(p => p.AverageRating, averageRating)
+            .Set(p => p.ReviewsCount, reviewsCount);
+        
+        await _products.UpdateOneAsync(filter, update);
+    }
+
     public async Task DeleteProduct(ObjectId id)
     {
         await _products.DeleteOneAsync(product => product.Id == id);

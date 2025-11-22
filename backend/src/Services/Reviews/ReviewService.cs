@@ -25,11 +25,12 @@ public class ReviewService(
     {
         var objectId = new ObjectId(request.Id);
         var review = await reviewRepository.GetReviewById(objectId);
-        
+
         if (review is null)
         {
             return Result<ReviewResponse>.Failure(ReviewErrors.NotFound(objectId));
         }
+
         return Result<ReviewResponse>.Success(review.ToResponse());
     }
 
@@ -37,12 +38,11 @@ public class ReviewService(
     {
         var userId = new ObjectId(request.UserId);
         var user = await userRepository.GetUserById(userId);
-
         if (user is null)
         {
             return Result<ReviewResponse>.Failure(UserErrors.NotFound(userId));
         }
-        
+
         var productId = new ObjectId(request.ProductId);
         var product = await productRepository.GetProductById(productId);
         if (product is null)
@@ -51,6 +51,12 @@ public class ReviewService(
         }
 
         var review = request.ToDomain();
+
+        // We also calculate the avg rating and increase the review count of the product
+        var newReviewsCount = product.ReviewsCount + 1;
+        var newAvgRating = (product.AverageRating * product.ReviewsCount + review.Rating) / newReviewsCount;
+        await productRepository.UpdateProductReviewAsync(productId, newAvgRating, newReviewsCount);
+
         await reviewRepository.CreateReview(review);
         return Result<ReviewResponse>.Success(review.ToResponse());
     }

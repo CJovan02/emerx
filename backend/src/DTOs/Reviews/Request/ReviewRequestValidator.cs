@@ -14,9 +14,9 @@ public class ReviewRequestValidator : AbstractValidator<ReviewRequest>
         RuleFor(x => x.ProductId)
             .Must(id => ObjectId.TryParse(id, out _))
             .WithMessage("Product ID must be a valid ObjectId");
-        
+
         RuleFor(x => x.Rating)
-            .GreaterThan(0)
-            .WithMessage("Rating must be greater than 0");
+            .InclusiveBetween(1.0, 5.0)
+            .WithMessage("Rating must be between 1 and 5");
     }
 }
