@@ -37,7 +37,7 @@ public static class ServiceCollectionExtension
             settings.ConnectionString = Environment.GetEnvironmentVariable(Constants.EnvVariables.Database) ??
                                         throw new EnvVariableNotFoundException(Constants.EnvVariables.Database);
         });
-        
+
         services.AddSingleton<MongoDbContext>();
 
         return services;

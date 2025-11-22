@@ -24,9 +24,9 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType((StatusCodes.Status404NotFound))]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(string id)
+    public async Task<IActionResult> GetProductById([FromRoute] IdRequest request)
     {
-        return (await productService.GetProductByIdAsync(new IdRequest(id))) .ToActionResult();
+        return (await productService.GetProductByIdAsync(request)).ToActionResult();
     }
 
     [ProducesResponseType((StatusCodes.Status201Created))]
@@ -35,7 +35,7 @@ public class ProductController(IProductService productService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] ProductRequest request)
     {
-        return (await  productService.CreateProductAsync(request)).ToActionResult();
+        return (await productService.CreateProductAsync(request)).ToActionResult();
     }
 
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -43,8 +43,8 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(string id)
+    public async Task<IActionResult> DeleteProduct([FromRoute] IdRequest request)
     {
-        return (await productService.DeleteProductAsync(new IdRequest(id))).ToActionResult();
+        return (await productService.DeleteProductAsync(request)).ToActionResult();
     }
 }

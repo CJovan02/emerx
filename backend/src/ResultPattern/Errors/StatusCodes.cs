@@ -1,4 +1,5 @@
 ﻿namespace EMerx.ResultPattern.Errors;
+
 public static class StatusCodes
 {
     public static int Ok = 200;

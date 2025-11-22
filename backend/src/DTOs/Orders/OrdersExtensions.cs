@@ -16,4 +16,17 @@ public static class OrdersExtensions
             order.Address,
             order.Quantity);
     }
+
+    public static Order ToDomain(this OrderRequest order)
+    {
+        return new Order
+        {
+            Id = ObjectId.GenerateNewId(),
+            Address = order.Address,
+            Quantity = order.Quantity,
+            PlacedAt = DateTime.UtcNow,
+            ProductId = ObjectId.Parse(order.ProductId),
+            UserId = ObjectId.Parse(order.UserId)
+        };
+    }
 }

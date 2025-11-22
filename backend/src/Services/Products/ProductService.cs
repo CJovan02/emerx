@@ -17,7 +17,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         var productsList = products
             .Select(product => product.ToResponse())
             .ToList();
-        
+
         return Result<IEnumerable<ProductResponse>>.Success(productsList);
     }
 
@@ -27,8 +27,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         var product = await productRepository.GetProductById(objectId);
         if (product is null)
         {
-            return Result<ProductResponse>.Failure(
-                ProductErrors.NotFound(objectId));
+            return Result<ProductResponse>.Failure(ProductErrors.NotFound(objectId));
         }
         return Result<ProductResponse>.Success(product.ToResponse());
     }
@@ -43,7 +42,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
     public async Task<Result> DeleteProductAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
-        await  productRepository.DeleteProduct(objectId);
+        await productRepository.DeleteProduct(objectId);
         return Result.Success();
     }
 }
