@@ -4,13 +4,19 @@ namespace EMerx.Entities;
 
 public class Order : BaseEntity
 {
-    public ObjectId UserId { get; set; }
+    // TODO Discuss order in more detail.
+    // - User should be able to order multiple products, not just one
+    // - How to store ordered products?
+    //  - Suggestion: items: [ { ProductId: xxxx, PriceAtOrder: xxxx, Quantity: xxxx}, ... ]
+    //  - We don't store entire product object inside items array, only some basic info so we don't have to query
+    //    all of the items. If the item gets deleted, we still have the last snapshot of it during the order time
+    public ObjectId UserId { get; init; }
 
-    public ObjectId ProductId { get; set; }
+    public ObjectId ProductId { get; init; }
 
-    public required Address Address { get; set; }
+    public required Address Address { get; init; }
 
-    public int Quantity { get; set; }
+    public int Quantity { get; init; }
 
-    public DateTime PlacedAt { get; set; } = DateTime.UtcNow;
+    public DateTime PlacedAt { get; init; } = DateTime.UtcNow;
 }
