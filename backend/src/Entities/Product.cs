@@ -11,6 +11,10 @@ public class Product : BaseEntity
     public string? Image { get; init; }
     public double Price { get; init; }
 
+    /// <summary>
+    /// Used for calculating AverageRating
+    /// </summary>
+    public double SumRatings { get; init; } = 0;
     public int ReviewsCount { get; init; } = 0;
 
     public double AverageRating { get; init; } = 0;

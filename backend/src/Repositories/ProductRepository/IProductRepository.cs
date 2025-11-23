@@ -1,5 +1,4 @@
 using EMerx.Entities;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
 namespace EMerx.Repositories.ProductRepository;
@@ -10,6 +9,6 @@ public interface IProductRepository
     Task<Product?> GetProductById(ObjectId id);
     Task CreateProduct(Product product);
     Task UpdateProduct(Product product);
-    Task UpdateProductReviewAsync(ObjectId productId, double averageRating, int reviewsCount);
+    Task UpdateProductReviewAsync(ObjectId productId, double averageRating, double sumRatings, int reviewsCount);
     Task DeleteProduct(ObjectId id);
 }

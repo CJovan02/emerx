@@ -19,9 +19,16 @@ public class ReviewRepository(MongoDbContext context) : IReviewRepository
         return await _reviews.Find(r => r.ProductId == productId).ToListAsync();
     }
 
+    public async Task<bool> UserPostedReviewForProduct(ObjectId userId, ObjectId productId)
+    {
+        return await _reviews
+            .Find(r => r.UserId == userId && r.ProductId == productId)
+            .AnyAsync();
+    }
+
     public async Task<Review?> GetReviewById(ObjectId id)
     {
-        return await _reviews.Find(r => r.ProductId == id).FirstOrDefaultAsync();
+        return await _reviews.Find(r => r.Id == id).FirstOrDefaultAsync();
     }
 
     public async Task CreateReview(Review review)
@@ -31,11 +38,11 @@ public class ReviewRepository(MongoDbContext context) : IReviewRepository
 
     public async Task UpdateReview(Review review)
     {
-        await _reviews.ReplaceOneAsync(r => r.ProductId == review.ProductId, review);
+        await _reviews.ReplaceOneAsync(r => r.Id == review.Id, review);
     }
 
     public async Task DeleteReview(ObjectId id)
     {
-        await _reviews.DeleteOneAsync(r => r.ProductId == id);
+        await _reviews.DeleteOneAsync(r => r.Id == id);
     }
 }

@@ -24,6 +24,13 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
         return await _orders.Find(order => order.UserId == userId).ToListAsync();
     }
 
+    public async Task<bool> HasUserOrderedProduct(ObjectId userId, ObjectId productId)
+    {
+        return await _orders
+            .Find(o => o.ProductId == productId && o.UserId == userId)
+            .AnyAsync();
+    }
+
     public async Task<Order?> GetOrderById(ObjectId id)
     {
         return await _orders.Find(o => o.Id == id).FirstOrDefaultAsync();

@@ -7,6 +7,7 @@ public interface IReviewRepository
 {
     Task<IEnumerable<Review>> GetReviews();
     Task<IEnumerable<Review>> GetReviewsForProduct(ObjectId productId);
+    Task<bool> UserPostedReviewForProduct(ObjectId userId, ObjectId productId);
     Task<Review?> GetReviewById(ObjectId id);
     Task CreateReview(Review review);
     Task UpdateReview(Review review);
