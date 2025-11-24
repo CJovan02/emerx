@@ -14,8 +14,13 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
         return await _products.Find(product => true).ToListAsync();
     }
 
-    public async Task<Product?> GetProductById(ObjectId id)
+    public async Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null)
     {
+        if (session is not null)
+        {
+            return await _products.Find(session, product => product.Id == id).FirstOrDefaultAsync();
+        }
+
         return await _products.Find(product => product.Id == id).FirstOrDefaultAsync();
     }
 
@@ -30,7 +35,7 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
     }
 
     public async Task UpdateProductReviewAsync(ObjectId productId, double averageRating, double sumRatings,
-        int reviewsCount)
+        int reviewsCount, IClientSessionHandle? session = null)
     {
         var filter = Builders<Product>.Filter.Eq(p => p.Id, productId);
         var update = Builders<Product>.Update
@@ -38,6 +43,12 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
             .Set(p => p.SumRatings, sumRatings)
             .Set(p => p.ReviewsCount, reviewsCount);
 
+        if (session is not null)
+        {
+            await _products.UpdateOneAsync(session, filter, update);
+            return;
+        }
+        
         await _products.UpdateOneAsync(filter, update);
     }
 

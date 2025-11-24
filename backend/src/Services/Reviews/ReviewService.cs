@@ -3,6 +3,7 @@ using EMerx.DTOs.Reviews;
 using EMerx.DTOs.Reviews.Request;
 using EMerx.DTOs.Reviews.Response;
 using EMerx.Entities;
+using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.ReviewRepository;
@@ -10,6 +11,7 @@ using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace EMerx.Services.Reviews;
 
@@ -17,7 +19,8 @@ public class ReviewService(
     IReviewRepository reviewRepository,
     IUserRepository userRepository,
     IProductRepository productRepository,
-    IOrderRepository orderRepository) : IReviewService
+    IOrderRepository orderRepository,
+    MongoDbContext mongoDbContext) : IReviewService
 {
     public async Task<Result<IEnumerable<ReviewResponse>>> GetAllAsync()
     {
@@ -37,77 +40,110 @@ public class ReviewService(
         return Result<ReviewResponse>.Success(review.ToResponse());
     }
 
-    // TODO create a transaction instead of 6 separate database calls
     public async Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request)
     {
-        // Discuss user and product checks, maybe they are not required
-        var userId = new ObjectId(request.UserId);
-        var user = await userRepository.GetUserById(userId);
-        if (user is null)
+        using var session = await mongoDbContext.StartSessionAsync();
+
+        try
         {
-            return Result<ReviewResponse>.Failure(UserErrors.NotFound(userId));
-        }
+            session.StartTransaction();
+            var userId = new ObjectId(request.UserId);
 
-        var productId = new ObjectId(request.ProductId);
-        var product = await productRepository.GetProductById(productId);
-        if (product is null)
+            // Discuss user check it's required
+            // var user = await userRepository.GetUserById(userId, session);
+            // if (user is null)
+            // {
+            //     await session.AbortTransactionAsync();
+            //     return Result<ReviewResponse>.Failure(UserErrors.NotFound(userId));
+            // }
+
+            var productId = new ObjectId(request.ProductId);
+            var product = await productRepository.GetProductById(productId, session);
+            if (product is null)
+            {
+                await session.AbortTransactionAsync();
+                return Result<ReviewResponse>.Failure(ProductErrors.NotFound(productId));
+            }
+
+            // We check if user ordered this item, if not then he can't leave review
+            if (!(await orderRepository.HasUserOrderedProduct(userId, productId, session)))
+            {
+                await session.AbortTransactionAsync();
+                return Result<ReviewResponse>.Failure(ReviewErrors.NotOrdered(userId, productId));
+            }
+
+            // Also, if user already left the review then he can't create another one
+            if (await reviewRepository.UserPostedReviewForProduct(userId, productId, session))
+            {
+                await session.AbortTransactionAsync();
+                return Result<ReviewResponse>.Failure(ReviewErrors.UserPostedReviewForProduct(userId, productId));
+            }
+
+            var review = request.ToDomain();
+
+            // We also calculate the avg rating and increase the review count of the product
+            await CalculateAndIncreaseProductRating(product, review.Rating, session);
+
+            await reviewRepository.CreateReview(review, session);
+            
+            await session.CommitTransactionAsync();
+            return Result<ReviewResponse>.Success(review.ToResponse());
+        }
+        catch (Exception)
         {
-            return Result<ReviewResponse>.Failure(ProductErrors.NotFound(productId));
+            await session.AbortTransactionAsync();
+            throw;
         }
-
-        // We check if user ordered this item, if not then he can't leave review
-        if (!(await orderRepository.HasUserOrderedProduct(userId, productId)))
-        {
-            return Result<ReviewResponse>.Failure(ReviewErrors.NotOrdered(userId, productId));
-        }
-        
-        // Also, if user already left the review then he can't create another one
-        if (await reviewRepository.UserPostedReviewForProduct(userId, productId))
-        {
-            return Result<ReviewResponse>.Failure(ReviewErrors.UserPostedReviewForProduct(userId, productId));
-        }
-
-        var review = request.ToDomain();
-
-        // We also calculate the avg rating and increase the review count of the product
-        await CalculateAndIncreaseProductRating(product, review.Rating);
-
-        await reviewRepository.CreateReview(review);
-        return Result<ReviewResponse>.Success(review.ToResponse());
     }
 
     public async Task<Result> DeleteAsync(IdRequest request)
     {
-        var objectId = ObjectId.Parse(request.Id);
-        var review = await reviewRepository.GetReviewById(objectId);
+        using var session = await mongoDbContext.StartSessionAsync();
 
-        if (review is null)
+        try
         {
-            return Result.Failure(ReviewErrors.NotFound(objectId));
+            session.StartTransaction();
+            
+            var objectId = ObjectId.Parse(request.Id);
+            var review = await reviewRepository.GetReviewById(objectId, session);
+
+            if (review is null)
+            {
+                await session.AbortTransactionAsync();
+                return Result.Failure(ReviewErrors.NotFound(objectId));
+            }
+
+            await reviewRepository.DeleteReview(review.Id, session);
+
+            // We also calculate the avg rating of the product
+            var product = await productRepository.GetProductById(review.ProductId, session);
+            if (product is null)
+            {
+                await session.AbortTransactionAsync();
+                return Result.Failure(ProductErrors.NotFound(review.ProductId));
+            }
+
+            await CalculateAndDecreaseProductRating(product, review.Rating, session);
+
+            await session.CommitTransactionAsync();
+            return Result.Success();
         }
-
-        await reviewRepository.DeleteReview(review.Id);
-
-        // We also calculate the avg rating of the product
-        var product = await productRepository.GetProductById(review.ProductId);
-        if (product is null)
+        catch (Exception)
         {
-            return Result.Failure(ProductErrors.NotFound(review.ProductId));
+            await session.AbortTransactionAsync();
+            throw;
         }
-        await CalculateAndDecreaseProductRating(product, review.Rating);
-
-        return Result.Success();
     }
 
-    private async Task CalculateAndIncreaseProductRating(Product product, double rating)
+    private async Task CalculateAndIncreaseProductRating(Product product, double rating, IClientSessionHandle session)
     {
         var newReviewsCount = product.ReviewsCount + 1;
         var newSumRatings = product.SumRatings + rating;
         var newAvgRating = newSumRatings / newReviewsCount;
-        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount);
+        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount, session);
     }
-    
-    private async Task CalculateAndDecreaseProductRating(Product product, double rating)
+
+    private async Task CalculateAndDecreaseProductRating(Product product, double rating, IClientSessionHandle session)
     {
         var newReviewsCount = product.ReviewsCount - 1;
         var newSumRatings = product.SumRatings - rating;
@@ -121,5 +157,7 @@ public class ReviewService(
             newSumRatings = 0;
             newAvgRating = 0;
         }
-        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount);
-    }}
+
+        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount, session);
+    }
+}
