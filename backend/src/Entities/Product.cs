@@ -9,7 +9,7 @@ public class Product : BaseEntity
 
     //will be changed
     public string? Image { get; init; }
-    public double Price { get; init; }
+    public decimal Price { get; init; }
 
     /// <summary>
     /// Used for calculating AverageRating

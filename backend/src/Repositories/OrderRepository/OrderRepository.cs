@@ -16,7 +16,16 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
 
     public async Task<IEnumerable<Order>> GetOrdersForProduct(ObjectId productId)
     {
-        return await _orders.Find(order => order.ProductId == productId).ToListAsync();
+        // Alternative syntax
+        //var filter = Builders<Order>.Filter.Eq("Items.ProductId", productId);
+        //var filter = Builders<Order>.Filter.AnyEq(x => x.Items.Select(i => i.ProductId), productId);
+
+        var filter = Builders<Order>.Filter.ElemMatch(
+            x => x.Items,
+            item => item.ProductId == productId
+        );
+
+        return await _orders.Find(filter).ToListAsync();
     }
 
     public async Task<IEnumerable<Order>> GetOrdersForUser(ObjectId userId)
@@ -27,7 +36,28 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
     public async Task<bool> HasUserOrderedProduct(ObjectId userId, ObjectId productId,
         IClientSessionHandle? session = null)
     {
-        var filter = Builders<Order>.Filter.Where(o => o.ProductId == productId && o.UserId == userId);
+        var builder = Builders<Order>.Filter;
+        // var filter = Builders<Order>.Filter.Where(o => o.ProductId == productId && o.UserId == userId);
+        // var filter = builder.And(
+        //     builder.Eq(o => o.UserId, userId),
+        //     builder.Eq(o => o.ProductId, productId)
+        // );
+
+        // Longer syntax
+        // var filter = builder.And(
+        //     builder.ElemMatch(
+        //         x => x.Items,
+        //         item => item.ProductId == productId
+        //     ),
+        //     builder.Eq(x => x.UserId, userId)
+        // );
+
+        // Shorter syntax for combining filters
+        var filter = builder.ElemMatch(
+            x => x.Items,
+            item => item.ProductId == productId
+        )
+        & builder.Eq(x => x.UserId, userId);
 
         if (session is not null)
         {
@@ -46,8 +76,14 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
         return await _orders.Find(o => o.Id == id).FirstOrDefaultAsync();
     }
 
-    public async Task CreateOrder(Order order)
+    public async Task CreateOrder(Order order, IClientSessionHandle? session = null)
     {
+        if (session is not null)
+        {
+            await _orders.InsertOneAsync(session, order);
+            return;
+        }
+
         await _orders.InsertOneAsync(order);
     }
 

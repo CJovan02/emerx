@@ -1,3 +1,6 @@
+using EMerx.DTOs.Addresses;
+using EMerx.DTOs.OrderItems.Request;
+using EMerx.Entities;
 using FluentValidation;
 using MongoDB.Bson;
 
@@ -11,11 +14,15 @@ public class OrderRequestValidator : AbstractValidator<OrderRequest>
             .Must(id => ObjectId.TryParse(id, out _))
             .WithMessage("Please provide a valid user ID.");
 
-        RuleFor(x => x.ProductId)
-            .Must(id => ObjectId.TryParse(id, out _))
-            .WithMessage("Please provide a valid product ID.");
+        RuleFor(x => x.Items)
+            .NotEmpty()
+            .WithMessage("Please provide at least one item.");
 
-        RuleFor(x => x.Quantity)
-            .GreaterThan(0);
+        RuleForEach(x => x.Items)
+            .SetValidator(new OrderItemRequestValidator());
+
+        RuleFor(x => x.Address)
+            .SetValidator(new AddressValidator());
     }
 }
+

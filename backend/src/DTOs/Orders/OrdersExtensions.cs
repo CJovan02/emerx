@@ -10,23 +10,41 @@ public static class OrdersExtensions
     public static OrderResponse ToResponse(this Order order)
     {
         return new OrderResponse(
-            order.Id,
-            order.UserId,
-            order.ProductId,
-            order.Address,
-            order.Quantity);
+            Id: order.Id,
+            UserId: order.UserId,
+            Items: order.Items,
+            Address: order.Address,
+            Price: order.Price,
+            PlacedAt: order.PlacedAt
+        );
     }
 
-    public static Order ToDomain(this OrderRequest order)
+    public static Order ToDomain(this OrderRequest order, IEnumerable<Product> products)
     {
+        // We create lookup (or dictionary) for easy access by the productId
+        var productsLookup = products.ToLookup(x => x.Id);
+
+        var domainItems = order.Items.Select(item =>
+        {
+            var productId = ObjectId.Parse(item.ProductId);
+            var product = productsLookup[productId].First();
+
+            return new OrderItem
+            {
+                ProductId = ObjectId.Parse(item.ProductId),
+                Name = product.Name,
+                PriceAtOrder = product.Price,
+                Quantity = item.Quantity,
+            };
+        }).ToList();
+
         return new Order
         {
             Id = ObjectId.GenerateNewId(),
+            UserId = ObjectId.Parse(order.UserId),
+            Items = domainItems,
             Address = order.Address,
-            Quantity = order.Quantity,
-            PlacedAt = DateTime.UtcNow,
-            ProductId = ObjectId.Parse(order.ProductId),
-            UserId = ObjectId.Parse(order.UserId)
+            Price = domainItems.Sum(x => x.PriceAtOrder * x.Quantity)
         };
     }
 }

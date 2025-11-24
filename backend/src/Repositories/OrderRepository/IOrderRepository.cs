@@ -11,6 +11,7 @@ public interface IOrderRepository
     Task<IEnumerable<Order>> GetOrdersForProduct(ObjectId productId);
 
     Task<IEnumerable<Order>> GetOrdersForUser(ObjectId userId);
+
     /// <summary>
     /// Checks if user has at least 1 order on product
     /// </summary>
@@ -18,7 +19,7 @@ public interface IOrderRepository
 
     Task<Order?> GetOrderById(ObjectId id);
 
-    Task CreateOrder(Order order);
+    Task CreateOrder(Order order, IClientSessionHandle? session = null);
 
     Task UpdateOrder(Order order);
 
