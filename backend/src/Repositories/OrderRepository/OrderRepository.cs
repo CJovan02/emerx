@@ -76,8 +76,14 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
         return await _orders.Find(o => o.Id == id).FirstOrDefaultAsync();
     }
 
-    public async Task CreateOrder(Order order)
+    public async Task CreateOrder(Order order, IClientSessionHandle? session = null)
     {
+        if (session is not null)
+        {
+            await _orders.InsertOneAsync(session, order);
+            return;
+        }
+
         await _orders.InsertOneAsync(order);
     }
 

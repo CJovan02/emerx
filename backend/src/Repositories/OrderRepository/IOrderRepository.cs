@@ -19,7 +19,7 @@ public interface IOrderRepository
 
     Task<Order?> GetOrderById(ObjectId id);
 
-    Task CreateOrder(Order order);
+    Task CreateOrder(Order order, IClientSessionHandle? session = null);
 
     Task UpdateOrder(Order order);
 

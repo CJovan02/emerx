@@ -2,6 +2,7 @@ using EMerx.DTOs.Id;
 using EMerx.DTOs.Orders;
 using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
+using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.UserRepository;
@@ -14,7 +15,8 @@ namespace EMerx.Services.Orders;
 public class OrderService(
     IOrderRepository orderRepository,
     IUserRepository userRepository,
-    IProductRepository productRepository) : IOrderService
+    IProductRepository productRepository,
+    MongoDbContext mongoDbContext) : IOrderService
 {
     public async Task<Result<IEnumerable<OrderResponse>>> GetAllAsync()
     {
@@ -38,31 +40,45 @@ public class OrderService(
 
     public async Task<Result<OrderResponse>> CreateAsync(OrderRequest request)
     {
-        var userId = ObjectId.Parse(request.UserId);
-        var user = await userRepository.GetUserById(userId);
-        if (user is null)
+        using var session = await mongoDbContext.StartSessionAsync();
+
+        try
         {
-            // Abort session
-            return Result<OrderResponse>.Failure(UserErrors.NotFound(userId));
+            session.StartTransaction();
+
+            var userId = ObjectId.Parse(request.UserId);
+            var user = await userRepository.GetUserById(userId, session);
+            if (user is null)
+            {
+                await session.AbortTransactionAsync();
+                return Result<OrderResponse>.Failure(UserErrors.NotFound(userId));
+            }
+
+            // We need to fetch all the products ordered, to see if all the requested ids are correct and
+            // to check the price and the name of the products.
+            // We could send the price and the name from the frontend inside a request to save on the database reads but
+            // that is a security hole, price needs to be read from the database and not specified.
+
+            var productIds = request.Items.Select(x => ObjectId.Parse(x.ProductId)).ToList();
+            var products = (await productRepository.GetProductsByIds(productIds, session)).ToList();
+            var missingProducts = productIds.Except(products.Select(x => x.Id)).ToList();
+            if (missingProducts.Any())
+            {
+                await session.AbortTransactionAsync();
+                return Result<OrderResponse>.Failure(OrderErrors.NotFound(missingProducts));
+            }
+
+            var order = request.ToDomain(products);
+            await orderRepository.CreateOrder(order, session);
+
+            await session.CommitTransactionAsync();
+            return Result<OrderResponse>.Success(order.ToResponse());
         }
-
-        // We need to fetch all the products ordered, to see if all the requested ids are correct and
-        // to check the price and the name of the products.
-        // We could send the price and the name from the frontend inside a request to save on the database reads but
-        // that is a security hole, price needs to be read from the database and not specified.
-
-        var productIds = request.Items.Select(x => ObjectId.Parse(x.ProductId)).ToList();
-        var products = (await productRepository.GetProductsByIds(productIds)).ToList();
-        var missingProducts = productIds.Except(products.Select(x => x.Id)).ToList();
-        if (missingProducts.Any())
+        catch (Exception)
         {
-            // Abort session
-            return Result<OrderResponse>.Failure(OrderErrors.NotFound(missingProducts));
+            await session.AbortTransactionAsync();
+            throw;
         }
-
-        var order = request.ToDomain(products);
-        await orderRepository.CreateOrder(order);
-        return Result<OrderResponse>.Success(order.ToResponse());
     }
 
     public async Task<Result> DeleteAsync(IdRequest request)
