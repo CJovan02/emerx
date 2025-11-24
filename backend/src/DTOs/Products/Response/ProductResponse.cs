@@ -6,5 +6,5 @@ public sealed record ProductResponse(
     ObjectId Id,
     string Name,
     string Category,
-    string Image,
-    double Price);
+    string? Image,
+    decimal Price);

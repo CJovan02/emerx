@@ -8,6 +8,7 @@ public interface IProductRepository
 {
     Task<IEnumerable<Product>> GetProducts();
     Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null);
+    Task<IEnumerable<Product>> GetProductsByIds (IEnumerable<ObjectId> ids, IClientSessionHandle? session = null);
     Task CreateProduct(Product product);
     Task UpdateProduct(Product product);
 

@@ -5,6 +5,11 @@ namespace EMerx.DTOs.Orders.Request;
 
 public sealed record OrderRequest(
     string UserId,
+    List<OrderItemRequest> Items,
+    Address Address
+);
+
+public sealed record OrderItemRequest(
     string ProductId,
-    Address Address,
-    int Quantity);
+    int Quantity
+);

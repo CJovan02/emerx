@@ -6,6 +6,8 @@ namespace EMerx.DTOs.Orders.Response;
 public sealed record OrderResponse(
     ObjectId Id,
     ObjectId UserId,
-    ObjectId ProductId,
+    List<OrderItem> Items,
     Address Address,
-    int Quantity);
+    decimal Price,
+    DateTime PlacedAt
+);

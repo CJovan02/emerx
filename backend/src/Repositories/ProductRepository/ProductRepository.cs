@@ -26,6 +26,19 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
         return await _products.Find(filter).FirstOrDefaultAsync();
     }
 
+    public async Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<ObjectId> ids,
+        IClientSessionHandle? session = null)
+    {
+        var filter = Builders<Product>.Filter.In(x => x.Id, ids);
+
+        if (session is not null)
+        {
+            return await _products.Find(session, filter).ToListAsync();
+        }
+
+        return await _products.Find(filter).ToListAsync();
+    }
+
     public async Task CreateProduct(Product product)
     {
         await _products.InsertOneAsync(product);

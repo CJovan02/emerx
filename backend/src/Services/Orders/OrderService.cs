@@ -42,17 +42,25 @@ public class OrderService(
         var user = await userRepository.GetUserById(userId);
         if (user is null)
         {
+            // Abort session
             return Result<OrderResponse>.Failure(UserErrors.NotFound(userId));
         }
 
-        var productId = ObjectId.Parse(request.ProductId);
-        var product = await productRepository.GetProductById(productId);
-        if (product is null)
+        // We need to fetch all the products ordered, to see if all the requested ids are correct and
+        // to check the price and the name of the products.
+        // We could send the price and the name from the frontend inside a request to save on the database reads but
+        // that is a security hole, price needs to be read from the database and not specified.
+
+        var productIds = request.Items.Select(x => ObjectId.Parse(x.ProductId)).ToList();
+        var products = (await productRepository.GetProductsByIds(productIds)).ToList();
+        var missingProducts = productIds.Except(products.Select(x => x.Id)).ToList();
+        if (missingProducts.Any())
         {
-            return Result<OrderResponse>.Failure(ProductErrors.NotFound(productId));
+            // Abort session
+            return Result<OrderResponse>.Failure(OrderErrors.NotFound(missingProducts));
         }
 
-        var order = request.ToDomain();
+        var order = request.ToDomain(products);
         await orderRepository.CreateOrder(order);
         return Result<OrderResponse>.Success(order.ToResponse());
     }

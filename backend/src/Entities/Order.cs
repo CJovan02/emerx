@@ -10,13 +10,24 @@ public class Order : BaseEntity
     //  - Suggestion: items: [ { ProductId: xxxx, PriceAtOrder: xxxx, Quantity: xxxx}, ... ]
     //  - We don't store entire product object inside items array, only some basic info so we don't have to query
     //    all of the items. If the item gets deleted, we still have the last snapshot of it during the order time
-    public ObjectId UserId { get; init; }
+    public required ObjectId UserId { get; init; }
 
-    public ObjectId ProductId { get; init; }
+    public required List<OrderItem> Items { get; init; }
 
     public required Address Address { get; init; }
 
-    public int Quantity { get; init; }
+    public required decimal Price { get; init; }
 
     public DateTime PlacedAt { get; init; } = DateTime.UtcNow;
+}
+
+public class OrderItem
+{
+    public required ObjectId ProductId { get; init; }
+
+    public required string Name { get; init; }
+
+    public required decimal PriceAtOrder { get; init; }
+
+    public required int Quantity { get; init; }
 }
