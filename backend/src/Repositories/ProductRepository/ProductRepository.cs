@@ -16,12 +16,14 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
 
     public async Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null)
     {
+        var filter = Builders<Product>.Filter.Where(product => product.Id == id);
+
         if (session is not null)
         {
-            return await _products.Find(session, product => product.Id == id).FirstOrDefaultAsync();
+            return await _products.Find(session, filter).FirstOrDefaultAsync();
         }
 
-        return await _products.Find(product => product.Id == id).FirstOrDefaultAsync();
+        return await _products.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task CreateProduct(Product product)
@@ -48,7 +50,7 @@ public class ProductRepository(MongoDbContext context) : IProductRepository
             await _products.UpdateOneAsync(session, filter, update);
             return;
         }
-        
+
         await _products.UpdateOneAsync(filter, update);
     }
 

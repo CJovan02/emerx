@@ -22,26 +22,30 @@ public class ReviewRepository(MongoDbContext context) : IReviewRepository
     public async Task<bool> UserPostedReviewForProduct(ObjectId userId, ObjectId productId,
         IClientSessionHandle? session = null)
     {
+        var filter = Builders<Review>.Filter.Where(r => r.UserId == userId && r.ProductId == productId);
+
         if (session is not null)
         {
             return await _reviews
-                .Find(session, r => r.UserId == userId && r.ProductId == productId)
+                .Find(session, filter)
                 .AnyAsync();
         }
 
         return await _reviews
-            .Find(r => r.UserId == userId && r.ProductId == productId)
+            .Find(filter)
             .AnyAsync();
     }
 
     public async Task<Review?> GetReviewById(ObjectId id, IClientSessionHandle? session = null)
     {
+        var filter = Builders<Review>.Filter.Where(r => r.Id == id);
+
         if (session is not null)
         {
-            return await _reviews.Find(session, r => r.Id == id).FirstOrDefaultAsync();
+            return await _reviews.Find(session, filter).FirstOrDefaultAsync();
         }
 
-        return await _reviews.Find(r => r.Id == id).FirstOrDefaultAsync();
+        return await _reviews.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task CreateReview(Review review, IClientSessionHandle? session = null)
@@ -62,12 +66,14 @@ public class ReviewRepository(MongoDbContext context) : IReviewRepository
 
     public async Task DeleteReview(ObjectId id, IClientSessionHandle? session = null)
     {
+        var filter = Builders<Review>.Filter.Where(r => r.Id == id);
+
         if (session is not null)
         {
-            await _reviews.DeleteOneAsync(session, r => r.Id == id);
+            await _reviews.DeleteOneAsync(session, filter);
             return;
         }
 
-        await _reviews.DeleteOneAsync(r => r.Id == id);
+        await _reviews.DeleteOneAsync(filter);
     }
 }

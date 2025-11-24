@@ -27,15 +27,17 @@ public class OrderRepository(MongoDbContext context) : IOrderRepository
     public async Task<bool> HasUserOrderedProduct(ObjectId userId, ObjectId productId,
         IClientSessionHandle? session = null)
     {
+        var filter = Builders<Order>.Filter.Where(o => o.ProductId == productId && o.UserId == userId);
+
         if (session is not null)
         {
             return await _orders
-                .Find(session, o => o.ProductId == productId && o.UserId == userId)
+                .Find(session, filter)
                 .AnyAsync();
         }
 
         return await _orders
-            .Find(o => o.ProductId == productId && o.UserId == userId)
+            .Find(filter)
             .AnyAsync();
     }
 

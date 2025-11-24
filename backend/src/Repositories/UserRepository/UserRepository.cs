@@ -26,12 +26,14 @@ public class UserRepository(MongoDbContext context) : IUserRepository
 
     public async Task<User?> GetUserById(ObjectId id, IClientSessionHandle? session = null)
     {
+        var filter = Builders<User>.Filter.Eq(x => x.Id, id);
+
         if (session is not null)
         {
-            return await _users.Find(session, u => u.Id == id).FirstOrDefaultAsync();
+            return await _users.Find(session, filter).FirstOrDefaultAsync();
         } 
         
-        return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        return await _users.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task CreateUser(User user)
