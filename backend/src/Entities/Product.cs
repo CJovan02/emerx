@@ -2,10 +2,20 @@
 
 public class Product : BaseEntity
 {
-    public required string Name { get; set; }
+    public required string Name { get; init; }
+
     //should be rediscussed about categories enum
-    public required string Category { get; set; }
+    public required string Category { get; init; }
+
     //will be changed
-    public string? Image { get; set; }
-    public double Price { get; set; }
+    public string? Image { get; init; }
+    public double Price { get; init; }
+
+    /// <summary>
+    /// Used for calculating AverageRating
+    /// </summary>
+    public double SumRatings { get; init; } = 0;
+    public int ReviewsCount { get; init; } = 0;
+
+    public double AverageRating { get; init; } = 0;
 }

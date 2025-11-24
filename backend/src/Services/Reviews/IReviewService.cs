@@ -10,6 +10,8 @@ public interface IReviewService
     Task<Result<IEnumerable<ReviewResponse>>> GetAllAsync();
     
     Task<Result<ReviewResponse>> GetByIdAsync(IdRequest request);
+
+    Task<Result<IEnumerable<ReviewResponse>>> GetByProductIdAsync(IdRequest request);
     
     Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request);
     

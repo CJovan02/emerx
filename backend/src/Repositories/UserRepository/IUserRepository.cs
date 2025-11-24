@@ -1,5 +1,6 @@
 using EMerx.Entities;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace EMerx.Repositories.UserRepository;
 
@@ -11,7 +12,7 @@ public interface IUserRepository
 
     Task<User?> GetUserByFirebaseUid(string firebaseUid);
 
-    Task<User?> GetUserById(ObjectId id);
+    Task<User?> GetUserById(ObjectId id, IClientSessionHandle? session = null);
 
     Task CreateUser(User user);
 

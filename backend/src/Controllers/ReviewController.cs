@@ -27,6 +27,12 @@ public class ReviewController(IReviewService reviewService) : ControllerBase
     {
         return (await reviewService.GetByIdAsync(request)).ToActionResult();
     }
+
+    [HttpGet("getProductReviews/{id}")]
+    public async Task<IActionResult> GetByProductId([FromRoute] IdRequest request)
+    {
+        return (await reviewService.GetByProductIdAsync(request)).ToActionResult();
+    }
     
     [ProducesResponseType((StatusCodes.Status201Created))]
     [ProducesResponseType((StatusCodes.Status400BadRequest))]

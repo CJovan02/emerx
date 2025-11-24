@@ -24,9 +24,16 @@ public class UserRepository(MongoDbContext context) : IUserRepository
         return await _users.Find(u => u.FirebaseUid == firebaseUid).FirstOrDefaultAsync();
     }
 
-    public async Task<User?> GetUserById(ObjectId id)
+    public async Task<User?> GetUserById(ObjectId id, IClientSessionHandle? session = null)
     {
-        return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        var filter = Builders<User>.Filter.Eq(x => x.Id, id);
+
+        if (session is not null)
+        {
+            return await _users.Find(session, filter).FirstOrDefaultAsync();
+        } 
+        
+        return await _users.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task CreateUser(User user)

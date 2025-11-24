@@ -3,7 +3,6 @@ using EMerx.DTOs.Users.Request;
 using EMerx.ResultPattern;
 using EMerx.Services.Users;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace EMerx.Controllers;
 
@@ -17,8 +16,8 @@ public class UserController(IUserService userService) : ControllerBase
         return  (await userService.GetById(request)).ToActionResult();
     }
 
-    //And think about should we convert to ObjectId here or in service
-    //Do validation for this
+    // And think about should we convert to ObjectId here or in service
+    // Do validation for this
     [HttpGet("getByFirebaseUid/{firebaseUid}")]
     public async Task<IActionResult> GetByFirebaseUid(string firebaseUid)
     {

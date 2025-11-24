@@ -9,6 +9,7 @@ public class MongoDbContext
 {
     private readonly IMongoDatabase _database;
     private readonly MongoClient _client;
+
     public MongoDbContext(IOptions<MongoDbSettings> options)
     {
         var settings = options.Value;
@@ -38,4 +39,9 @@ public class MongoDbContext
     public IMongoCollection<User> Users => _database.GetCollection<User>("users");
     public IMongoCollection<Review> Reviews => _database.GetCollection<Review>("reviews");
     public IMongoCollection<Order> Orders => _database.GetCollection<Order>("orders");
+    
+    public Task<IClientSessionHandle> StartSessionAsync()
+    {
+        return _client.StartSessionAsync();
+    }
 }
