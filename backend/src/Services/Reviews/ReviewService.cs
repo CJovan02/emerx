@@ -7,7 +7,6 @@ using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.ReviewRepository;
-using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
 using MongoDB.Bson;
@@ -17,7 +16,6 @@ namespace EMerx.Services.Reviews;
 
 public class ReviewService(
     IReviewRepository reviewRepository,
-    IUserRepository userRepository,
     IProductRepository productRepository,
     IOrderRepository orderRepository,
     MongoDbContext mongoDbContext) : IReviewService
@@ -38,6 +36,16 @@ public class ReviewService(
         }
 
         return Result<ReviewResponse>.Success(review.ToResponse());
+    }
+
+    public async Task<Result<IEnumerable<ReviewResponse>>> GetByProductIdAsync(IdRequest request)
+    {
+        var productId = new ObjectId(request.Id);
+        var products = await reviewRepository.GetReviewsForProduct(productId);
+
+        var productsResponse = products.Select(x => x.ToResponse()).ToList();
+
+        return Result<IEnumerable<ReviewResponse>>.Success(productsResponse);
     }
 
     public async Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request)

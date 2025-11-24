@@ -7,7 +7,7 @@ namespace EMerx.Repositories.ReviewRepository;
 
 public class ReviewRepository(MongoDbContext context) : IReviewRepository
 {
-    private IMongoCollection<Review> _reviews = context.Reviews;
+    private readonly IMongoCollection<Review> _reviews = context.Reviews;
 
     public async Task<IEnumerable<Review>> GetReviews()
     {
