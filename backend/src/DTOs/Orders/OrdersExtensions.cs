@@ -24,12 +24,18 @@ public static class OrdersExtensions
         // We create lookup (or dictionary) for easy access by the productId
         var productsLookup = products.ToLookup(x => x.Id);
 
-        var domainItems = order.Items.Select(x =>
+        var domainItems = order.Items.Select(item =>
         {
-            var productId = ObjectId.Parse(x.ProductId);
+            var productId = ObjectId.Parse(item.ProductId);
             var product = productsLookup[productId].First();
 
-            return x.ToDomain(product);
+            return new OrderItem
+            {
+                ProductId = ObjectId.Parse(item.ProductId),
+                Name = product.Name,
+                PriceAtOrder = product.Price,
+                Quantity = item.Quantity,
+            };
         }).ToList();
 
         return new Order
@@ -39,20 +45,6 @@ public static class OrdersExtensions
             Items = domainItems,
             Address = order.Address,
             Price = domainItems.Sum(x => x.PriceAtOrder * x.Quantity)
-        };
-    }
-}
-
-public static class OrderItemExtensions
-{
-    public static OrderItem ToDomain(this OrderItemRequest item, Product product)
-    {
-        return new OrderItem
-        {
-            ProductId = ObjectId.Parse(item.ProductId),
-            Name = product.Name,
-            PriceAtOrder = product.Price,
-            Quantity = item.Quantity,
         };
     }
 }

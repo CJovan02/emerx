@@ -1,4 +1,5 @@
 using EMerx.DTOs.Id;
+using EMerx.DTOs.OrderItems.Request;
 using EMerx.DTOs.Orders;
 using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
