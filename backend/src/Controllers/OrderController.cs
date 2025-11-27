@@ -1,3 +1,4 @@
+using EMerx.Auth;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Orders.Request;
 using EMerx.ResultPattern;
@@ -12,6 +13,7 @@ namespace EMerx.Controllers;
 public class OrderController(IOrderService orderService) : ControllerBase
 {
     [Authorize]
+    [RequiresRole(Roles.Admin)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]

@@ -1,4 +1,4 @@
-using EMerx.Entities;
+using EMerx.Auth;
 using FirebaseAdmin.Auth;
 
 namespace EMerx.Repositories.AuthRepository;
