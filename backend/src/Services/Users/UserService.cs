@@ -5,13 +5,14 @@ using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
+using FirebaseAdmin.Auth;
 using MongoDB.Bson;
 
 namespace EMerx.Services.Users;
 
 public class UserService(IUserRepository userRepository, IAuthRepository authRepository) : IUserService
 {
-    public async Task<Result<User>> GetById(IdRequest request)
+    public async Task<Result<User>> GetByIdAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
         var user = await userRepository.GetUserById(objectId);
@@ -21,7 +22,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<User>.Success(user);
     }
 
-    public async Task<Result<User>> GetByFirebaseUid(string firebaseUid)
+    public async Task<Result<User>> GetByFirebaseUidAsync(string firebaseUid)
     {
         var user = await userRepository.GetUserByFirebaseUid(firebaseUid);
         if (user is null)
@@ -57,6 +58,38 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         }
     }
 
+    public async Task<Result> GrantAdminRoleAsync(string email)
+    {
+        try
+        {
+            var user = await authRepository.GetUserByEmailAsync(email);
+            await authRepository.GrantAdminRoleAsync(user.Uid);
+
+            return Result.Success();
+        }
+        // Thrown if auth user with the provided email can't be found
+        catch (FirebaseAuthException e)
+        {
+            return Result.Failure(AuthErrors.NotFoundByEmail(email));
+        }
+    }
+
+    public async Task<Result> RemoveAdminRoleAsync(string email)
+    {
+        try
+        {
+            var user = await authRepository.GetUserByEmailAsync(email);
+            await authRepository.RemoveAdminRoleAsync(user.Uid);
+
+            return Result.Success();
+        }
+        // Thrown if auth user with the provided email can't be found
+        catch (FirebaseAuthException e)
+        {
+            return Result.Failure(AuthErrors.NotFoundByEmail(email));
+        }
+    }
+
     /// <summary>
     /// We query the user in db with the id = userId
     /// Then we grab his firebaseUid, and using that we call authRepo to delete firebase user.
@@ -64,8 +97,6 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
     /// It could be faster if we had the same id for the firebase auth user and databse user id, but delete user is not
     /// a common operation, and it's usually slow because it also deletes all data connected to that user
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
     public async Task<Result> DeleteAsync(IdRequest request)
     {
         // We find the user with the specified id

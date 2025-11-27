@@ -1,3 +1,4 @@
+using EMerx.DTOs.Email;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.ResultPattern;
@@ -13,13 +14,13 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(IdRequest request)
     {
-        return  (await userService.GetById(request)).ToActionResult();
+        return (await userService.GetByIdAsync(request)).ToActionResult();
     }
-    
+
     [HttpGet("getByFirebaseUid/{firebaseUid}")]
     public async Task<IActionResult> GetByFirebaseUid(string firebaseUid)
     {
-        var result = await userService.GetByFirebaseUid(firebaseUid);
+        var result = await userService.GetByFirebaseUidAsync(firebaseUid);
 
         return result.ToActionResult();
     }
@@ -30,6 +31,22 @@ public class UserController(IUserService userService) : ControllerBase
         var result = await userService.RegisterAsync(dto);
 
         return result.ToActionResult();
+    }
+
+    [HttpPatch("grantAdminRole/{email}")]
+    public async Task<IActionResult> GrantAdminRole([FromRoute] EmailRequest request)
+    {
+        // Need to check if user trying to access this endpoint is admin
+
+        return (await userService.GrantAdminRoleAsync(request.Email)).ToActionResult();
+    }
+
+    [HttpPatch("removeAdminRole/{email}")]
+    public async Task<IActionResult> RemoveAdminRole([FromRoute] EmailRequest request)
+    {
+        // Need to check if user trying to access this endpoint is admin
+
+        return (await userService.RemoveAdminRoleAsync(request.Email)).ToActionResult();
     }
 
     [HttpDelete("{id}")]
