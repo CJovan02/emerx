@@ -15,9 +15,7 @@ public class UserController(IUserService userService) : ControllerBase
     {
         return  (await userService.GetById(request)).ToActionResult();
     }
-
-    // And think about should we convert to ObjectId here or in service
-    // Do validation for this
+    
     [HttpGet("getByFirebaseUid/{firebaseUid}")]
     public async Task<IActionResult> GetByFirebaseUid(string firebaseUid)
     {
