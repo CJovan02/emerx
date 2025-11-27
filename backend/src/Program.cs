@@ -1,18 +1,15 @@
 using EMerx.DTOs.Id;
-using EMerx.DTOs.Products.Request;
-using EMerx.DTOs.Users.Request;
 using EMerx.Infrastructure;
 using EMerx.Infrastructure.MongoDb;
 using FirebaseAdmin;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Google.Apis.Auth.OAuth2;
-using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabase();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerWithAuth();
 
 builder.Services.AddValidatorsFromAssembly(typeof(IdRequest).Assembly, includeInternalTypes: true);
 builder.Services.AddFluentValidationAutoValidation();
@@ -20,8 +17,9 @@ builder.Services.AddFluentValidationAutoValidation();
 
 FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromFile("firebase.json")
+    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialsPath"])
 });
+builder.Services.AddFirebaseAuthentication(builder.Configuration);
 
 builder.Services
     .AddRepository()
@@ -30,8 +28,6 @@ builder.Services
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-
-
 
 var app = builder.Build();
 
@@ -49,7 +45,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
-
-public static class RootAssembly { }
