@@ -1,8 +1,10 @@
+using EMerx.Auth;
 using EMerx.DTOs.Email;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.ResultPattern;
 using EMerx.Services.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMerx.Controllers;
@@ -32,20 +34,20 @@ public class UserController(IUserService userService) : ControllerBase
 
         return result.ToActionResult();
     }
-
+    
+    [Authorize]
+    [RequiresRole(Roles.Admin)]
     [HttpPatch("grantAdminRole/{email}")]
     public async Task<IActionResult> GrantAdminRole([FromRoute] EmailRequest request)
     {
-        // Need to check if user trying to access this endpoint is admin
-
         return (await userService.GrantAdminRoleAsync(request.Email)).ToActionResult();
     }
 
+    [Authorize]
+    [RequiresRole(Roles.Admin)]
     [HttpPatch("removeAdminRole/{email}")]
     public async Task<IActionResult> RemoveAdminRole([FromRoute] EmailRequest request)
     {
-        // Need to check if user trying to access this endpoint is admin
-
         return (await userService.RemoveAdminRoleAsync(request.Email)).ToActionResult();
     }
 
