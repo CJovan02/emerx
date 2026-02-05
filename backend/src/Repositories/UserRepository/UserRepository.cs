@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace EMerx.Repositories.UserRepository;
 
-public class UserRepository(MongoDbContext context) : IUserRepository
+public class UserRepository(MongoContext context) : IUserRepository
 {
     private readonly IMongoCollection<User> _users = context.Users;
 

@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace EMerx.Repositories.ReviewRepository;
 
-public class ReviewRepository(MongoDbContext context) : IReviewRepository
+public class ReviewRepository(MongoContext context) : IReviewRepository
 {
     private readonly IMongoCollection<Review> _reviews = context.Reviews;
 

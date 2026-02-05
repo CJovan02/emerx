@@ -14,11 +14,6 @@ builder.Services.AddSwaggerWithAuth();
 builder.Services.AddValidatorsFromAssembly(typeof(IdRequest).Assembly, includeInternalTypes: true);
 builder.Services.AddFluentValidationAutoValidation();
 
-
-FirebaseApp.Create(new AppOptions
-{
-    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialsPath"])
-});
 builder.Services.AddFirebaseAuthentication(builder.Configuration);
 
 builder.Services
@@ -31,18 +26,18 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Ping test to see if everything is connected
-var mongoContext = app.Services.GetRequiredService<MongoDbContext>();
+// Connect and ping the database
+var mongoContext = app.Services.GetRequiredService<MongoContext>();
+mongoContext.Connect();
 await mongoContext.PingAsync();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapControllers();
-    //app.MapOpenApi();
 }
 
+app.MapControllers();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

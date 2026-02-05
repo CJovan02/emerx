@@ -18,7 +18,7 @@ public class ReviewService(
     IReviewRepository reviewRepository,
     IProductRepository productRepository,
     IOrderRepository orderRepository,
-    MongoDbContext mongoDbContext) : IReviewService
+    MongoContext mongoContext) : IReviewService
 {
     public async Task<Result<IEnumerable<ReviewResponse>>> GetAllAsync()
     {
@@ -50,7 +50,7 @@ public class ReviewService(
 
     public async Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request)
     {
-        using var session = await mongoDbContext.StartSessionAsync();
+        using var session = await mongoContext.StartSessionAsync();
 
         try
         {
@@ -106,7 +106,7 @@ public class ReviewService(
 
     public async Task<Result> DeleteAsync(IdRequest request)
     {
-        using var session = await mongoDbContext.StartSessionAsync();
+        using var session = await mongoContext.StartSessionAsync();
 
         try
         {

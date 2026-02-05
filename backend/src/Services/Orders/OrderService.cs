@@ -17,7 +17,7 @@ public class OrderService(
     IOrderRepository orderRepository,
     IUserRepository userRepository,
     IProductRepository productRepository,
-    MongoDbContext mongoDbContext) : IOrderService
+    MongoContext mongoContext) : IOrderService
 {
     public async Task<Result<IEnumerable<OrderResponse>>> GetAllAsync()
     {
@@ -41,7 +41,7 @@ public class OrderService(
 
     public async Task<Result<OrderResponse>> CreateAsync(OrderRequest request)
     {
-        using var session = await mongoDbContext.StartSessionAsync();
+        using var session = await mongoContext.StartSessionAsync();
 
         try
         {

@@ -5,12 +5,13 @@ using MongoDB.Driver;
 
 namespace EMerx.Infrastructure.MongoDb;
 
-public class MongoDbContext
+public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContext> logger)
 {
-    private readonly IMongoDatabase _database;
-    private readonly MongoClient _client;
+    private IMongoDatabase _database;
+    private MongoClient _client;
+    private readonly ILogger<MongoContext> _logger = logger;
 
-    public MongoDbContext(IOptions<MongoDbSettings> options)
+    public void Connect()
     {
         var settings = options.Value;
 
@@ -26,12 +27,11 @@ public class MongoDbContext
         try
         {
             await _client.GetDatabase("admin").RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1));
-            Console.WriteLine("✅ Pinged your deployment. You successfully connected to MongoDB!");
+            _logger.LogInformation("✅ Pinged your deployment. You successfully connected to MongoDB!");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("❌ MongoDb connection could not be established.");
-            Console.WriteLine(ex);
+            _logger.LogError(ex, "❌ MongoDb connection could not be established.");
         }
     }
 
@@ -39,7 +39,7 @@ public class MongoDbContext
     public IMongoCollection<User> Users => _database.GetCollection<User>("users");
     public IMongoCollection<Review> Reviews => _database.GetCollection<Review>("reviews");
     public IMongoCollection<Order> Orders => _database.GetCollection<Order>("orders");
-    
+
     public Task<IClientSessionHandle> StartSessionAsync()
     {
         return _client.StartSessionAsync();

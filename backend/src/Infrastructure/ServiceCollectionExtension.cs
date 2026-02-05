@@ -11,6 +11,8 @@ using EMerx.Services.Orders;
 using EMerx.Services.Products;
 using EMerx.Services.Reviews;
 using EMerx.Services.Users;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -46,7 +48,7 @@ public static class ServiceCollectionExtension
                                         throw new EnvVariableNotFoundException(Constants.EnvVariables.Database);
         });
 
-        services.AddSingleton<MongoDbContext>();
+        services.AddSingleton<MongoContext>();
 
         return services;
     }
@@ -86,6 +88,21 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddFirebaseAuthentication(this IServiceCollection services,
         IConfiguration configuration)
     {
+        var credentialsPath = configuration["Firebase:CredentialsPath"];
+
+        if (string.IsNullOrEmpty(credentialsPath))
+            throw new InvalidOperationException("Firebase:CredentialsPath not set.");
+
+        if (!File.Exists(credentialsPath))
+            throw new FileNotFoundException(
+                $"Firebase credentials file not found at path: {credentialsPath}",
+                credentialsPath);
+
+        FirebaseApp.Create(new AppOptions
+        {
+            Credential = GoogleCredential.FromFile(credentialsPath)
+        });
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {

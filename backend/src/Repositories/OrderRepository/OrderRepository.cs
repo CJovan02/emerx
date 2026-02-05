@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace EMerx.Repositories.OrderRepository;
 
-public class OrderRepository(MongoDbContext context) : IOrderRepository
+public class OrderRepository(MongoContext context) : IOrderRepository
 {
     private readonly IMongoCollection<Order> _orders = context.Orders;
 

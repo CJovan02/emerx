@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace EMerx.Repositories.ProductRepository;
 
-public class ProductRepository(MongoDbContext context) : IProductRepository
+public class ProductRepository(MongoContext context) : IProductRepository
 {
     private readonly IMongoCollection<Product> _products = context.Products;
 
