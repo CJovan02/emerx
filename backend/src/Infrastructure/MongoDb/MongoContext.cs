@@ -13,6 +13,8 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
 
     public void Connect()
     {
+        _logger.LogInformation("Connecting to MongoDB...");
+
         var settings = options.Value;
 
         var mongoSettings = MongoClientSettings.FromConnectionString(settings.ConnectionString);
@@ -32,6 +34,7 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
         catch (Exception ex)
         {
             _logger.LogError(ex, "❌ MongoDb connection could not be established.");
+            throw ex;
         }
     }
 

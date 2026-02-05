@@ -1,6 +1,6 @@
 using EMerx.Common;
 using EMerx.Common.Exceptions;
-using EMerx.Entities;
+using EMerx.ExceptionHandlers;
 using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.OrderRepository;
@@ -83,6 +83,12 @@ public static class ServiceCollectionExtension
                     }
                 });
             });
+    }
+
+    public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+    {
+        return services
+            .AddExceptionHandler<GlobalExceptionHandler>();
     }
 
     public static IServiceCollection AddFirebaseAuthentication(this IServiceCollection services,

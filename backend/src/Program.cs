@@ -1,12 +1,13 @@
 using EMerx.DTOs.Id;
 using EMerx.Infrastructure;
 using EMerx.Infrastructure.MongoDb;
-using FirebaseAdmin;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandlers();
 
 builder.Services.AddDatabase();
 builder.Services.AddSwaggerWithAuth();
