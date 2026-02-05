@@ -36,7 +36,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         // calls the auth repository to try and create firebase auth account
         var uid = await authRepository.RegisterAsync(registerUser.Email, registerUser.Password);
 
-        // if it's successful, we also create the dabatase entry
+        // if it's successful, we also create the database entry
         var user = new User
         {
             Email = registerUser.Email,
@@ -94,7 +94,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
     /// We query the user in db with the id = userId
     /// Then we grab his firebaseUid, and using that we call authRepo to delete firebase user.
     ///
-    /// It could be faster if we had the same id for the firebase auth user and databse user id, but delete user is not
+    /// It could be faster if we had the same id for the firebase auth user and database user id, but delete user is not
     /// a common operation, and it's usually slow because it also deletes all data connected to that user
     /// </summary>
     public async Task<Result> DeleteAsync(IdRequest request)
