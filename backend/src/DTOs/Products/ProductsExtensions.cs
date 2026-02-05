@@ -21,11 +21,13 @@ public static class ProductsExtensions
 
     public static ProductResponse ToResponse(this Product domain)
     {
-        return new ProductResponse(
-            domain.Id,
-            domain.Name,
-            domain.Category,
-            domain.Image,
-            domain.Price);
+        return new ProductResponse
+        {
+            Id = domain.Id,
+            Name = domain.Name,
+            Category = domain.Category,
+            Image = domain.Image,
+            Price = domain.Price
+        };
     }
 }

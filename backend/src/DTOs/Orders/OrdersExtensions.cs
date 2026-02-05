@@ -9,14 +9,15 @@ public static class OrdersExtensions
 {
     public static OrderResponse ToResponse(this Order order)
     {
-        return new OrderResponse(
-            Id: order.Id,
-            UserId: order.UserId,
-            Items: order.Items,
-            Address: order.Address,
-            Price: order.Price,
-            PlacedAt: order.PlacedAt
-        );
+        return new OrderResponse
+        {
+            Id = order.Id,
+            UserId = order.UserId,
+            Items = order.Items,
+            Address = order.Address,
+            Price = order.Price,
+            PlacedAt = order.PlacedAt
+        };
     }
 
     public static Order ToDomain(this OrderRequest order, IEnumerable<Product> products)

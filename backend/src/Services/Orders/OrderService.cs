@@ -59,9 +59,11 @@ public class OrderService(
             // If some bug on frontend happens and duplicate items get sent
             var normalizedItems = request.Items
                 .GroupBy(x => x.ProductId)
-                .Select(g => new OrderItemRequest(
-                    ProductId: g.Key,
-                    Quantity: g.Sum(x => x.Quantity))
+                .Select(g => new OrderItemRequest
+                    {
+                        ProductId = g.Key,
+                        Quantity = g.Sum(x => x.Quantity)
+                    }
                 ).ToList();
             var normalizedRequest = request with { Items = normalizedItems };
 

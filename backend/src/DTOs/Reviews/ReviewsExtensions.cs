@@ -9,12 +9,14 @@ public static class ReviewsExtensions
 {
     public static ReviewResponse ToResponse(this Review review)
     {
-        return new ReviewResponse(
-            review.Id,
-            review.UserId,
-            review.ProductId,
-            review.Rating,
-            review.Description);
+        return new ReviewResponse
+        {
+            Id = review.Id,
+            UserId = review.UserId,
+            ProductId = review.ProductId,
+            Rating = review.Rating,
+            Description = review.Description
+        };
     }
 
     public static Review ToDomain(this ReviewRequest request)
