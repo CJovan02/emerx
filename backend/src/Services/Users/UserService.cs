@@ -1,5 +1,7 @@
 using EMerx.DTOs.Id;
+using EMerx.DTOs.Users;
 using EMerx.DTOs.Users.Request;
+using EMerx.DTOs.Users.Response;
 using EMerx.Entities;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.UserRepository;
@@ -12,26 +14,26 @@ namespace EMerx.Services.Users;
 
 public class UserService(IUserRepository userRepository, IAuthRepository authRepository) : IUserService
 {
-    public async Task<Result<User>> GetByIdAsync(IdRequest request)
+    public async Task<Result<UserResponse>> GetByIdAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
         var user = await userRepository.GetUserById(objectId);
         if (user is null)
-            return Result<User>.Failure(UserErrors.NotFound(objectId));
+            return Result<UserResponse>.Failure(UserErrors.NotFound(objectId));
 
-        return Result<User>.Success(user);
+        return Result<UserResponse>.Success(user.ToResponse());
     }
 
-    public async Task<Result<User>> GetByFirebaseUidAsync(string firebaseUid)
+    public async Task<Result<UserResponse>> GetByFirebaseUidAsync(string firebaseUid)
     {
         var user = await userRepository.GetUserByFirebaseUid(firebaseUid);
         if (user is null)
-            return Result<User>.Failure(UserErrors.NotFound(firebaseUid));
+            return Result<UserResponse>.Failure(UserErrors.NotFound(firebaseUid));
 
-        return Result<User>.Success(user);
+        return Result<UserResponse>.Success(user.ToResponse());
     }
 
-    public async Task<Result<User>> RegisterAsync(RegisterUser registerUser)
+    public async Task<Result<UserResponse>> RegisterAsync(RegisterUser registerUser)
     {
         // calls the auth repository to try and create firebase auth account
         var uid = await authRepository.RegisterAsync(registerUser.Email, registerUser.Password);
@@ -49,12 +51,12 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         {
             await userRepository.CreateUser(user);
 
-            return Result<User>.Success(user);
+            return Result<UserResponse>.Success(user.ToResponse());
         }
         catch (Exception)
         {
             await authRepository.DeleteUserAsync(user.FirebaseUid);
-            return Result<User>.Failure(GeneralErrors.DatabaseError());
+            return Result<UserResponse>.Failure(GeneralErrors.DatabaseError());
         }
     }
 

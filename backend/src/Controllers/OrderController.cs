@@ -1,6 +1,7 @@
 using EMerx.Auth;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Orders.Request;
+using EMerx.DTOs.Orders.Response;
 using EMerx.ResultPattern;
 using EMerx.Services.Orders;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +15,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 {
     [Authorize]
     [RequiresRole(Roles.Admin)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -22,17 +23,17 @@ public class OrderController(IOrderService orderService) : ControllerBase
         return (await orderService.GetAllAsync()).ToActionResult();
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] IdRequest request)
     {
-        return(await orderService.GetByIdAsync(request)).ToActionResult();
+        return (await orderService.GetByIdAsync(request)).ToActionResult();
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

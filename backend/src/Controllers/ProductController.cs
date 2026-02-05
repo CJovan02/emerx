@@ -1,5 +1,6 @@
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Products.Request;
+using EMerx.DTOs.Products.Response;
 using EMerx.ResultPattern;
 using EMerx.Services.Products;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace EMerx.Controllers;
 public class ProductController(IProductService productService) : ControllerBase
 {
     // Add pagination
-    [ProducesResponseType((StatusCodes.Status200OK))]
+    [ProducesResponseType(typeof(IEnumerable<ProductResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -19,7 +20,7 @@ public class ProductController(IProductService productService) : ControllerBase
         return (await productService.GetAllAsync()).ToActionResult();
     }
 
-    [ProducesResponseType((StatusCodes.Status200OK))]
+    [ProducesResponseType(typeof(ProductResponse), (StatusCodes.Status200OK))]
     [ProducesResponseType((StatusCodes.Status400BadRequest))]
     [ProducesResponseType((StatusCodes.Status404NotFound))]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
@@ -29,7 +30,7 @@ public class ProductController(IProductService productService) : ControllerBase
         return (await productService.GetByIdAsync(request)).ToActionResult();
     }
 
-    [ProducesResponseType((StatusCodes.Status201Created))]
+    [ProducesResponseType(typeof(ProductResponse), (StatusCodes.Status201Created))]
     [ProducesResponseType((StatusCodes.Status400BadRequest))]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpPost]
