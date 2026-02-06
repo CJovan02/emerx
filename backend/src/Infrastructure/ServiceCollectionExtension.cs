@@ -58,7 +58,14 @@ public static class ServiceCollectionExtension
         return services
             .AddSwaggerGen(option =>
             {
-                option.CustomOperationIds(e => $"{e.ActionDescriptor.RouteValues["controller"]}_{e.HttpMethod}");
+                option.CustomOperationIds(e =>
+                {
+                    var controller = e.ActionDescriptor.RouteValues["controller"];
+                    // action is the name of the function in c#
+                    var action = e.ActionDescriptor.RouteValues["action"];
+                    //var method = e.HttpMethod;
+                    return $"{controller}_{action}";
+                });
                 option.SwaggerDoc("v1", new OpenApiInfo() { Title = "Demo API", Version = "v1" });
                 option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

@@ -7,17 +7,18 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api-generate": "openapi-rq -i http://localhost:5016/swagger/v1/swagger.json -o ./src/api/openApi"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
+    "@tanstack/react-query": "^5.90.20",
     "firebase": "^12.6.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "api-generate": "dotenv -e .env.local -- openapi-rq -i $VITE_BACKEND_ADDRESS/swagger/v1/swagger.json"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@7nohe/openapi-react-query-codegen": "^2.0.0",
@@ -26,7 +27,6 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
