@@ -11,6 +11,13 @@ export default defineConfig(() => {
                 clean: true,
                 prettier: true,
                 client: 'react-query',
+                httpClient: 'axios',
+                override: {
+                    mutator: {
+                        name: 'axiosInstance',
+                        path: './src/api/axiosInstance.ts',
+                    },
+                },
             },
             hooks: {
                 afterAllFilesWrite: 'prettier --write',

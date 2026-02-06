@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase.ts';
 import {Button} from "@mui/material";
+import {useProductGetAll} from "../api/openApi/product/product.ts";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
+
+	const { data } = useProductGetAll()
+	console.log(data);
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
