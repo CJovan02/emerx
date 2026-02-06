@@ -16,14 +16,17 @@
     "@mui/material": "^7.3.5",
     "firebase": "^12.6.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "api-generate": "dotenv -e .env.local -- openapi-rq -i $VITE_BACKEND_ADDRESS/swagger/v1/swagger.json"
   },
   "devDependencies": {
+    "@7nohe/openapi-react-query-codegen": "^2.0.0",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
