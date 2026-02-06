@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase.ts';
+import {Button} from "@mui/material";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
@@ -64,11 +65,11 @@ const LoginPage = () => {
 
 				{error && <p style={{ color: 'red' }}>{error}</p>}
 
-				<button
+				<Button
 					disabled={loading}
 					type='submit'>
 					{loading ? 'Logging in...' : 'Login'}
-				</button>
+				</Button>
 			</form>
 		</div>
 	);

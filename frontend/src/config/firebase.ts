@@ -6,7 +6,7 @@ const app = firebase.initializeApp({
 	authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
 	databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 	projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-	storageBucket: import.meta.env.STORAGE_BUCKET,
+	storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
 	messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER,
 	appId: import.meta.env.VITE_FIREBASE_APP_ID,
 });

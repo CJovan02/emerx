@@ -1,12 +1,26 @@
-import { createTheme } from '@mui/material';
-import { Colors } from '../shared/common/constants/colors';
+import {createTheme} from '@mui/material';
+import {blue, purple} from "@mui/material/colors";
 
-export const theme = createTheme({
-	palette: {
-		primary: {
-			main: Colors.Primary.Main,
-			light: Colors.Primary.Light,
-			dark: Colors.Primary.Dark,
-		},
-	},
-});
+function useTheme() {
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: blue[700],
+            },
+            secondary: {
+                main: purple[500],
+            }
+        },
+        components: {
+            MuiButton: {
+                defaultProps: {
+                    variant: 'contained',
+                }
+            }
+        }
+    });
+
+    return theme;
+}
+
+export default useTheme;
