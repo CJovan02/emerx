@@ -1,16 +1,21 @@
-import {createTheme} from '@mui/material';
-import {blue, indigo, purple} from "@mui/material/colors";
+import {createTheme, lighten} from '@mui/material';
+import {Colors} from "../shared/common/constants/colors.ts";
 
 function useTheme() {
     const theme = createTheme({
         palette: {
             primary: {
-                main: blue[700],
+                main: Colors.Primary.Main,
             },
             secondary: {
-                main: purple[500],
+                main: Colors.Secondary.Main,
+            },
+            background: {
+                default: lighten(Colors.Primary.Main, 0.97),
+                paper: lighten(Colors.Primary.Main, 0.95),
             }
         },
+
         shape: {
             borderRadius: 12,
         },
@@ -22,6 +27,7 @@ function useTheme() {
             },
         },
         components: {
+
             MuiButton: {
                 defaultProps: {
                     variant: 'contained',

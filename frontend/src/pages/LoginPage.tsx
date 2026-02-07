@@ -1,5 +1,4 @@
 import {
-    alpha,
     Box,
     Button,
     Card,
@@ -12,6 +11,7 @@ import {
 import TextInput from "../componenets/reusable/textInput.tsx";
 import useLoginLogic from "../hooks/useLoginLogic.ts";
 import {FormProvider} from "react-hook-form";
+import {bgGradient} from "../shared/common/gradient.ts";
 
 const LoginPage = () => {
     const {form, login} = useLoginLogic();
@@ -23,12 +23,7 @@ const LoginPage = () => {
             alignItems="center"
             justifyContent="center"
             sx={{
-                background: (theme) =>
-                    `linear-gradient(
-        135deg,
-        ${alpha(theme.palette.primary.main, 0.08)},
-        ${alpha(theme.palette.secondary.main, 0.08)}
-      )`
+                background: (theme) => bgGradient(theme)
             }}
         >
             <Card
