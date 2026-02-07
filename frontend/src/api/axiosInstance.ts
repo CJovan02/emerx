@@ -1,4 +1,4 @@
-import Axios, {type AxiosRequestConfig, AxiosError } from 'axios';
+import Axios, {type AxiosRequestConfig, AxiosError} from 'axios';
 
 export const AXIOS_INSTANCE = Axios.create({
     baseURL: '/api',
@@ -35,7 +35,7 @@ export const axiosInstance = <T>(
     return AXIOS_INSTANCE({
         ...config,
         ...options,
-    }).then(({ data }) => data);
+    }).then(({data}) => data);
 };
 
 export type ErrorType<Error> = AxiosError<Error>;
