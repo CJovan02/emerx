@@ -1,4 +1,4 @@
-import {createTheme, lighten} from '@mui/material';
+import {alpha, createTheme, lighten} from '@mui/material';
 import {Colors} from "../shared/common/constants/colors.ts";
 
 function useTheme() {
@@ -25,6 +25,15 @@ function useTheme() {
                 textTransform: 'none',
                 fontWeight: 600,
             },
+        },
+        custom: {
+            gradients: {
+                background: `linear-gradient(
+                    135deg,
+                    ${alpha(Colors.Primary.Main, 0.08)},
+                    ${alpha(Colors.Secondary.Main, 0.08)}
+                  )`
+            }
         },
         components: {
 
