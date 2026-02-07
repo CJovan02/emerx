@@ -11,5 +11,5 @@ const app = firebase.initializeApp({
 	appId: import.meta.env.VITE_FIREBASE_APP_ID,
 });
 
-export const auth = getAuth();
+export const auth = getAuth(app);
 export default app;
