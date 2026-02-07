@@ -1,19 +1,26 @@
 import {
+    Alert,
     Box,
     Button,
     Card,
     CardActions,
     CardContent,
     CardHeader,
-    Link,
+    Link, Snackbar,
     Stack,
 } from "@mui/material";
 import TextInput from "../componenets/reusable/textInput.tsx";
 import useLoginLogic from "../hooks/useLoginLogic.ts";
 import {FormProvider} from "react-hook-form";
+import {useEffect, useState} from "react";
 
 const LoginPage = () => {
-    const {form, login} = useLoginLogic();
+    const {form, login, isLoading, isError, errorMessage} = useLoginLogic();
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
+
+    useEffect(() => {
+        if (isError) setShowErrorSnackbar(true);
+    }, [isError]);
 
     return (
         <Box
@@ -25,15 +32,17 @@ const LoginPage = () => {
                 background: (theme) => theme.custom.gradients.background
             }}
         >
+            <Snackbar open={showErrorSnackbar} autoHideDuration={4000} onClose={() => setShowErrorSnackbar(false)}>
+                <Alert severity="error" variant='filled' sx={{width: '100%'}}>{errorMessage}</Alert>
+            </Snackbar>
             <Card
                 elevation={3}
-                sx={{
-                    padding: 2
-                }}
+                sx={{padding: 2}}
             >
                 <CardHeader
                     title="Sign In"
                     subheader="Welcome back, please login to start shopping"
+
                 />
                 <CardContent>
                     <FormProvider {...form}>
@@ -72,6 +81,7 @@ const LoginPage = () => {
                         sx={{
                             py: 1.5,
                         }}
+                        loading={isLoading}
                     >
                         Sign In
                     </Button>
