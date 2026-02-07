@@ -9,6 +9,7 @@ interface TextInputProps {
     type?: string;
     required?: boolean;
     disabled?: boolean;
+    fullWidth?: boolean;
 }
 
 const TextInput = ({
@@ -19,6 +20,7 @@ const TextInput = ({
                        disabled,
                        type,
                        description,
+                       fullWidth
                    }: TextInputProps) => {
     const {control} = useFormContext();
     return (
@@ -42,6 +44,7 @@ const TextInput = ({
                                 field.onChange(type === 'number' ? Number(value) : value);
                             }}
                             label={label}
+                            fullWidth={fullWidth}
                             type={type || 'text'}
                             error={fieldState.invalid}
                             helperText={fieldState.invalid ? fieldState.error?.message : description}

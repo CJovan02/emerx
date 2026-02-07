@@ -12,8 +12,8 @@ const Providers = ({children}: { children: ReactNode }) => {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline/>
             <QueryClientProvider client={queryClient}>
-                <CssBaseline/>
                 {children}
             </QueryClientProvider>
         </ThemeProvider>
