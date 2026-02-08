@@ -6,12 +6,7 @@ import {auth} from "../config/firebase.ts";
 import {signInWithEmailAndPassword} from "firebase/auth"
 import {FirebaseError} from "firebase/app"
 
-enum LoginLogicState {
-    init,
-    loading,
-    success,
-    error
-}
+type LoginLogicState = 'init' | 'success' | 'error' | 'loading';
 
 function useLoginLogic() {
     const formSchema = z.object({
@@ -28,20 +23,20 @@ function useLoginLogic() {
         }
     });
 
-    const [state, setState] = useState<LoginLogicState>(LoginLogicState.init)
+    const [state, setState] = useState<LoginLogicState>('init')
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const login = useCallback(async (values: FormValues) => {
         try {
-            if (state === LoginLogicState.loading) return;
-            setState(LoginLogicState.loading)
+            if (state === 'loading') return;
+            setState('loading');
 
             const credential = await signInWithEmailAndPassword(auth, values.email, values.password)
             console.log(credential)
 
-            setState(LoginLogicState.success)
+            setState('success')
         } catch (error) {
-            setState(LoginLogicState.error)
+            setState('error')
             if (error instanceof FirebaseError && error.code === 'auth/invalid-credential') {
                 setErrorMessage("Invalid email or password");
                 return;
@@ -55,9 +50,9 @@ function useLoginLogic() {
     return {
         form,
         login,
-        isLoading: state === LoginLogicState.loading,
-        isSuccess: state === LoginLogicState.success,
-        isError: state === LoginLogicState.error,
+        isLoading: state === 'loading',
+        isSuccess: state === 'success',
+        isError: state === 'error',
         errorMessage,
     }
 }

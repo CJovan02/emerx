@@ -1,10 +1,10 @@
 using EMerx.Auth;
 using EMerx.DTOs.Email;
-using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.DTOs.Users.Response;
 using EMerx.ResultPattern;
 using EMerx.Services.Users;
+using EMerx.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,23 +14,17 @@ namespace EMerx.Controllers;
 [Route("[controller]")]
 public class UserController(IUserService userService) : ControllerBase
 {
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetById(IdRequest request)
-    {
-        return (await userService.GetByIdAsync(request)).ToActionResult();
-    }
-
-    [HttpGet("getByFirebaseUid/{firebaseUid}")]
+    [Authorize]
+    [HttpGet]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetByFirebaseUid(string firebaseUid)
+    public async Task<IActionResult> GetSelf()
     {
-        var result = await userService.GetByFirebaseUidAsync(firebaseUid);
+        var uid = JwtUtils.GetUidFromHttpContext(HttpContext);
+        if (uid is null)
+            return Unauthorized();
+        var result = await userService.GetByFirebaseUidAsync(uid);
 
         return result.ToActionResult();
     }
@@ -72,13 +66,17 @@ public class UserController(IUserService userService) : ControllerBase
         return (await userService.RemoveAdminRoleAsync(request.Email)).ToActionResult();
     }
 
-    [HttpDelete("{id}")]
+    [Authorize]
+    [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Delete([FromRoute] IdRequest request)
+    public async Task<IActionResult> Delete()
     {
-        var result = await userService.DeleteAsync(request);
+        var uid = JwtUtils.GetUidFromHttpContext(HttpContext);
+        if (uid is null)
+            return Unauthorized();
+        var result = await userService.DeleteByFirebaseIdAsync(uid);
 
         return result.ToActionResult();
     }
