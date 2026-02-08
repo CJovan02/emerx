@@ -7,7 +7,7 @@ function RootLayout() {
         <>
             <AuthUserSync/>
             <AuthFlowRedirection/>
-            <Outlet />
+            <Outlet/>
         </>
     )
 }

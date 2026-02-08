@@ -5,7 +5,7 @@ import {
     Card,
     CardActions,
     CardContent,
-    CardHeader,
+    CardHeader, Divider,
     Link, Snackbar,
     Stack,
 } from "@mui/material";
@@ -68,8 +68,6 @@ const LoginPage = () => {
                             </Stack>
                         </form>
                     </FormProvider>
-
-                    <Box marginY={2}>Don't have an account? <Link href='#'>Sign up</Link></Box>
                 </CardContent>
                 <CardActions>
                     <Button
@@ -86,6 +84,10 @@ const LoginPage = () => {
                         Sign In
                     </Button>
                 </CardActions>
+                <CardContent>
+                    <Divider />
+                    <Box marginY={2}>Don't have an account? <Link href='#'>Sign up</Link></Box>
+                </CardContent>
             </Card>
 
         </Box>

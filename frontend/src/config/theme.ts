@@ -36,7 +36,13 @@ function useTheme() {
             }
         },
         components: {
-
+            MuiDivider: {
+                styleOverrides: {
+                    root: ({ theme }) => ({
+                        borderColor: theme.palette.text.disabled,
+                    }),
+                },
+            },
             MuiButton: {
                 defaultProps: {
                     variant: 'contained',

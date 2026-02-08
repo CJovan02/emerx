@@ -8,6 +8,7 @@ import {RouterProvider} from "react-router/dom";
 import LoginPage from "../pages/LoginPage.tsx";
 import RootLayout from "../pages/layouts/RootLayout.tsx";
 import SplashPage from "../pages/SplashPage.tsx";
+import StorePage from "../pages/StorePage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
             {
                 path: "/login",
                 Component: LoginPage,
+            },
+            {
+                path: '/store',
+                Component: StorePage,
             }
         ]
     },
