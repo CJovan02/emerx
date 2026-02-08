@@ -258,11 +258,7 @@ export const getOrderGetByIdQueryOptions = <
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof orderGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof orderGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	}
@@ -299,11 +295,7 @@ export function useOrderGetById<
 	id: string,
 	options: {
 		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof orderGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof orderGetById>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
@@ -326,11 +318,7 @@ export function useOrderGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof orderGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof orderGetById>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
@@ -353,11 +341,7 @@ export function useOrderGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof orderGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof orderGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -373,11 +357,7 @@ export function useOrderGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof orderGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof orderGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},

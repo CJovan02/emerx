@@ -116,4 +116,21 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
 
         return Result.Success();
     }
+
+    public async Task<Result> DeleteByFirebaseIdAsync(string firebaseUid)
+    {
+        // We find the user with the specified id
+        var dbUser = await userRepository.GetUserByFirebaseUid(firebaseUid);
+
+        if (dbUser is null)
+            return Result.Failure(UserErrors.NotFound(firebaseUid));
+
+        // We delete the user with extracted firebaseId
+        await authRepository.DeleteUserAsync(dbUser.FirebaseUid);
+
+        // Then we delete user and user data
+        await userRepository.DeleteUser(dbUser.Id);
+
+        return Result.Success();
+    }
 }

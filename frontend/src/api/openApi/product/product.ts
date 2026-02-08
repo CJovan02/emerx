@@ -80,11 +80,7 @@ export function useProductGetAll<
 >(
 	options: {
 		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
@@ -106,11 +102,7 @@ export function useProductGetAll<
 >(
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
@@ -132,11 +124,7 @@ export function useProductGetAll<
 >(
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -151,11 +139,7 @@ export function useProductGetAll<
 >(
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -278,11 +262,7 @@ export const getProductGetByIdQueryOptions = <
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	}
@@ -319,11 +299,7 @@ export function useProductGetById<
 	id: string,
 	options: {
 		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetById>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
@@ -346,11 +322,7 @@ export function useProductGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetById>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
@@ -373,11 +345,7 @@ export function useProductGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -393,11 +361,7 @@ export function useProductGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof productGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof productGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},

@@ -1,82 +1,97 @@
-import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase.ts';
-import {Button} from "@mui/material";
-import {useProductGetAll} from "../api/openApi/product/product.ts";
+import {
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader, Divider,
+    Link, Snackbar,
+    Stack,
+} from "@mui/material";
+import TextInput from "../componenets/reusable/textInput.tsx";
+import useLoginLogic from "../hooks/useLoginLogic.ts";
+import {FormProvider} from "react-hook-form";
+import {useEffect, useState} from "react";
 
 const LoginPage = () => {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState('');
+    const {form, login, isLoading, isError, errorMessage} = useLoginLogic();
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
 
-	const { data } = useProductGetAll()
-	console.log(data);
+    useEffect(() => {
+        if (isError) setShowErrorSnackbar(true);
+    }, [isError]);
 
-	const handleLogin = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError('');
-		setLoading(true);
+    return (
+        <Box
+            minHeight="100vh"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            sx={{
+                background: (theme) => theme.custom.gradients.background
+            }}
+        >
+            <Snackbar open={showErrorSnackbar} autoHideDuration={4000} onClose={() => setShowErrorSnackbar(false)}>
+                <Alert severity="error" variant='filled' sx={{width: '100%'}}>{errorMessage}</Alert>
+            </Snackbar>
+            <Card
+                elevation={3}
+                sx={{padding: 2}}
+            >
+                <CardHeader
+                    title="Sign In"
+                    subheader="Welcome back, please login to start shopping"
 
-		try {
-			const userCredential = await signInWithEmailAndPassword(
-				auth,
-				email,
-				password
-			);
-			const user = userCredential.user;
+                />
+                <CardContent>
+                    <FormProvider {...form}>
+                        <form
+                            id='login-form'
+                            onSubmit={form.handleSubmit(login)}
+                        >
+                            <Stack gap={3}>
+                                <TextInput
+                                    id='email'
+                                    label='Email'
+                                    required
+                                    fullWidth
+                                />
 
-			// Uzmi token → može i sa force refresh
-			const token = await user.getIdToken();
+                                <TextInput
+                                    id='password'
+                                    label='Password'
+                                    type='password'
+                                    required
+                                    fullWidth
+                                />
+                            </Stack>
+                        </form>
+                    </FormProvider>
+                </CardContent>
+                <CardActions>
+                    <Button
+                        type="submit"
+                        form="login-form"
+                        fullWidth
+                        size='large'
+                        variant="contained"
+                        sx={{
+                            py: 1.5,
+                        }}
+                        loading={isLoading}
+                    >
+                        Sign In
+                    </Button>
+                </CardActions>
+                <CardContent>
+                    <Divider />
+                    <Box marginY={2}>Don't have an account? <Link href='#'>Sign up</Link></Box>
+                </CardContent>
+            </Card>
 
-			console.log('Logged in user:', user);
-			console.log('Token:', token);
-
-			alert('Login successful!');
-		} catch (err: any) {
-			setError(err.message ?? 'Unknown error');
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	return (
-		<div style={{ maxWidth: 400, margin: '50px auto' }}>
-			<h2>Login</h2>
-
-			<form onSubmit={handleLogin}>
-				<div style={{ marginBottom: '12px' }}>
-					<label>Email</label>
-					<input
-						type='email'
-						value={email}
-						onChange={e => setEmail(e.target.value)}
-						required
-						style={{ width: '100%' }}
-					/>
-				</div>
-
-				<div style={{ marginBottom: '12px' }}>
-					<label>Password</label>
-					<input
-						type='password'
-						value={password}
-						onChange={e => setPassword(e.target.value)}
-						required
-						style={{ width: '100%' }}
-					/>
-				</div>
-
-				{error && <p style={{ color: 'red' }}>{error}</p>}
-
-				<Button
-					disabled={loading}
-					type='submit'>
-					{loading ? 'Logging in...' : 'Login'}
-				</Button>
-			</form>
-		</div>
-	);
+        </Box>
+    )
 };
 
 export default LoginPage;
