@@ -4,6 +4,7 @@ import useTheme from "../config/theme.ts";
 import {
     QueryClient, QueryClientProvider,
 } from '@tanstack/react-query'
+import AuthUserSync from "./authUserSync.tsx";
 
 const queryClient = new QueryClient()
 
@@ -14,6 +15,7 @@ const Providers = ({children}: { children: ReactNode }) => {
         <ThemeProvider theme={theme}>
             <CssBaseline/>
             <QueryClientProvider client={queryClient}>
+                <AuthUserSync/>
                 {children}
             </QueryClientProvider>
         </ThemeProvider>
