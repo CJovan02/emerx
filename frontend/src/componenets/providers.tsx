@@ -8,6 +8,8 @@ import RootLayout from '../pages/layouts/RootLayout.tsx';
 import SplashPage from '../pages/SplashPage.tsx';
 import StorePage from '../pages/StorePage.tsx';
 import { Routes } from '../shared/common/constants/routeNames.ts';
+import RegisterPage from '../pages/RegisterPage.tsx';
+import { SnackbarProvider } from 'notistack';
 
 const router = createBrowserRouter([
 	{
@@ -21,6 +23,10 @@ const router = createBrowserRouter([
 			{
 				path: Routes.Login,
 				Component: LoginPage,
+			},
+			{
+				path: Routes.Register,
+				Component: RegisterPage,
 			},
 			{
 				path: Routes.Store,
@@ -39,7 +45,9 @@ const Providers = () => {
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
+				<SnackbarProvider>
+					<RouterProvider router={router} />
+				</SnackbarProvider>
 			</QueryClientProvider>
 		</ThemeProvider>
 	);

@@ -96,6 +96,7 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
     {
         return services
+            .AddExceptionHandler<FirebaseAuthExceptionHandler>()
             .AddExceptionHandler<GlobalExceptionHandler>();
     }
 

@@ -33,7 +33,7 @@ public class UserController(IUserService userService) : ControllerBase
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Register([FromBody] RegisterUser dto)
+    public async Task<IActionResult> Register([FromBody] RegisterUserRequest dto)
     {
         var result = await userService.RegisterAsync(dto);
 
