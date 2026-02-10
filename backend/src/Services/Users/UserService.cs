@@ -33,17 +33,18 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<UserResponse>.Success(user.ToResponse());
     }
 
-    public async Task<Result<UserResponse>> RegisterAsync(RegisterUser registerUser)
+    public async Task<Result<UserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest)
     {
         // calls the auth repository to try and create firebase auth account
-        var uid = await authRepository.RegisterAsync(registerUser.Email, registerUser.Password);
+        // handling firebase exception with global exception handler
+        var uid = await authRepository.RegisterAsync(registerUserRequest.Email, registerUserRequest.Password);
 
         // if it's successful, we also create the database entry
         var user = new User
         {
-            Email = registerUser.Email,
-            Name = registerUser.Name,
-            Surname = registerUser.Surname,
+            Email = registerUserRequest.Email,
+            Name = registerUserRequest.Name,
+            Surname = registerUserRequest.Surname,
             FirebaseUid = uid,
         };
 

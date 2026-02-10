@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace EMerx.DTOs.Users.Request;
 
-public class RegisterUserValidator : AbstractValidator<RegisterUser>
+public class RegisterUserValidator : AbstractValidator<RegisterUserRequest>
 {
     public RegisterUserValidator()
     {
@@ -11,7 +11,7 @@ public class RegisterUserValidator : AbstractValidator<RegisterUser>
             .WithMessage("Name must be between 5 and 20 characters long");
 
         RuleFor(x => x.Surname)
-            .Length(5, 30)
+            .Length(5, 20)
             .WithMessage("Surname must be between 5 and 30 characters long");
 
         RuleFor(x => x.Email)

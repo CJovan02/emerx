@@ -5,7 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export interface RegisterUser {
+export interface RegisterUserRequest {
 	/** @minLength 1 */
 	name: string;
 	/** @minLength 1 */
