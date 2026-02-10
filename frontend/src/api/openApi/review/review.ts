@@ -76,11 +76,7 @@ export function useReviewGetAll<
 >(
 	options: {
 		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
@@ -102,11 +98,7 @@ export function useReviewGetAll<
 >(
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
@@ -128,11 +120,7 @@ export function useReviewGetAll<
 >(
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -147,11 +135,7 @@ export function useReviewGetAll<
 >(
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetAll>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -274,11 +258,7 @@ export const getReviewGetByIdQueryOptions = <
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	}
@@ -315,11 +295,7 @@ export function useReviewGetById<
 	id: string,
 	options: {
 		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetById>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
@@ -342,11 +318,7 @@ export function useReviewGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetById>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
@@ -369,11 +341,7 @@ export function useReviewGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -389,11 +357,7 @@ export function useReviewGetById<
 	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof reviewGetById>>,
-				TError,
-				TData
-			>
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetById>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},

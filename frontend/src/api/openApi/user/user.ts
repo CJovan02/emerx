@@ -27,72 +27,62 @@ import type { ErrorType, BodyType } from '../../axiosInstance';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const userGetById = (
-	id: string,
+export const userGetSelf = (
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
 	return axiosInstance<UserResponse>(
-		{ url: `/User/${id}`, method: 'GET', signal },
+		{ url: `/User`, method: 'GET', signal },
 		options
 	);
 };
 
-export const getUserGetByIdQueryKey = (id: string) => {
-	return [`/User/${id}`] as const;
+export const getUserGetSelfQueryKey = () => {
+	return [`/User`] as const;
 };
 
-export const getUserGetByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof userGetById>>,
+export const getUserGetSelfQueryOptions = <
+	TData = Awaited<ReturnType<typeof userGetSelf>>,
 	TError = ErrorType<ProblemDetails | void>,
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof userGetById>>, TError, TData>
-		>;
-		request?: SecondParameter<typeof axiosInstance>;
-	}
-) => {
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<Awaited<ReturnType<typeof userGetSelf>>, TError, TData>
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}) => {
 	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-	const queryKey = queryOptions?.queryKey ?? getUserGetByIdQueryKey(id);
+	const queryKey = queryOptions?.queryKey ?? getUserGetSelfQueryKey();
 
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof userGetById>>> = ({
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof userGetSelf>>> = ({
 		signal,
-	}) => userGetById(id, requestOptions, signal);
+	}) => userGetSelf(requestOptions, signal);
 
-	return {
-		queryKey,
-		queryFn,
-		enabled: !!id,
-		...queryOptions,
-	} as UseQueryOptions<
-		Awaited<ReturnType<typeof userGetById>>,
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof userGetSelf>>,
 		TError,
 		TData
 	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type UserGetByIdQueryResult = NonNullable<
-	Awaited<ReturnType<typeof userGetById>>
+export type UserGetSelfQueryResult = NonNullable<
+	Awaited<ReturnType<typeof userGetSelf>>
 >;
-export type UserGetByIdQueryError = ErrorType<ProblemDetails | void>;
+export type UserGetSelfQueryError = ErrorType<ProblemDetails | void>;
 
-export function useUserGetById<
-	TData = Awaited<ReturnType<typeof userGetById>>,
+export function useUserGetSelf<
+	TData = Awaited<ReturnType<typeof userGetSelf>>,
 	TError = ErrorType<ProblemDetails | void>,
 >(
-	id: string,
 	options: {
 		query: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof userGetById>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof userGetSelf>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof userGetById>>,
+					Awaited<ReturnType<typeof userGetSelf>>,
 					TError,
-					Awaited<ReturnType<typeof userGetById>>
+					Awaited<ReturnType<typeof userGetSelf>>
 				>,
 				'initialData'
 			>;
@@ -102,20 +92,19 @@ export function useUserGetById<
 ): DefinedUseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useUserGetById<
-	TData = Awaited<ReturnType<typeof userGetById>>,
+export function useUserGetSelf<
+	TData = Awaited<ReturnType<typeof userGetSelf>>,
 	TError = ErrorType<ProblemDetails | void>,
 >(
-	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof userGetById>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof userGetSelf>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof userGetById>>,
+					Awaited<ReturnType<typeof userGetSelf>>,
 					TError,
-					Awaited<ReturnType<typeof userGetById>>
+					Awaited<ReturnType<typeof userGetSelf>>
 				>,
 				'initialData'
 			>;
@@ -125,14 +114,13 @@ export function useUserGetById<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useUserGetById<
-	TData = Awaited<ReturnType<typeof userGetById>>,
+export function useUserGetSelf<
+	TData = Awaited<ReturnType<typeof userGetSelf>>,
 	TError = ErrorType<ProblemDetails | void>,
 >(
-	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof userGetById>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof userGetSelf>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -141,14 +129,13 @@ export function useUserGetById<
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
-export function useUserGetById<
-	TData = Awaited<ReturnType<typeof userGetById>>,
+export function useUserGetSelf<
+	TData = Awaited<ReturnType<typeof userGetSelf>>,
 	TError = ErrorType<ProblemDetails | void>,
 >(
-	id: string,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof userGetById>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof userGetSelf>>, TError, TData>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -156,7 +143,7 @@ export function useUserGetById<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-	const queryOptions = getUserGetByIdQueryOptions(id, options);
+	const queryOptions = getUserGetSelfQueryOptions(options);
 
 	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
 		TData,
@@ -167,12 +154,11 @@ export function useUserGetById<
 }
 
 export const userDelete = (
-	id: string,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
 	return axiosInstance<void>(
-		{ url: `/User/${id}`, method: 'DELETE', signal },
+		{ url: `/User`, method: 'DELETE', signal },
 		options
 	);
 };
@@ -184,14 +170,14 @@ export const getUserDeleteMutationOptions = <
 	mutation?: UseMutationOptions<
 		Awaited<ReturnType<typeof userDelete>>,
 		TError,
-		{ id: string },
+		void,
 		TContext
 	>;
 	request?: SecondParameter<typeof axiosInstance>;
 }): UseMutationOptions<
 	Awaited<ReturnType<typeof userDelete>>,
 	TError,
-	{ id: string },
+	void,
 	TContext
 > => {
 	const mutationKey = ['userDelete'];
@@ -205,11 +191,9 @@ export const getUserDeleteMutationOptions = <
 
 	const mutationFn: MutationFunction<
 		Awaited<ReturnType<typeof userDelete>>,
-		{ id: string }
-	> = props => {
-		const { id } = props ?? {};
-
-		return userDelete(id, requestOptions);
+		void
+	> = () => {
+		return userDelete(requestOptions);
 	};
 
 	return { mutationFn, ...mutationOptions };
@@ -229,7 +213,7 @@ export const useUserDelete = <
 		mutation?: UseMutationOptions<
 			Awaited<ReturnType<typeof userDelete>>,
 			TError,
-			{ id: string },
+			void,
 			TContext
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
@@ -238,175 +222,11 @@ export const useUserDelete = <
 ): UseMutationResult<
 	Awaited<ReturnType<typeof userDelete>>,
 	TError,
-	{ id: string },
+	void,
 	TContext
 > => {
 	return useMutation(getUserDeleteMutationOptions(options), queryClient);
 };
-export const userGetByFirebaseUid = (
-	firebaseUid: string,
-	options?: SecondParameter<typeof axiosInstance>,
-	signal?: AbortSignal
-) => {
-	return axiosInstance<UserResponse>(
-		{ url: `/User/getByFirebaseUid/${firebaseUid}`, method: 'GET', signal },
-		options
-	);
-};
-
-export const getUserGetByFirebaseUidQueryKey = (firebaseUid: string) => {
-	return [`/User/getByFirebaseUid/${firebaseUid}`] as const;
-};
-
-export const getUserGetByFirebaseUidQueryOptions = <
-	TData = Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	firebaseUid: string,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-				TError,
-				TData
-			>
-		>;
-		request?: SecondParameter<typeof axiosInstance>;
-	}
-) => {
-	const { query: queryOptions, request: requestOptions } = options ?? {};
-
-	const queryKey =
-		queryOptions?.queryKey ?? getUserGetByFirebaseUidQueryKey(firebaseUid);
-
-	const queryFn: QueryFunction<
-		Awaited<ReturnType<typeof userGetByFirebaseUid>>
-	> = ({ signal }) =>
-		userGetByFirebaseUid(firebaseUid, requestOptions, signal);
-
-	return {
-		queryKey,
-		queryFn,
-		enabled: !!firebaseUid,
-		...queryOptions,
-	} as UseQueryOptions<
-		Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type UserGetByFirebaseUidQueryResult = NonNullable<
-	Awaited<ReturnType<typeof userGetByFirebaseUid>>
->;
-export type UserGetByFirebaseUidQueryError = ErrorType<ProblemDetails | void>;
-
-export function useUserGetByFirebaseUid<
-	TData = Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	firebaseUid: string,
-	options: {
-		query: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-					TError,
-					Awaited<ReturnType<typeof userGetByFirebaseUid>>
-				>,
-				'initialData'
-			>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useUserGetByFirebaseUid<
-	TData = Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	firebaseUid: string,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-					TError,
-					Awaited<ReturnType<typeof userGetByFirebaseUid>>
-				>,
-				'initialData'
-			>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useUserGetByFirebaseUid<
-	TData = Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	firebaseUid: string,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-				TError,
-				TData
-			>
-		>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-};
-
-export function useUserGetByFirebaseUid<
-	TData = Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	firebaseUid: string,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<
-				Awaited<ReturnType<typeof userGetByFirebaseUid>>,
-				TError,
-				TData
-			>
-		>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-} {
-	const queryOptions = getUserGetByFirebaseUidQueryOptions(
-		firebaseUid,
-		options
-	);
-
-	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-		TData,
-		TError
-	> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-	return { ...query, queryKey: queryOptions.queryKey };
-}
-
 export const userRegister = (
 	registerUser: BodyType<RegisterUser>,
 	options?: SecondParameter<typeof axiosInstance>,
