@@ -1,6 +1,7 @@
-import {useEffect} from "react";
-import {useNavigate} from "react-router";
-import {useUserStore} from "../stores/userStore.ts";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useUserStore } from '../stores/userStore.ts';
+import { Routes } from '../shared/common/constants/routeNames.ts';
 
 // This component is used to redirect user depending on the user store state
 // user is logged in -> redirect to store page
@@ -8,18 +9,18 @@ import {useUserStore} from "../stores/userStore.ts";
 // NOTE: the reason I used user store instead of auth state is that we need to make user is logged in as well as
 // that the user data is fetched from the server. User store is also in sync with auth state so it's fine
 function AuthFlowRedirection() {
-    const navigate = useNavigate();
-    const user = useUserStore(state => state.user)
+	const navigate = useNavigate();
+	const user = useUserStore(state => state.user);
 
-    useEffect(() => {
-        if (!user) {
-            navigate("/login", {replace: true});
-            return;
-        }
-        navigate("/store", {replace: true});
-    }, [user])
+	useEffect(() => {
+		if (!user) {
+			navigate(Routes.Login, { replace: true });
+			return;
+		}
+		navigate(Routes.Store, { replace: true });
+	}, [user]);
 
-    return null;
+	return null;
 }
 
 export default AuthFlowRedirection;
