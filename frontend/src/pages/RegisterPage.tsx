@@ -13,11 +13,36 @@ import { FormProvider } from 'react-hook-form';
 import TextInput from '../componenets/reusable/textInput';
 import useRegisterLogic from '../hooks/useRegisterLogic';
 import { Routes } from '../shared/common/constants/routeNames';
-import { Link as RouterLink } from 'react-router';
+import { Link as RouterLink, useNavigate } from 'react-router';
+import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 
 export default function RegisterPage() {
-	const { form, handleFormRegister, isError, isLoading, isSuccess } =
-		useRegisterLogic();
+	const {
+		form,
+		handleFormRegister,
+		isError,
+		isLoading,
+		isSuccess,
+		errorMessage,
+	} = useRegisterLogic();
+	const { enqueueSnackbar } = useSnackbar();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!isError || !errorMessage) return;
+
+		enqueueSnackbar(errorMessage, { variant: 'error' });
+	}, [isError, errorMessage]);
+	useEffect(() => {
+		if (!isSuccess) return;
+
+		enqueueSnackbar(
+			'You successfully created a new account. Please log in with it to start shopping!',
+			{ variant: 'success' }
+		);
+		navigate(Routes.Login, { replace: true });
+	}, [isSuccess]);
 
 	return (
 		<Box
@@ -93,7 +118,8 @@ export default function RegisterPage() {
 						Already have an account?{' '}
 						<Link
 							component={RouterLink}
-							to={Routes.Login}>
+							to={Routes.Login}
+							replace>
 							Sign In
 						</Link>
 					</Box>

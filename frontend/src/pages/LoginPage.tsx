@@ -8,23 +8,25 @@ import {
 	CardHeader,
 	Divider,
 	Link,
-	Snackbar,
 	Stack,
 } from '@mui/material';
 import TextInput from '../componenets/reusable/textInput.tsx';
 import useLoginLogic from '../hooks/useLoginLogic.ts';
 import { FormProvider } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link as RouterLink } from 'react-router';
 import { Routes } from '../shared/common/constants/routeNames.ts';
+import { useSnackbar } from 'notistack';
 
 const LoginPage = () => {
 	const { form, login, isLoading, isError, errorMessage } = useLoginLogic();
-	const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
+	const { enqueueSnackbar } = useSnackbar();
 
 	useEffect(() => {
-		if (isError) setShowErrorSnackbar(true);
-	}, [isError]);
+		if (!isError) return;
+
+		enqueueSnackbar(errorMessage, { variant: 'error' });
+	}, [isError, errorMessage]);
 
 	return (
 		<Box
@@ -35,17 +37,6 @@ const LoginPage = () => {
 			sx={{
 				background: theme => theme.custom.gradients.background,
 			}}>
-			<Snackbar
-				open={showErrorSnackbar}
-				autoHideDuration={4000}
-				onClose={() => setShowErrorSnackbar(false)}>
-				<Alert
-					severity='error'
-					variant='filled'
-					sx={{ width: '100%' }}>
-					{errorMessage}
-				</Alert>
-			</Snackbar>
 			<Card
 				elevation={3}
 				sx={{ padding: 2 }}>
@@ -97,7 +88,8 @@ const LoginPage = () => {
 						Don't have an account?{' '}
 						<Link
 							component={RouterLink}
-							to={Routes.Register}>
+							to={Routes.Register}
+							replace>
 							Sign up
 						</Link>
 					</Box>
