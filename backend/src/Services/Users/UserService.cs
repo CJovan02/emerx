@@ -33,10 +33,14 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<UserResponse>.Success(user.ToResponse());
     }
 
+    /// <summary>
+    /// Not the perfect solution for the error flow, there are edge cases where firebase user will be created
+    /// without the db user. That would result in user not being able to log in with new account and not being able to create
+    /// new account with the same address.
+    /// </summary>
     public async Task<Result<UserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest)
     {
         // calls the auth repository to try and create firebase auth account
-        // handling firebase exception with global exception handler
         var uid = await authRepository.RegisterAsync(registerUserRequest.Email, registerUserRequest.Password);
 
         // if it's successful, we also create the database entry
@@ -56,7 +60,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         }
         catch (Exception)
         {
-            await authRepository.DeleteUserAsync(user.FirebaseUid);
+            _ = Task.Run(() => authRepository.DeleteUserAsync(uid));
             return Result<UserResponse>.Failure(GeneralErrors.DatabaseError());
         }
     }
