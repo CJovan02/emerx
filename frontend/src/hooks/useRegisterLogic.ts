@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { useUserRegister } from '../api/openApi/user/user';
 import type { ProblemDetails, RegisterUserRequest } from '../api/openApi/model';
-import { useState } from 'react';
 import type { ErrorType } from '../api/axiosInstance';
 import { isAxiosError } from 'axios';
 
@@ -55,7 +54,7 @@ function useRegisterLogic() {
 	return {
 		isError,
 		isSuccess,
-		isPending,
+		isLoading: isPending,
 		errorMesage: extractErrorMessage(error),
 		form,
 		handleFormRegister,
