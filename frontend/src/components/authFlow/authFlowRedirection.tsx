@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { useUserStore } from '../stores/userStore.ts';
-import { Routes } from '../shared/common/constants/routeNames.ts';
+import { useUserStore } from '../../stores/userStore.ts';
+import { Routes } from '../../shared/common/constants/routeNames.ts';
 
 // This component is used to redirect user depending on the user store state
 // user is logged in -> redirect to store page
@@ -17,7 +17,7 @@ function AuthFlowRedirection() {
 			navigate(Routes.Login, { replace: true });
 			return;
 		}
-		navigate(Routes.Store, { replace: true });
+		navigate(Routes.Products, { replace: true });
 	}, [user]);
 
 	return null;

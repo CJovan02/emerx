@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { auth } from '../config/firebase.ts';
-import { useUserStore } from '../stores/userStore.ts';
-import { userGetSelf } from '../api/openApi/user/user.ts';
+import { auth } from '../../config/firebase.ts';
+import { useUserStore } from '../../stores/userStore.ts';
+import { userGetSelf } from '../../api/openApi/user/user.ts';
 import { Backdrop } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
