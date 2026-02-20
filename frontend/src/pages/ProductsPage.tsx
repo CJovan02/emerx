@@ -1,14 +1,12 @@
-import { Box, Button } from '@mui/material';
-import { auth } from '../config/firebase.ts';
+import {Box} from "@mui/material";
 
 export default function ProductsPage() {
 	return (
 		<Box
-			display='flex'
-			alignItems='center'
-			justifyContent='center'
+			// display='flex'
+			// alignItems='center'
+			// justifyContent='center'
 			minHeight='100vh'>
-			<Button onClick={() => auth.signOut()}>Sign Out</Button>
 		</Box>
 	);
 }

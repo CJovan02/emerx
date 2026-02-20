@@ -13,7 +13,30 @@ function useTheme() {
             background: {
                 default: lighten(Colors.Primary.Main, 0.97),
                 paper: lighten(Colors.Primary.Main, 0.95),
-            }
+            },
+
+            surface: {
+                base: "#ffffff",
+                subtle: alpha(Colors.Primary.Main, 0.03),
+                muted: alpha(Colors.Primary.Main, 0.05),
+                elevated: alpha("#000", 0.02),
+                hover: alpha(Colors.Primary.Main, 0.08),
+            },
+
+            brand: {
+                soft: alpha(Colors.Primary.Main, 0.12),
+                muted: alpha(Colors.Primary.Main, 0.06),
+            },
+
+            // border: {
+            //     subtle: "#e2e8f0",
+            //     strong: "#cbd5e1",
+            // },
+
+            // text: {
+            //     primary: "#0f172a",
+            //     secondary: "#475569",
+            // },
         },
 
         shape: {
@@ -68,6 +91,21 @@ function useTheme() {
                     variant: 'outlined',
                 },
             },
+            MuiListItemIcon: {
+                styleOverrides: {
+                    root: {
+                        color: "inherit",
+                    },
+                },
+            },
+            // MuiAppBar: {
+            //     styleOverrides: {
+            //         root: ({theme}) => ({
+            //             backgroundColor: theme.palette.surface.muted,
+            //             color: theme.palette.text.primary,
+            //         })
+            //     }
+            // }
         },
     });
 
