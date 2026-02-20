@@ -10,12 +10,12 @@ import {
 	Stack,
 } from '@mui/material';
 import { FormProvider } from 'react-hook-form';
-import TextInput from '../componenets/reusable/textInput';
 import useRegisterLogic from '../hooks/useRegisterLogic';
 import { Routes } from '../shared/common/constants/routeNames';
 import { Link as RouterLink, useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
+import TextInput from "../components/reusable/textInput.tsx";
 
 export default function RegisterPage() {
 	const {
