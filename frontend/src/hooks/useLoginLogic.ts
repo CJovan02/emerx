@@ -39,7 +39,6 @@ function useLoginLogic() {
 					values.email,
 					values.password
 				);
-				console.log(credential);
 
 				setState('success');
 			} catch (error) {
