@@ -1,5 +1,4 @@
 import {
-	Alert,
 	Box,
 	Button,
 	Card,
@@ -10,30 +9,47 @@ import {
 	Link,
 	Stack,
 } from '@mui/material';
-import TextInput from '../componenets/reusable/textInput.tsx';
-import useLoginLogic from '../hooks/useLoginLogic.ts';
 import { FormProvider } from 'react-hook-form';
-import { useEffect } from 'react';
-import { Link as RouterLink } from 'react-router';
-import { Routes } from '../shared/common/constants/routeNames.ts';
+import TextInput from '../componenets/reusable/textInput';
+import useRegisterLogic from '../hooks/useRegisterLogic';
+import { Routes } from '../shared/common/constants/routeNames';
+import { Link as RouterLink, useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 
-const LoginPage = () => {
-	const { form, login, isLoading, isError, errorMessage } = useLoginLogic();
+export default function RegisterPage() {
+	const {
+		form,
+		handleFormRegister,
+		isError,
+		isLoading,
+		isSuccess,
+		errorMessage,
+	} = useRegisterLogic();
 	const { enqueueSnackbar } = useSnackbar();
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!isError) return;
+		if (!isError || !errorMessage) return;
 
 		enqueueSnackbar(errorMessage, { variant: 'error' });
 	}, [isError, errorMessage]);
+	useEffect(() => {
+		if (!isSuccess) return;
+
+		enqueueSnackbar(
+			'You successfully created a new account. Please log in with it to start shopping!',
+			{ variant: 'success' }
+		);
+		navigate(Routes.Login, { replace: true });
+	}, [isSuccess]);
 
 	return (
 		<Box
-			minHeight='100vh'
 			display='flex'
-			alignItems='center'
 			justifyContent='center'
+			alignItems='center'
+			minHeight='100vh'
 			sx={{
 				background: theme => theme.custom.gradients.background,
 			}}>
@@ -41,15 +57,29 @@ const LoginPage = () => {
 				elevation={3}
 				sx={{ padding: 2 }}>
 				<CardHeader
-					title='Sign In'
-					subheader='Welcome back, please login to start shopping'
+					title='Sign Up'
+					subheader='Create a new account to explore our products.'
 				/>
 				<CardContent>
 					<FormProvider {...form}>
 						<form
-							id='login-form'
-							onSubmit={form.handleSubmit(login)}>
+							id='register-form'
+							onSubmit={handleFormRegister}>
 							<Stack gap={3}>
+								<TextInput
+									id='name'
+									label='Name'
+									required
+									fullWidth
+								/>
+
+								<TextInput
+									id='surname'
+									label='Surname'
+									required
+									fullWidth
+								/>
+
 								<TextInput
 									id='email'
 									label='Email'
@@ -71,7 +101,7 @@ const LoginPage = () => {
 				<CardActions>
 					<Button
 						type='submit'
-						form='login-form'
+						form='register-form'
 						fullWidth
 						size='large'
 						variant='contained'
@@ -85,18 +115,16 @@ const LoginPage = () => {
 				<CardContent>
 					<Divider />
 					<Box marginY={2}>
-						Don't have an account?{' '}
+						Already have an account?{' '}
 						<Link
 							component={RouterLink}
-							to={Routes.Register}
+							to={Routes.Login}
 							replace>
-							Sign up
+							Sign In
 						</Link>
 					</Box>
 				</CardContent>
 			</Card>
 		</Box>
 	);
-};
-
-export default LoginPage;
+}

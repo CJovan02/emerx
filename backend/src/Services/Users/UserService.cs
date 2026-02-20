@@ -33,31 +33,54 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<UserResponse>.Success(user.ToResponse());
     }
 
-    public async Task<Result<UserResponse>> RegisterAsync(RegisterUser registerUser)
+    /// <summary>
+    /// Creates db user and firebase user. If db user creation fails, firebase user won't be created.
+    /// If db user is created and firebase user creation fails, it leaves db user without assigned FirebaseUid.
+    /// The next time this function is called it will not create new db user, instead it will continue where it left of:
+    /// creating firebase user and assigning FirebaseUid to the db user.
+    /// </summary>
+    public async Task<Result<UserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest)
     {
-        // calls the auth repository to try and create firebase auth account
-        var uid = await authRepository.RegisterAsync(registerUser.Email, registerUser.Password);
+        var user = await userRepository.GetUserByEmail(registerUserRequest.Email);
 
-        // if it's successful, we also create the database entry
-        var user = new User
+        // If user exists and FirebaseUid is assigned, then user is fully created -> return the error
+        if (user?.FirebaseUid != null)
+            return Result<UserResponse>.Failure(UserErrors.EmailOccupied(user.Email));
+
+
+        // If user doesn't exist -> create db user
+        if (user is null)
         {
-            Email = registerUser.Email,
-            Name = registerUser.Name,
-            Surname = registerUser.Surname,
-            FirebaseUid = uid,
-        };
+            user = new User
+            {
+                Id = ObjectId.GenerateNewId(),
+                Email = registerUserRequest.Email,
+                Name = registerUserRequest.Name,
+                Surname = registerUserRequest.Surname,
+                FirebaseUid = null,
+            };
 
+            // If this operation fails execution will stop here and firebase user won't be created.
+            await userRepository.CreateUser(user);
+        }
+
+        string uid;
         try
         {
-            await userRepository.CreateUser(user);
-
-            return Result<UserResponse>.Success(user.ToResponse());
+            // Then we create firebase user
+            uid = await authRepository.RegisterAsync(registerUserRequest.Email, registerUserRequest.Password);
         }
-        catch (Exception)
+        // If for some odd reason firebase user already exists (this should never happen), then we just fetch the uid in order to update the db user
+        catch (FirebaseAuthException e) when (e.AuthErrorCode == AuthErrorCode.EmailAlreadyExists)
         {
-            await authRepository.DeleteUserAsync(user.FirebaseUid);
-            return Result<UserResponse>.Failure(GeneralErrors.DatabaseError());
+            uid = (await authRepository.GetUserByEmailAsync(registerUserRequest.Email)).Uid;
         }
+
+        // Then we update the uid
+        user.FirebaseUid = uid;
+        await userRepository.UpdateUser(user);
+
+        return Result<UserResponse>.Success(user.ToResponse());
     }
 
     public async Task<Result> GrantAdminRoleAsync(string email)
@@ -119,17 +142,22 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
 
     public async Task<Result> DeleteByFirebaseIdAsync(string firebaseUid)
     {
-        // We find the user with the specified id
+        // Best-effort delete Firebase
+        try
+        {
+            await authRepository.DeleteUserAsync(firebaseUid);
+        }
+        catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+        {
+            // ignore
+        }
+
+        // Best-effort delete DB
         var dbUser = await userRepository.GetUserByFirebaseUid(firebaseUid);
-
-        if (dbUser is null)
-            return Result.Failure(UserErrors.NotFound(firebaseUid));
-
-        // We delete the user with extracted firebaseId
-        await authRepository.DeleteUserAsync(dbUser.FirebaseUid);
-
-        // Then we delete user and user data
-        await userRepository.DeleteUser(dbUser.Id);
+        if (dbUser is not null)
+        {
+            await userRepository.DeleteUser(dbUser.Id);
+        }
 
         return Result.Success();
     }

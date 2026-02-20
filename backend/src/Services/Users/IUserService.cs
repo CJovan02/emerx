@@ -12,7 +12,7 @@ public interface IUserService
 
     Task<Result<UserResponse>> GetByFirebaseUidAsync(string firebaseUid);
 
-    Task<Result<UserResponse>> RegisterAsync(RegisterUser registerUser);
+    Task<Result<UserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest);
 
     Task<Result> GrantAdminRoleAsync(string email);
 

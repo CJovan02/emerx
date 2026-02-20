@@ -2,7 +2,7 @@
 
 namespace EMerx.DTOs.Users.Request;
 
-public sealed record RegisterUser
+public sealed record RegisterUserRequest
 {
     [Required] public required string Name { get; init; }
     [Required] public required string Surname { get; init; }

@@ -20,7 +20,11 @@ import type {
 	UseQueryResult,
 } from '@tanstack/react-query';
 
-import type { ProblemDetails, RegisterUser, UserResponse } from '.././model';
+import type {
+	ProblemDetails,
+	RegisterUserRequest,
+	UserResponse,
+} from '.././model';
 
 import { axiosInstance } from '../../axiosInstance';
 import type { ErrorType, BodyType } from '../../axiosInstance';
@@ -228,7 +232,7 @@ export const useUserDelete = <
 	return useMutation(getUserDeleteMutationOptions(options), queryClient);
 };
 export const userRegister = (
-	registerUser: BodyType<RegisterUser>,
+	registerUserRequest: BodyType<RegisterUserRequest>,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
@@ -237,7 +241,7 @@ export const userRegister = (
 			url: `/User/register`,
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			data: registerUser,
+			data: registerUserRequest,
 			signal,
 		},
 		options
@@ -251,14 +255,14 @@ export const getUserRegisterMutationOptions = <
 	mutation?: UseMutationOptions<
 		Awaited<ReturnType<typeof userRegister>>,
 		TError,
-		{ data: BodyType<RegisterUser> },
+		{ data: BodyType<RegisterUserRequest> },
 		TContext
 	>;
 	request?: SecondParameter<typeof axiosInstance>;
 }): UseMutationOptions<
 	Awaited<ReturnType<typeof userRegister>>,
 	TError,
-	{ data: BodyType<RegisterUser> },
+	{ data: BodyType<RegisterUserRequest> },
 	TContext
 > => {
 	const mutationKey = ['userRegister'];
@@ -272,7 +276,7 @@ export const getUserRegisterMutationOptions = <
 
 	const mutationFn: MutationFunction<
 		Awaited<ReturnType<typeof userRegister>>,
-		{ data: BodyType<RegisterUser> }
+		{ data: BodyType<RegisterUserRequest> }
 	> = props => {
 		const { data } = props ?? {};
 
@@ -285,7 +289,7 @@ export const getUserRegisterMutationOptions = <
 export type UserRegisterMutationResult = NonNullable<
 	Awaited<ReturnType<typeof userRegister>>
 >;
-export type UserRegisterMutationBody = BodyType<RegisterUser>;
+export type UserRegisterMutationBody = BodyType<RegisterUserRequest>;
 export type UserRegisterMutationError = ErrorType<ProblemDetails | void>;
 
 export const useUserRegister = <
@@ -296,7 +300,7 @@ export const useUserRegister = <
 		mutation?: UseMutationOptions<
 			Awaited<ReturnType<typeof userRegister>>,
 			TError,
-			{ data: BodyType<RegisterUser> },
+			{ data: BodyType<RegisterUserRequest> },
 			TContext
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
@@ -305,7 +309,7 @@ export const useUserRegister = <
 ): UseMutationResult<
 	Awaited<ReturnType<typeof userRegister>>,
 	TError,
-	{ data: BodyType<RegisterUser> },
+	{ data: BodyType<RegisterUserRequest> },
 	TContext
 > => {
 	return useMutation(getUserRegisterMutationOptions(options), queryClient);
