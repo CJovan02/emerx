@@ -46,7 +46,7 @@ function AuthUserSync() {
 			sx={theme => ({
 				zIndex: theme.zIndex.drawer + 1,
 			})}
-			open={true}>
+			open={loading}>
 			<CircularProgress
 				sx={theme => ({ color: theme.palette.primary.contrastText })}
 				size={50}
