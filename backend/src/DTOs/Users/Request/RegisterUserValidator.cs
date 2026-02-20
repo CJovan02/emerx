@@ -10,13 +10,13 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserRequest>
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name is required")
-            .Length(5, 20)
+            .Length(3, 20)
             .WithMessage("Name must be between 5 and 20 characters long");
 
         RuleFor(x => x.Surname)
             .NotEmpty()
             .WithMessage("Surname is required")
-            .Length(5, 20)
+            .Length(3, 20)
             .WithMessage("Surname must be between 5 and 30 characters long");
 
         RuleFor(x => x.Email)
