@@ -1,7 +1,7 @@
 import {alpha, createTheme, lighten} from '@mui/material';
 import {Colors} from "../shared/common/constants/colors.ts";
 
-function useTheme() {
+function useAppTheme() {
     const theme = createTheme({
         palette: {
             primary: {
@@ -18,7 +18,7 @@ function useTheme() {
             surface: {
                 base: "#ffffff",
                 subtle: alpha(Colors.Primary.Main, 0.03),
-                muted: alpha(Colors.Primary.Main, 0.05),
+                muted: alpha(Colors.Primary.Main, 0.06),
                 elevated: alpha("#000", 0.02),
                 hover: alpha(Colors.Primary.Main, 0.08),
             },
@@ -112,4 +112,4 @@ function useTheme() {
     return theme;
 }
 
-export default useTheme;
+export default useAppTheme;

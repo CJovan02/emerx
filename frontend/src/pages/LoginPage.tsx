@@ -5,14 +5,16 @@ import {
     Card,
     CardActions,
     CardContent,
-    CardHeader, Divider,
-    Link, Snackbar,
+    CardHeader, Divider, Link,
+    Snackbar,
     Stack,
 } from "@mui/material";
 import TextInput from "../components/reusable/textInput.tsx";
 import useLoginLogic from "../hooks/useLoginLogic.ts";
 import {FormProvider} from "react-hook-form";
 import {useEffect, useState} from "react";
+import {Link as RouterLink} from "react-router";
+import {Routes} from "../shared/common/constants/routeNames.ts";
 
 const LoginPage = () => {
     const {form, login, isLoading, isError, errorMessage} = useLoginLogic();
@@ -85,8 +87,14 @@ const LoginPage = () => {
                     </Button>
                 </CardActions>
                 <CardContent>
-                    <Divider />
-                    <Box marginY={2}>Don't have an account? <Link href='#'>Sign up</Link></Box>
+                    <Divider/>
+                    <Box marginY={2}>Don't have an account?{' '}
+                        <Link
+                            component={RouterLink}
+                            to={Routes.Register}
+                            replace>
+                            Sign Up
+                        </Link></Box>
                 </CardContent>
             </Card>
 

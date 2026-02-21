@@ -1,5 +1,5 @@
 import {CssBaseline, ThemeProvider} from '@mui/material';
-import useTheme from '../config/theme.ts';
+import useAppTheme from '../config/useAppTheme.ts';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {createBrowserRouter} from 'react-router';
 import {RouterProvider} from 'react-router/dom';
@@ -49,7 +49,7 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 const Providers = () => {
-    const theme = useTheme();
+    const theme = useAppTheme();
 
     return (
         <ThemeProvider theme={theme}>

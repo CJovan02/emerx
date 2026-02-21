@@ -27,7 +27,7 @@ export default function StoreDrawer() {
             <Toolbar/>
             <Divider/>
             <List>
-                <ListItemButton>jole</ListItemButton>
+                {/*<ListItemButton>jole</ListItemButton>*/}
             </List>
         </Drawer>
 

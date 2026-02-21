@@ -15,6 +15,7 @@ import StoreTabs from "./storeTabs.tsx";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
 import useScreenSize from "../../hooks/useScreenSize.tsx";
 import {useStoreDrawerStore} from "../../stores/storeDrawerStore.tsx";
+import {auth} from "../../config/firebase.ts";
 
 const drawerWidth = Drawers.Store.Width;
 
@@ -114,7 +115,7 @@ export default function StoreAppBar() {
                             <ListItemText primary='Cart'/>
                         </MenuItem>
                         <MenuItem
-                            onClick={handleCloseUserMenu}
+                            onClick={() => auth.signOut()}
                             sx={{color: "error.main"}}
                         >
                             <ListItemIcon>
