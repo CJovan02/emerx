@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.Entities;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -6,7 +7,7 @@ namespace EMerx.Repositories.OrderRepository;
 
 public interface IOrderRepository
 {
-    Task<IEnumerable<Order>> GetOrders();
+    Task<PageOf<Order>> GetOrders(int page, int pageSize);
 
     Task<IEnumerable<Order>> GetOrdersForProduct(ObjectId productId);
 
