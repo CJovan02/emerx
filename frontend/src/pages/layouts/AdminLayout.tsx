@@ -5,9 +5,13 @@ import {Outlet} from "react-router/internal/react-server-client";
 import {useUserStore} from "../../stores/userStore.ts";
 import {Navigate} from "react-router";
 import {Routes} from "../../shared/common/constants/routeNames.ts";
+import {Drawers} from "../../shared/common/constants/drawers.ts";
 
 export default function AdminLayout() {
-    const {user} = useUserStore();
+    const user = useUserStore(state => state.user);
+    const isLoading = useUserStore(state => state.isLoading);
+
+    if (isLoading) return null;
 
     if (!user || !user.isAdmin) {
         return <Navigate to={Routes.Products} replace/>;
@@ -22,7 +26,8 @@ export default function AdminLayout() {
                 component='main'
                 sx={{
                     flexGrow: 1,
-                    p: 3
+                    p: 3,
+                    //ml: Drawers.Admin.Width
                 }}
             >
                 <Outlet/>

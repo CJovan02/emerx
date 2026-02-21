@@ -20,7 +20,7 @@ import {Routes} from "../../shared/common/constants/routeNames.ts";
 export default function AvatarMenu() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const {user: storeUser} = useUserStore();
+    const storeUser = useUserStore(state => state.user);
     // When we log out there will be a brief moment when where user store will have empty user and redirect will not trigger
     // leaving user menu to show undefined user info, we use this state as a cache for user info
     const [user, setUser] = useState<AppUser>();

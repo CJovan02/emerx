@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {auth} from '../../config/firebase.ts';
 import {useUserStore} from '../../stores/userStore.ts';
 import {userGetSelf} from '../../api/openApi/user/user.ts';
@@ -13,8 +13,9 @@ import {mapResponseToUser} from "../../domain/models/appUser.ts";
 function AuthUserSync() {
     const setUser = useUserStore(state => state.setUser);
     const clearUser = useUserStore(state => state.clearUser);
-    const [loading, setLoading] = useState(false);
-    const { enqueueSnackbar } = useSnackbar();
+    const isLoading = useUserStore(state => state.isLoading);
+    const setLoading = useUserStore(state => state.setLoading);
+    const {enqueueSnackbar} = useSnackbar();
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async user => {
@@ -58,7 +59,7 @@ function AuthUserSync() {
             sx={theme => ({
                 zIndex: theme.zIndex.drawer + 1,
             })}
-            open={loading}>
+            open={isLoading}>
             <CircularProgress
                 sx={theme => ({color: theme.palette.primary.contrastText})}
                 size={50}

@@ -7,7 +7,8 @@ const drawerWidth = Drawers.Store.Width;
 
 export default function StoreDrawer() {
     const { isDesktop } = useScreenSize();
-    const {close, isOpen} = useStoreDrawerStore();
+    const close = useStoreDrawerStore(state => state.close);
+    const isOpen = useStoreDrawerStore(state => state.isOpen);
 
     return (
         <Drawer

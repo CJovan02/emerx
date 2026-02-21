@@ -1,7 +1,7 @@
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import useAppTheme from '../config/useAppTheme.ts';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {createBrowserRouter} from 'react-router';
+import {createBrowserRouter, Navigate} from 'react-router';
 import {RouterProvider} from 'react-router/dom';
 import LoginPage from '../pages/LoginPage.tsx';
 import RootLayout from '../pages/layouts/RootLayout.tsx';
@@ -12,7 +12,7 @@ import RegisterPage from '../pages/RegisterPage.tsx';
 import {SnackbarProvider} from 'notistack';
 import StoreLayout from "../pages/layouts/StoreLayout.tsx";
 import AdminLayout from "../pages/layouts/AdminLayout.tsx";
-import AdminDashboard from "../pages/AdminDashboard.tsx";
+import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -52,8 +52,11 @@ const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
+                        Component: () => <Navigate to={Routes.Admin.Dashboard} replace/>
+                    },
+                    {
                         path: Routes.Admin.Dashboard,
-                        Component: AdminDashboard,
+                        Component: AdminDashboardPage,
                     }
                 ]
             }

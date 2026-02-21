@@ -17,7 +17,7 @@ const drawerWidth = Drawers.Store.Width;
 
 export default function StoreAppBar() {
     const {isDesktop} = useScreenSize();
-    const {open: openDrawer} = useStoreDrawerStore();
+    const openDrawer = useStoreDrawerStore(state => state.open);
 
     return (
         <AppBar
