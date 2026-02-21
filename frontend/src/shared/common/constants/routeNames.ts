@@ -4,4 +4,4 @@ export const Routes = {
 	Register: '/register',
 	Products: '/products',
 	Cart: '/cart',
-};
+} as const;
