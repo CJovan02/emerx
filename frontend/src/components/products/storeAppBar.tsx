@@ -14,6 +14,7 @@ import * as React from "react";
 import StoreTabs from "./storeTabs.tsx";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
 import useScreenSize from "../../hooks/useScreenSize.tsx";
+import {useStoreDrawerStore} from "../../stores/storeDrawerStore.tsx";
 
 const drawerWidth = Drawers.Store.Width;
 
@@ -30,22 +31,30 @@ export default function StoreAppBar() {
         setAnchorEl(null);
     };
 
+    const { open: openDrawer } = useStoreDrawerStore();
+
     return (
         <AppBar
-            position={isDesktop ? "fixed" : "static"}
+            position='fixed'
             sx={isDesktop ? {width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`} : {}}
         >
             <Toolbar>
 
                 {/* Drawer Toggle */}
-                <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="open filters drawer"
-                >
-                    <FilterAlt/>
-                </IconButton>
+                {!isDesktop && (
+                    <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="open filters drawer"
+                        onClick={openDrawer}
+                        sx={{
+                            mr: 5
+                        }}
+                    >
+                        <FilterAlt/>
+                    </IconButton>
+                )}
 
                 {/* Logo */}
                 <Typography
@@ -53,14 +62,13 @@ export default function StoreAppBar() {
                     sx={{
                         fontWeight: 700,
                         letterSpacing: ".2rem",
-                        mx: 5
                     }}
                 >
                     EMERX
                 </Typography>
 
                 {/* Navigation Links */}
-                <Box sx={{display: "flex", gap: 2}}>
+                <Box sx={{display: "flex", gap: 2, ml: 5}}>
                     <StoreTabs/>
                 </Box>
 
