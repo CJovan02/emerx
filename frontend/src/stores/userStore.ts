@@ -1,9 +1,9 @@
-import type {UserResponse} from "../api/openApi/model";
 import {create} from 'zustand'
+import type AppUser from "../domain/models/appUser.ts";
 
 interface UserState {
-    user: UserResponse | null;
-    setUser: (user: UserResponse) => void;
+    user: AppUser | null;
+    setUser: (user: AppUser) => void;
     clearUser: () => void;
 }
 

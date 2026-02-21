@@ -7,7 +7,7 @@ import { Routes } from '../../shared/common/constants/routeNames.ts';
 // user is logged in -> redirect to store page
 // user is not logged in -> redirect to login page
 // NOTE: the reason I used user store instead of auth state is that we need to make user is logged in as well as
-// that the user data is fetched from the server. User store is also in sync with auth state so it's fine
+// that the user data is fetched from the server. AppUser store is also in sync with auth state so it's fine
 function AuthFlowRedirection() {
 	const navigate = useNavigate();
 	const user = useUserStore(state => state.user);
