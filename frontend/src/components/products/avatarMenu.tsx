@@ -1,10 +1,21 @@
 import {Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Typography} from "@mui/material";
-import {AccountCircle, AdminPanelSettings, Logout, Person, Settings, ShoppingCart, Verified} from "@mui/icons-material";
+import {
+    AccountCircle,
+    AdminPanelSettings,
+    Inventory,
+    Logout,
+    Person,
+    Settings,
+    ShoppingCart,
+    Verified
+} from "@mui/icons-material";
 import {auth} from "../../config/firebase.ts";
 import {useEffect, useState} from "react";
 import * as React from "react";
 import {useUserStore} from "../../stores/userStore.ts";
 import type AppUser from "../../domain/models/appUser.ts";
+import {useLocation, useNavigate} from "react-router";
+import {Routes} from "../../shared/common/constants/routeNames.ts";
 
 export default function AvatarMenu() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -13,6 +24,8 @@ export default function AvatarMenu() {
     // When we log out there will be a brief moment when where user store will have empty user and redirect will not trigger
     // leaving user menu to show undefined user info, we use this state as a cache for user info
     const [user, setUser] = useState<AppUser>();
+    const navigate = useNavigate();
+    const isAdminPage = useLocation().pathname.includes(Routes.Admin.Base);
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -24,6 +37,9 @@ export default function AvatarMenu() {
         if (callback)
             callback();
     };
+
+    const navigateToAdmin = () => navigate(Routes.Admin.Base);
+    const navigateToStore = () => navigate(Routes.Products);
 
     useEffect(() => {
         if (!storeUser) return;
@@ -47,7 +63,7 @@ export default function AvatarMenu() {
                 id="account-menu"
                 anchorEl={anchorEl}
                 open={open}
-                onClose={() => handleMenuAction}
+                onClose={() => handleMenuAction()}
                 anchorOrigin={{
                     vertical: "bottom",
                     horizontal: "right"
@@ -76,12 +92,20 @@ export default function AvatarMenu() {
                     <ListItemText primary='Edit Profile'/>
                 </MenuItem>
                 <Divider/>
-                {user?.isAdmin && (
-                    <MenuItem onClick={handleOpenUserMenu}>
+                {(user?.isAdmin && !isAdminPage) && (
+                    <MenuItem onClick={() => handleMenuAction(navigateToAdmin)}>
                         <ListItemIcon>
                             <AdminPanelSettings fontSize='small'/>
                         </ListItemIcon>
                         <ListItemText primary='Admin Dashboard'/>
+                    </MenuItem>
+                )}
+                {(user?.isAdmin && isAdminPage) && (
+                    <MenuItem onClick={() => handleMenuAction(navigateToStore)}>
+                        <ListItemIcon>
+                            <Inventory fontSize='small'/>
+                        </ListItemIcon>
+                        <ListItemText primary='Store Page'/>
                     </MenuItem>
                 )}
                 {user?.isAdmin && (

@@ -11,6 +11,8 @@ import {Routes} from '../shared/common/constants/routeNames.ts';
 import RegisterPage from '../pages/RegisterPage.tsx';
 import {SnackbarProvider} from 'notistack';
 import StoreLayout from "../pages/layouts/StoreLayout.tsx";
+import AdminLayout from "../pages/layouts/AdminLayout.tsx";
+import AdminDashboard from "../pages/AdminDashboard.tsx";
 
 const router = createBrowserRouter([
     {
@@ -29,6 +31,7 @@ const router = createBrowserRouter([
                 path: Routes.Register,
                 Component: RegisterPage,
             },
+            // Store layout
             {
                 Component: StoreLayout,
                 children: [
@@ -39,6 +42,18 @@ const router = createBrowserRouter([
                     {
                         path: Routes.Cart,
                         Component: ProductsPage
+                    }
+                ]
+            },
+            // Admin layout
+            {
+                path: Routes.Admin.Base,
+                Component: AdminLayout,
+                children: [
+                    {
+                        index: true,
+                        path: Routes.Admin.Dashboard,
+                        Component: AdminDashboard,
                     }
                 ]
             }
