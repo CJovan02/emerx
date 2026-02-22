@@ -2,20 +2,8 @@ import AdminDrawer from "../../components/admin/adminDrawer.tsx";
 import {AdminAppBar} from "../../components/admin/adminAppBar.tsx";
 import {Box, Toolbar} from "@mui/material";
 import {Outlet} from "react-router/internal/react-server-client";
-import {useUserStore} from "../../stores/userStore.ts";
-import {Navigate} from "react-router";
-import {Routes} from "../../shared/common/constants/routeNames.ts";
 
 export default function AdminLayout() {
-    const user = useUserStore(state => state.user);
-    const isLoading = useUserStore(state => state.isLoading);
-
-    if (isLoading) return null;
-
-    if (!user || !user.isAdmin) {
-        return <Navigate to={Routes.Products} replace/>;
-    }
-
     return (
         <Box display='flex'>
             <AdminDrawer/>
@@ -28,7 +16,7 @@ export default function AdminLayout() {
                     p: 3,
                 }}
             >
-                <Toolbar />
+                <Toolbar/>
                 <Outlet/>
             </Box>
         </Box>
