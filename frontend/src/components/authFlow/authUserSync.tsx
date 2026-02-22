@@ -53,6 +53,8 @@ function AuthUserSync() {
         return () => unsubscribe();
     }, []);
 
+    if (!isLoading) return null;
+
     return (
         <Backdrop
             sx={theme => ({

@@ -1,6 +1,6 @@
 import AdminDrawer from "../../components/admin/adminDrawer.tsx";
 import {AdminAppBar} from "../../components/admin/adminAppBar.tsx";
-import {Box} from "@mui/material";
+import {Box, Toolbar} from "@mui/material";
 import {Outlet} from "react-router/internal/react-server-client";
 import {useUserStore} from "../../stores/userStore.ts";
 import {Navigate} from "react-router";
@@ -17,7 +17,7 @@ export default function AdminLayout() {
     }
 
     return (
-        <>
+        <Box display='flex'>
             <AdminDrawer/>
             <AdminAppBar/>
 
@@ -26,11 +26,11 @@ export default function AdminLayout() {
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    //ml: Drawers.Admin.Width
                 }}
             >
+                <Toolbar />
                 <Outlet/>
             </Box>
-        </>
+        </Box>
     )
 }

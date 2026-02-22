@@ -1,6 +1,8 @@
-import {Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar} from "@mui/material";
+import {Divider, Drawer, List, Toolbar, Typography} from "@mui/material";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
 import {AdminPanelSettings, Inventory, SupervisorAccount} from "@mui/icons-material";
+import DrawerNavLinkButton from "../reusable/drawerNavLinkButton.tsx";
+import {Routes} from "../../shared/common/constants/routeNames.ts";
 
 const drawerWidth = Drawers.Admin.Width;
 
@@ -17,30 +19,32 @@ export default function AdminDrawer() {
                 },
             }}
         >
-            <Toolbar />
-            <Divider />
+            <Toolbar disableGutters
+                sx={{
+                    px: 2,
+                    gap: 3,
+                    alignItems: "center",
+                }}
+            >
+                <AdminPanelSettings fontSize='large' color='primary' />
+                <Typography color='primary' variant='h6' fontWeight={700}>
+                    Dashboard
+                </Typography>
+            </Toolbar>
+            <Divider/>
 
             <List>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <AdminPanelSettings />
-                    </ListItemIcon>
-                    <ListItemText primary="Dashboard" />
-                </ListItemButton>
+                <DrawerNavLinkButton
+                    to={Routes.Admin.Products}
+                    icon={<Inventory/>}
+                    text='Products'
+                />
+                <DrawerNavLinkButton
+                    to={Routes.Admin.AdminsManagement}
+                    icon={<SupervisorAccount/>}
+                    text='Admins Management'
+                />
 
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Inventory />
-                    </ListItemIcon>
-                    <ListItemText primary="Products" />
-                </ListItemButton>
-
-                <ListItemButton>
-                    <ListItemIcon>
-                        <SupervisorAccount />
-                    </ListItemIcon>
-                    <ListItemText primary="Control Admin Roles" />
-                </ListItemButton>
             </List>
         </Drawer>
 

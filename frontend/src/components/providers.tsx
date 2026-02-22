@@ -12,7 +12,8 @@ import RegisterPage from '../pages/RegisterPage.tsx';
 import {SnackbarProvider} from 'notistack';
 import StoreLayout from "../pages/layouts/StoreLayout.tsx";
 import AdminLayout from "../pages/layouts/AdminLayout.tsx";
-import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
+import AdminProductsPage from "../pages/admin/AdminProductsPage.tsx";
+import AdminsManagementPage from "../pages/admin/AdminsManagementPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -52,11 +53,15 @@ const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        Component: () => <Navigate to={Routes.Admin.Dashboard} replace/>
+                        Component: () => <Navigate to={Routes.Admin.Products} replace/>
                     },
                     {
-                        path: Routes.Admin.Dashboard,
-                        Component: AdminDashboardPage,
+                        path: Routes.Admin.Products,
+                        Component: AdminProductsPage,
+                    },
+                    {
+                        path: Routes.Admin.AdminsManagement,
+                        Component: AdminsManagementPage
                     }
                 ]
             }
