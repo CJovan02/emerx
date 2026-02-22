@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Products.Request;
 using EMerx.DTOs.Products.Response;
@@ -7,7 +8,7 @@ namespace EMerx.Services.Products;
 
 public interface IProductService
 {
-    Task<Result<IEnumerable<ProductResponse>>> GetAllAsync();
+    Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize);
 
     Task<Result<ProductResponse>> GetByIdAsync(IdRequest request);
 

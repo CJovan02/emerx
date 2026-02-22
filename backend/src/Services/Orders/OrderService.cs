@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.OrderItems.Request;
 using EMerx.DTOs.Orders;
@@ -19,11 +20,22 @@ public class OrderService(
     IProductRepository productRepository,
     MongoContext mongoContext) : IOrderService
 {
-    public async Task<Result<IEnumerable<OrderResponse>>> GetAllAsync()
+    public async Task<Result<PageOfResponse<OrderResponse>>> GetAllAsync(int page, int pageSize)
     {
-        return (await orderRepository.GetOrders())
+        
+        var pageOfOrders = await orderRepository.GetOrders(page, pageSize);
+        var productResponses = pageOfOrders
+            .Items
             .Select(order => order.ToResponse())
             .ToList();
+
+        var response = new PageOfResponse<OrderResponse>(
+            productResponses,
+            pageOfOrders.Page,
+            pageOfOrders.PageSize,
+            pageOfOrders.TotalItems);
+        
+        return Result<PageOfResponse<OrderResponse>>.Success(response);
     }
 
     public async Task<Result<OrderResponse>> GetByIdAsync(IdRequest request)

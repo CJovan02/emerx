@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.Entities;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -6,7 +7,7 @@ namespace EMerx.Repositories.ReviewRepository;
 
 public interface IReviewRepository
 {
-    Task<IEnumerable<Review>> GetReviews();
+    Task<PageOf<Review>> GetReviews(int page, int pageSize);
     Task<IEnumerable<Review>> GetReviewsForProduct(ObjectId productId);
     Task<bool> UserPostedReviewForProduct(ObjectId userId, ObjectId productId, IClientSessionHandle? session = null);
     Task<Review?> GetReviewById(ObjectId id, IClientSessionHandle? session = null);

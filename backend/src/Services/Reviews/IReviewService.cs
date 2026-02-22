@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Reviews.Request;
 using EMerx.DTOs.Reviews.Response;
@@ -7,7 +8,7 @@ namespace EMerx.Services.Reviews;
 
 public interface IReviewService
 {
-    Task<Result<IEnumerable<ReviewResponse>>> GetAllAsync();
+    Task<Result<PageOfResponse<ReviewResponse>>> GetAllAsync(int page, int pageSize);
     
     Task<Result<ReviewResponse>> GetByIdAsync(IdRequest request);
 

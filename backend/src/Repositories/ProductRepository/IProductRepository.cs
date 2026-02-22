@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.Entities;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -6,7 +7,7 @@ namespace EMerx.Repositories.ProductRepository;
 
 public interface IProductRepository
 {
-    Task<IEnumerable<Product>> GetProducts();
+    Task<PageOf<Product>> GetProducts(int page, int pageSize);
     Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null);
     Task<IEnumerable<Product>> GetProductsByIds (IEnumerable<ObjectId> ids, IClientSessionHandle? session = null);
     Task CreateProduct(Product product);

@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.Entities;
 using EMerx.Infrastructure.MongoDb;
 using MongoDB.Bson;
@@ -9,9 +10,18 @@ public class ReviewRepository(MongoContext context) : IReviewRepository
 {
     private readonly IMongoCollection<Review> _reviews = context.Reviews;
 
-    public async Task<IEnumerable<Review>> GetReviews()
+    public async Task<PageOf<Review>> GetReviews(int page, int pageSize)
     {
-        return await _reviews.Find(r => true).ToListAsync();
+        var totalItems = await _reviews.CountDocumentsAsync(Builders<Review>.Filter.Empty);
+        
+        var reviews = await _reviews
+            .Find(review => true)
+            .SortBy(review => review.Id)
+            .Skip((page - 1) * pageSize)
+            .Limit(pageSize)
+            .ToListAsync();
+        
+        return new PageOf<Review>(reviews, page, pageSize, (int)totalItems);
     }
 
     public async Task<IEnumerable<Review>> GetReviewsForProduct(ObjectId productId)
