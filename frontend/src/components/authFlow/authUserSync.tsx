@@ -38,7 +38,6 @@ function AuthUserSync() {
                 const roles: number[] = (tokenResult.claims.roles) as number[] ?? [];
                 const appUser = mapResponseToUser(userResponse, roles);
 
-                console.log(appUser);
                 setUser(appUser);
             } catch (error) {
                 enqueueSnackbar("Error trying to retrieve your user data", {variant: 'error'});

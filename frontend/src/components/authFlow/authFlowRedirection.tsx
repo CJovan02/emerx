@@ -25,7 +25,7 @@ function AuthFlowRedirection() {
 		// If user opened application directly through specific url (ex. /dashboard/products)
 		// we don't want to interrupt him and redirect him to Products page.
 		// Redirection to Products when user logs in is done only when user is in /login page
-		if (location.pathname !== Routes.Login) return;
+		if (location.pathname !== Routes.Login && location.pathname !== '/') return;
 
 		navigate(Routes.Products, { replace: true });
 	}, [user, location.pathname, isLoading]);

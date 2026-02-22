@@ -5,7 +5,6 @@ import {Outlet} from "react-router/internal/react-server-client";
 import {useUserStore} from "../../stores/userStore.ts";
 import {Navigate} from "react-router";
 import {Routes} from "../../shared/common/constants/routeNames.ts";
-import {Drawers} from "../../shared/common/constants/drawers.ts";
 
 export default function AdminLayout() {
     const user = useUserStore(state => state.user);
