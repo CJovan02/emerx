@@ -1,7 +1,7 @@
 import {Divider, Drawer, List, Toolbar} from "@mui/material";
 import {useStoreDrawerStore} from "../../stores/storeDrawerStore.tsx";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
-import useScreenSize from "../../hooks/useScreenSize.tsx";
+import useScreenSize from "../../hooks/useScreenSize.ts";
 
 const drawerWidth = Drawers.Store.Width;
 

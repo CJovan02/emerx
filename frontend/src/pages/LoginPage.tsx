@@ -10,7 +10,7 @@ import {
     Stack,
 } from "@mui/material";
 import TextInput from "../components/reusable/textInput.tsx";
-import useLoginLogic from "../hooks/useLoginLogic.ts";
+import useLoginLogic from "../hooks/pageLogic/useLoginLogic.ts";
 import {FormProvider} from "react-hook-form";
 import {useEffect, useState} from "react";
 import {Link as RouterLink} from "react-router";

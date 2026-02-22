@@ -47,9 +47,17 @@ public class UserController(IUserService userService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GrantAdminRole([FromRoute] EmailRequest request)
     {
+        var email = JwtUtils.GetEmailFromHttpContext(HttpContext);
+        if (email is null)
+            return Unauthorized();
+
+        if (email == request.Email)
+            return Conflict("You can't edit your own roles");
+
         return (await userService.GrantAdminRoleAsync(request.Email)).ToActionResult();
     }
 
@@ -58,11 +66,20 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPatch("removeAdminRole/{email}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RemoveAdminRole([FromRoute] EmailRequest request)
     {
+        var email = JwtUtils.GetEmailFromHttpContext(HttpContext);
+        if (email is null)
+            return Unauthorized();
+
+        if (email == request.Email)
+            return Conflict("You can't edit your own roles");
         return (await userService.RemoveAdminRoleAsync(request.Email)).ToActionResult();
     }
 
@@ -70,6 +87,9 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete()
     {

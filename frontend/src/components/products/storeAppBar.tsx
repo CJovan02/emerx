@@ -9,7 +9,7 @@ import {FilterAlt} from "@mui/icons-material";
 import {Spacer} from "../reusable/spacer.tsx";
 import StoreTabs from "./storeTabs.tsx";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
-import useScreenSize from "../../hooks/useScreenSize.tsx";
+import useScreenSize from "../../hooks/useScreenSize.ts";
 import {useStoreDrawerStore} from "../../stores/storeDrawerStore.tsx";
 import AvatarMenu from "./avatarMenu.tsx";
 

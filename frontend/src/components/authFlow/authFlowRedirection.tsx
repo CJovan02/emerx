@@ -28,7 +28,7 @@ function AuthFlowRedirection() {
 		if (location.pathname !== Routes.Login && location.pathname !== '/') return;
 
 		navigate(Routes.Products, { replace: true });
-	}, [user, location.pathname, isLoading]);
+	}, [user, isLoading]);
 
 	return null;
 }

@@ -10,7 +10,7 @@ import {
 	Stack,
 } from '@mui/material';
 import { FormProvider } from 'react-hook-form';
-import useRegisterLogic from '../hooks/useRegisterLogic';
+import useRegisterLogic from '../hooks/pageLogic/useRegisterLogic.ts';
 import { Routes } from '../shared/common/constants/routeNames';
 import { Link as RouterLink, useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
