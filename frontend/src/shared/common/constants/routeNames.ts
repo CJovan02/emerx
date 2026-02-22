@@ -4,4 +4,5 @@ export const Routes = {
 	Register: '/register',
 	Products: '/products',
 	Cart: '/cart',
+	MyProfile: '/my-profile',
 } as const;
