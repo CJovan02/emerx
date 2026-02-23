@@ -15,7 +15,7 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType(typeof(PageOfResponse<ProductResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PageParams pageParams)
+    public async Task<IActionResult> GetPaged([FromQuery] PageParams pageParams)
     {
         var result = await productService.GetAllAsync(pageParams.Page, pageParams.PageSize);
         

@@ -5,7 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export type ProductGetAllParams = {
+export type ProductGetPagedParams = {
 	PageSize?: number;
 	Page?: number;
 };

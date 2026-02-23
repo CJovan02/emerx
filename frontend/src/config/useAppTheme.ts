@@ -1,5 +1,6 @@
 import {alpha, createTheme, lighten} from '@mui/material';
 import {Colors} from "../shared/common/constants/colors.ts";
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 function useAppTheme() {
     const theme = createTheme({
@@ -105,7 +106,31 @@ function useAppTheme() {
             //             color: theme.palette.text.primary,
             //         })
             //     }
-            // }
+            // },
+            MuiDataGrid: {
+                styleOverrides: {
+                    cell: {
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '0.875rem',
+                        '&:focus, &:focus-within': {
+                            outline: 'none',
+                        },
+                    },
+                    // toolbar: ({ theme }) => ({
+                    //     backgroundColor: grey[50],
+                    //     ...theme.applyStyles('dark', {
+                    //         backgroundColor: grey[900],
+                    //     }),
+                    // }),
+                    // footerContainer: ({ theme }) => ({
+                    //     backgroundColor: grey[50],
+                    //     ...theme.applyStyles('dark', {
+                    //         backgroundColor: grey[900],
+                    //     }),
+                    // }),
+                },
+            },
         },
     });
 

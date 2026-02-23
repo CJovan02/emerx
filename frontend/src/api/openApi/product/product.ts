@@ -22,7 +22,7 @@ import type {
 
 import type {
 	ProblemDetails,
-	ProductGetAllParams,
+	ProductGetPagedParams,
 	ProductRequest,
 	ProductResponse,
 	ProductResponsePageOfResponse,
@@ -33,8 +33,8 @@ import type { ErrorType, BodyType } from '../../axiosInstance';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const productGetAll = (
-	params?: ProductGetAllParams,
+export const productGetPaged = (
+	params?: ProductGetPagedParams,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
@@ -44,56 +44,64 @@ export const productGetAll = (
 	);
 };
 
-export const getProductGetAllQueryKey = (params?: ProductGetAllParams) => {
+export const getProductGetPagedQueryKey = (params?: ProductGetPagedParams) => {
 	return [`/Product`, ...(params ? [params] : [])] as const;
 };
 
-export const getProductGetAllQueryOptions = <
-	TData = Awaited<ReturnType<typeof productGetAll>>,
+export const getProductGetPagedQueryOptions = <
+	TData = Awaited<ReturnType<typeof productGetPaged>>,
 	TError = ErrorType<void>,
 >(
-	params?: ProductGetAllParams,
+	params?: ProductGetPagedParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetPaged>>,
+				TError,
+				TData
+			>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	}
 ) => {
 	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-	const queryKey = queryOptions?.queryKey ?? getProductGetAllQueryKey(params);
+	const queryKey = queryOptions?.queryKey ?? getProductGetPagedQueryKey(params);
 
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof productGetAll>>> = ({
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof productGetPaged>>> = ({
 		signal,
-	}) => productGetAll(params, requestOptions, signal);
+	}) => productGetPaged(params, requestOptions, signal);
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-		Awaited<ReturnType<typeof productGetAll>>,
+		Awaited<ReturnType<typeof productGetPaged>>,
 		TError,
 		TData
 	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ProductGetAllQueryResult = NonNullable<
-	Awaited<ReturnType<typeof productGetAll>>
+export type ProductGetPagedQueryResult = NonNullable<
+	Awaited<ReturnType<typeof productGetPaged>>
 >;
-export type ProductGetAllQueryError = ErrorType<void>;
+export type ProductGetPagedQueryError = ErrorType<void>;
 
-export function useProductGetAll<
-	TData = Awaited<ReturnType<typeof productGetAll>>,
+export function useProductGetPaged<
+	TData = Awaited<ReturnType<typeof productGetPaged>>,
 	TError = ErrorType<void>,
 >(
-	params: undefined | ProductGetAllParams,
+	params: undefined | ProductGetPagedParams,
 	options: {
 		query: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetPaged>>,
+				TError,
+				TData
+			>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof productGetAll>>,
+					Awaited<ReturnType<typeof productGetPaged>>,
 					TError,
-					Awaited<ReturnType<typeof productGetAll>>
+					Awaited<ReturnType<typeof productGetPaged>>
 				>,
 				'initialData'
 			>;
@@ -103,20 +111,24 @@ export function useProductGetAll<
 ): DefinedUseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useProductGetAll<
-	TData = Awaited<ReturnType<typeof productGetAll>>,
+export function useProductGetPaged<
+	TData = Awaited<ReturnType<typeof productGetPaged>>,
 	TError = ErrorType<void>,
 >(
-	params?: ProductGetAllParams,
+	params?: ProductGetPagedParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetPaged>>,
+				TError,
+				TData
+			>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof productGetAll>>,
+					Awaited<ReturnType<typeof productGetPaged>>,
 					TError,
-					Awaited<ReturnType<typeof productGetAll>>
+					Awaited<ReturnType<typeof productGetPaged>>
 				>,
 				'initialData'
 			>;
@@ -126,14 +138,18 @@ export function useProductGetAll<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useProductGetAll<
-	TData = Awaited<ReturnType<typeof productGetAll>>,
+export function useProductGetPaged<
+	TData = Awaited<ReturnType<typeof productGetPaged>>,
 	TError = ErrorType<void>,
 >(
-	params?: ProductGetAllParams,
+	params?: ProductGetPagedParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetPaged>>,
+				TError,
+				TData
+			>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -142,14 +158,18 @@ export function useProductGetAll<
 	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
-export function useProductGetAll<
-	TData = Awaited<ReturnType<typeof productGetAll>>,
+export function useProductGetPaged<
+	TData = Awaited<ReturnType<typeof productGetPaged>>,
 	TError = ErrorType<void>,
 >(
-	params?: ProductGetAllParams,
+	params?: ProductGetPagedParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof productGetAll>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetPaged>>,
+				TError,
+				TData
+			>
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
@@ -157,7 +177,7 @@ export function useProductGetAll<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-	const queryOptions = getProductGetAllQueryOptions(params, options);
+	const queryOptions = getProductGetPagedQueryOptions(params, options);
 
 	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
 		TData,

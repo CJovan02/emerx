@@ -23,7 +23,7 @@ public static class ProductsExtensions
     {
         return new ProductResponse
         {
-            Id = domain.Id,
+            Id = domain.Id.ToString(),
             Name = domain.Name,
             Category = domain.Category,
             Image = domain.Image,
