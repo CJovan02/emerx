@@ -1,5 +1,5 @@
 import {useProductGetPaged} from "../../api/openApi/product/product.ts";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
 
 export default function useAdminProductsLogic() {
@@ -19,15 +19,15 @@ export default function useAdminProductsLogic() {
     // drawer UI logic
     const [open, setOpen] = useState<boolean>(false);
 
-    const openDrawer = (product: ProductResponse) => {
+    const openDrawer = useCallback((product: ProductResponse) => {
         setProduct(product);
 
         setOpen(true);
-    };
+    }, [setProduct, setOpen]);
 
-    const closeDrawer = () => {
+    const closeDrawer = useCallback(() => {
         setOpen(false);
-    };
+    }, [setOpen]);
 
     useEffect(() => {
         if (!isError) {

@@ -4,6 +4,7 @@ import useAdminProductsLogic from "../../hooks/pageLogic/useAdminProductsLogic.t
 import {Refresh} from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
 import AdminProductDrawer from "../../components/admin/adminProductDrawer.tsx";
+import {useCallback} from "react";
 
 export default function AdminProductsPage() {
     const {
@@ -19,6 +20,9 @@ export default function AdminProductsPage() {
         closeDrawer,
         product
     } = useAdminProductsLogic();
+
+    const fetchPage = useCallback(() => {
+    }, []);
 
     return (
         <>
@@ -54,10 +58,9 @@ export default function AdminProductsPage() {
                     <ProductsGrid
                         openDrawer={openDrawer}
                         data={data!.items}
-                        totalItems={1000}
+                        totalItems={data!.totalItems}
                         loading={isLoading}
-                        fetchPage={() => {
-                        }}
+                        fetchPage={fetchPage}
                     />
                 }
 

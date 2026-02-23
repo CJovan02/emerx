@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {useMemo, useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
 import RatingMemo from "../reusable/ratingMemo.tsx";
+import * as React from "react";
 
 interface Props {
     data: ProductResponse[];
@@ -15,7 +16,7 @@ interface Props {
     openDrawer: (product: ProductResponse) => void;
 }
 
-export default function ProductsGrid({
+function ProductsGrid({
                                          data,
                                          totalItems,
                                          loading,
@@ -26,7 +27,7 @@ export default function ProductsGrid({
         page: 0,
         pageSize: 10
     });
-
+    
     const columns = useMemo<GridColDef<ProductResponse>[]>(() => [
         {
             field: "image",
@@ -118,3 +119,5 @@ export default function ProductsGrid({
         </Box>
     );
 }
+
+export default React.memo(ProductsGrid);
