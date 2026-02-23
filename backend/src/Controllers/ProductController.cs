@@ -21,7 +21,7 @@ public class ProductController(IProductService productService) : ControllerBase
     public async Task<IActionResult> GetPaged([FromQuery] PageParams pageParams)
     {
         var result = await productService.GetAllAsync(pageParams.Page, pageParams.PageSize);
-        
+
         return result.ToActionResult();
     }
 
@@ -45,6 +45,18 @@ public class ProductController(IProductService productService) : ControllerBase
     public async Task<IActionResult> Create([FromBody] ProductRequest request)
     {
         return (await productService.CreateAsync(request)).ToActionResult();
+    }
+
+    [Authorize]
+    [RequiresRole(Roles.Admin)]
+    [ProducesResponseType((StatusCodes.Status200OK))]
+    [ProducesResponseType((StatusCodes.Status404NotFound))]
+    [ProducesResponseType((StatusCodes.Status400BadRequest))]
+    [ProducesResponseType((StatusCodes.Status500InternalServerError))]
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch([FromRoute] IdRequest idRequest, [FromBody] PatchProductRequest request)
+    {
+        return (await productService.PatchAsync(idRequest, request)).ToActionResult();
     }
 
     [Authorize]

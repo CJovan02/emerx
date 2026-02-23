@@ -73,6 +73,7 @@ export default function ProductsGrid({
                             e.stopPropagation();
                             openDrawer(params.row);
                         }}
+                        disableRipple // disable ripple for data grid performance
                     >
                         <EditIcon/>
                     </IconButton>
@@ -80,7 +81,9 @@ export default function ProductsGrid({
                     <IconButton
                         onClick={(e) => {
                             e.stopPropagation();
+                            console.log(params.row.id);
                         }}
+                        disableRipple // disable ripple for data grid performance
                     >
                         <DeleteIcon/>
                     </IconButton>

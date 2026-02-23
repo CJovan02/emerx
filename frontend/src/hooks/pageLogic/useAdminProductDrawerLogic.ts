@@ -1,6 +1,6 @@
 import {useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
-
+import {useForm} from "react-hook-form";
 
 export default function useAdminProductDrawerLogic() {
     // drawer UI logic
@@ -14,6 +14,7 @@ export default function useAdminProductDrawerLogic() {
     const closeDrawer = () => {
         setOpen(false);
     };
+
 
     // custom states
     // external components that open this drawer need to provide the product that is being displayed in the drawer
