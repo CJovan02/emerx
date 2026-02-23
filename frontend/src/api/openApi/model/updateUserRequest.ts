@@ -6,14 +6,10 @@
  */
 import type { Address } from './address';
 
-export interface UserResponse {
-	/** @minLength 1 */
-	id: string;
+export interface UpdateUserRequest {
 	/** @minLength 1 */
 	name: string;
 	/** @minLength 1 */
 	surname: string;
-	/** @minLength 1 */
-	email: string;
-	address: Address;
+	address?: Address;
 }

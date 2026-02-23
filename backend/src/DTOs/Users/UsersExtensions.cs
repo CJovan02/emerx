@@ -9,7 +9,7 @@ public static class UsersExtensions
     {
         return new UserResponse
         {
-            Id = domain.Id,
+            Id = domain.Id.ToString(),
             Name = domain.Name,
             Surname = domain.Surname,
             Email = domain.Email,

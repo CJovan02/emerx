@@ -83,6 +83,24 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         return Result<UserResponse>.Success(user.ToResponse());
     }
 
+    public async Task<Result<UserResponse>> UpdateAsync(string id, UpdateUserRequest request)
+    {
+        if (!ObjectId.TryParse(id, out var objectId))
+            return Result<UserResponse>.Failure(UserErrors.NotFound(id));
+
+        var user = await userRepository.GetUserById(objectId);
+        if (user is null)
+            return Result<UserResponse>.Failure(UserErrors.NotFound(objectId));
+
+        user.Name = request.Name;
+        user.Surname = request.Surname;
+        user.Address = request.Address;
+
+        await userRepository.UpdateUser(user);
+
+        return Result<UserResponse>.Success(user.ToResponse());
+    }
+
     public async Task<Result> GrantAdminRoleAsync(string email)
     {
         try

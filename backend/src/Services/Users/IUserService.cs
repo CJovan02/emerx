@@ -18,6 +18,8 @@ public interface IUserService
 
     Task<Result> RemoveAdminRoleAsync(string email);
 
+    Task<Result<UserResponse>> UpdateAsync(string id, UpdateUserRequest request);
+
     Task<Result> DeleteAsync(IdRequest request);
 
     Task<Result> DeleteByFirebaseIdAsync(string firebaseUid);

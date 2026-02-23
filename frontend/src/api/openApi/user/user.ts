@@ -23,6 +23,7 @@ import type {
 import type {
 	ProblemDetails,
 	RegisterUserRequest,
+	UpdateUserRequest,
 	UserResponse,
 } from '.././model';
 
@@ -473,4 +474,88 @@ export const useUserRemoveAdminRole = <
 		getUserRemoveAdminRoleMutationOptions(options),
 		queryClient
 	);
+};
+export const userUpdate = (
+	id: string,
+	updateUserRequest: BodyType<UpdateUserRequest>,
+	options?: SecondParameter<typeof axiosInstance>,
+	signal?: AbortSignal
+) => {
+	return axiosInstance<UserResponse>(
+		{
+			url: `/User/${id}`,
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			data: updateUserRequest,
+			signal,
+		},
+		options
+	);
+};
+
+export const getUserUpdateMutationOptions = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof userUpdate>>,
+		TError,
+		{ id: string; data: BodyType<UpdateUserRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof userUpdate>>,
+	TError,
+	{ id: string; data: BodyType<UpdateUserRequest> },
+	TContext
+> => {
+	const mutationKey = ['userUpdate'];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			'mutationKey' in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof userUpdate>>,
+		{ id: string; data: BodyType<UpdateUserRequest> }
+	> = props => {
+		const { id, data } = props ?? {};
+
+		return userUpdate(id, data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type UserUpdateMutationResult = NonNullable<
+	Awaited<ReturnType<typeof userUpdate>>
+>;
+export type UserUpdateMutationBody = BodyType<UpdateUserRequest>;
+export type UserUpdateMutationError = ErrorType<ProblemDetails | void>;
+
+export const useUserUpdate = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof userUpdate>>,
+			TError,
+			{ id: string; data: BodyType<UpdateUserRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseMutationResult<
+	Awaited<ReturnType<typeof userUpdate>>,
+	TError,
+	{ id: string; data: BodyType<UpdateUserRequest> },
+	TContext
+> => {
+	return useMutation(getUserUpdateMutationOptions(options), queryClient);
 };
