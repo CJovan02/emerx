@@ -6,7 +6,7 @@ import {
     Typography,
 } from "@mui/material";
 import {FilterAlt} from "@mui/icons-material";
-import {Spacer} from "../reusable/spacer.tsx";
+import {Spacer} from "../../shared/components/ui/spacer.tsx";
 import StoreTabs from "./storeTabs.tsx";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
 import useScreenSize from "../../hooks/useScreenSize.ts";

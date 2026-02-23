@@ -1,7 +1,7 @@
 import {Divider, Drawer, List, Toolbar, Typography} from "@mui/material";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
 import {AdminPanelSettings, Inventory, SupervisorAccount} from "@mui/icons-material";
-import DrawerNavLinkButton from "../reusable/drawerNavLinkButton.tsx";
+import DrawerNavLinkButton from "../../shared/components/ui/drawerNavLinkButton.tsx";
 import {Routes} from "../../shared/common/constants/routeNames.ts";
 
 const drawerWidth = Drawers.Admin.Width;

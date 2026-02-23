@@ -9,6 +9,8 @@ import {useCallback} from "react";
 export default function AdminProductsPage() {
     const {
         data,
+        page,
+        pageSize,
         isSuccess,
         isError,
         errorMessage,
@@ -30,6 +32,8 @@ export default function AdminProductsPage() {
                 open={open}
                 handleClose={closeDrawer}
                 product={product}
+                page={page}
+                pageSize={pageSize}
             />
 
             <Container>

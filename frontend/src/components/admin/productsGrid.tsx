@@ -5,7 +5,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useMemo, useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
-import RatingMemo from "../reusable/ratingMemo.tsx";
+import RatingMemo from "../../shared/components/ui/ratingMemo.tsx";
 import * as React from "react";
 
 interface Props {
@@ -27,7 +27,7 @@ function ProductsGrid({
         page: 0,
         pageSize: 10
     });
-    
+
     const columns = useMemo<GridColDef<ProductResponse>[]>(() => [
         {
             field: "image",

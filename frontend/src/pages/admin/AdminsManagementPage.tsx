@@ -3,7 +3,7 @@ import {useEffect} from "react";
 import {useSnackbar} from "notistack";
 import {Box, Button} from "@mui/material";
 import {FormProvider} from "react-hook-form";
-import TextInput from "../../components/reusable/textInput.tsx";
+import TextInput from "../../shared/components/ui/textInput.tsx";
 
 export default function AdminsManagementPage() {
     const {

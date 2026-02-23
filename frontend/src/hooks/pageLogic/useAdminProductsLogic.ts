@@ -1,6 +1,7 @@
 import {useProductGetPaged} from "../../api/openApi/product/product.ts";
 import {useCallback, useEffect, useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
+import {QueryKeys} from "../../shared/common/queryKeys.ts";
 
 export default function useAdminProductsLogic() {
     const [page, setPage] = useState<number>(0); // we use 0 since Data Grid uses 0-based index
@@ -13,6 +14,11 @@ export default function useAdminProductsLogic() {
             Page: page + 1, // backend uses 1-based index
             PageSize: pageSize,
         },
+        {
+            query: {
+                queryKey: QueryKeys.adminGetProductsPaged(page, pageSize)
+            }
+        }
     )
     const {isError, error} = query
 

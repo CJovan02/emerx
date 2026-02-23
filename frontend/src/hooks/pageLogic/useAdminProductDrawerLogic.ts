@@ -1,13 +1,19 @@
-import {useState} from "react";
-import type {PatchProductRequest, ProblemDetails, ProductResponse} from "../../api/openApi/model";
+import {useEffect, useState} from "react";
+import type {
+    PatchProductRequest,
+    ProblemDetails,
+    ProductResponse
+} from "../../api/openApi/model";
 import {useForm} from "react-hook-form";
 import z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useProductPatch} from "../../api/openApi/product/product.ts";
 import type {ErrorType} from "../../api/axiosInstance.ts";
 import {isAxiosError} from "axios";
+import {useQueryClient} from "@tanstack/react-query";
+import {QueryKeys} from "../../shared/common/queryKeys.ts";
 
-export default function useAdminProductDrawerLogic(product: ProductResponse | null) {
+export default function useAdminProductDrawerLogic(product: ProductResponse | null, page: number, pageSize: number) {
     // form
     const formSchema = z.object({
         name: z
@@ -27,23 +33,27 @@ export default function useAdminProductDrawerLogic(product: ProductResponse | nu
 
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: product?.name ?? '',
-            category: product?.category ?? '',
-            price: product?.price ?? 0,
-        }
     });
 
 
     // api functions
+    const queryClient = useQueryClient();
     const {mutateAsync, isPending, isError, isSuccess} = useProductPatch({
         mutation: {
             onError: handleError,
+            // When we change the product, we refetch the page that contained that product
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({queryKey: QueryKeys.adminGetProductsPaged(page, pageSize)})
+            }
         }
     });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    // used when all the form values are the same as the initial product info
+    const [allSet, setAllSet] = useState<boolean>(false);
 
     const submitEditForm = form.handleSubmit(async ({name, category, price}: FormValues) => {
+        setAllSet(false);
+
         if (!product) {
             throw new Error("Product is null when submitting the form");
         }
@@ -53,6 +63,12 @@ export default function useAdminProductDrawerLogic(product: ProductResponse | nu
             name: name !== product.name ? name : null,
             category: category !== product.category ? category : null,
             price: price !== product.price ? price : null,
+        }
+
+        const isEmptyRequest = Object.values(request).every(val => val === null)
+        if (isEmptyRequest) {
+            setAllSet(true);
+            return;
         }
 
         await mutateAsync({id: product.id, data: request});
@@ -78,12 +94,22 @@ export default function useAdminProductDrawerLogic(product: ProductResponse | nu
         setErrorMessage("Unexpected error occurred, please try again.");
     }
 
+    useEffect(() => {
+        if (!product) return;
+
+        setAllSet(false);
+
+        form.setValue('name', product.name);
+        form.setValue('category', product.category);
+        form.setValue('price', product.price);
+    }, [product, setAllSet]);
+
     return {
         form,
-        product,
-        open,
         isSuccess,
         isError,
+        allSet,
+        setAllSet,
         errorMessage,
         isLoading: isPending,
         submitEditForm,
