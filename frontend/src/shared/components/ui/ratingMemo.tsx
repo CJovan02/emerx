@@ -7,7 +7,7 @@ interface Props {
 
 // Memoized version of rating MUI component for faster performance
 const RatingMemo = React.memo(({value}: Props) => {
-    return <Rating value={value} precision={0.1} size="small" readOnly />;
+    return <Rating value={value} precision={0.5} size="small" readOnly />;
 });
 
 export default RatingMemo;

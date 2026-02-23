@@ -1,5 +1,5 @@
 import {Box, Button, Divider, Drawer, Stack, Toolbar, Typography} from "@mui/material";
-import {ArrowUpward, Inventory} from "@mui/icons-material";
+import {ArrowUpward} from "@mui/icons-material";
 import type {ProductResponse} from "../../api/openApi/model";
 import useEditProductLogic from "../../hooks/pageLogic/admin/useEditProductLogic.ts";
 import {useEffect} from "react";
@@ -7,6 +7,7 @@ import {useSnackbar} from "notistack";
 import {FormProvider} from "react-hook-form";
 import TextInput from "../../shared/components/ui/textInput.tsx";
 import CircularProgress from "@mui/material/CircularProgress";
+import EditIcon from "@mui/icons-material/Edit";
 
 type Props = {
     open: boolean;
@@ -65,7 +66,7 @@ export default function EditProductDrawer({open, handleClose, product, page, pag
                         gap: 3
                     }}
                 >
-                    <Inventory color='primary' fontSize='large'/>
+                    <EditIcon color='primary' fontSize='large'/>
                     <Typography variant='h6' color='primary' fontWeight={700}>
                         Edit "{product?.name}"
                     </Typography>
