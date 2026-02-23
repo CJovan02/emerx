@@ -3,6 +3,7 @@ using EMerx.DTOs.Users.Request;
 using EMerx.DTOs.Users.Response;
 using EMerx.Entities;
 using EMerx.ResultPattern;
+using MongoDB.Bson;
 
 namespace EMerx.Services.Users;
 
@@ -21,4 +22,6 @@ public interface IUserService
     Task<Result> DeleteAsync(IdRequest request);
 
     Task<Result> DeleteByFirebaseIdAsync(string firebaseUid);
+    
+    Task<Result<UserResponse>> UpdateAsync(IdRequest request, UpdateUserRequest updateUserRequest);
 }
