@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.Entities;
 using EMerx.Infrastructure.MongoDb;
 using MongoDB.Bson;
@@ -9,9 +10,18 @@ public class ProductRepository(MongoContext context) : IProductRepository
 {
     private readonly IMongoCollection<Product> _products = context.Products;
 
-    public async Task<IEnumerable<Product>> GetProducts()
+    public async Task<PageOf<Product>> GetProducts(int page, int pageSize)
     {
-        return await _products.Find(product => true).ToListAsync();
+        var totalItems = await this._products.CountDocumentsAsync(Builders<Product>.Filter.Empty);
+        
+        var products = await _products
+            .Find(product => true)
+            .SortBy(product => product.Id)
+            .Skip((page - 1) * pageSize)
+            .Limit(pageSize)
+            .ToListAsync();
+        
+        return new PageOf<Product>(products, page, pageSize, (int)totalItems);
     }
 
     public async Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null)

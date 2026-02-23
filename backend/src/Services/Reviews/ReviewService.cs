@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Reviews;
 using EMerx.DTOs.Reviews.Request;
@@ -20,9 +21,21 @@ public class ReviewService(
     IOrderRepository orderRepository,
     MongoContext mongoContext) : IReviewService
 {
-    public async Task<Result<IEnumerable<ReviewResponse>>> GetAllAsync()
+    public async Task<Result<PageOfResponse<ReviewResponse>>> GetAllAsync(int page, int pageSize)
     {
-        return (await reviewRepository.GetReviews()).Select(review => review.ToResponse()).ToList();
+        var pageOfReviews = await reviewRepository.GetReviews(page, pageSize);
+        var reviewResponses = pageOfReviews
+            .Items
+            .Select(review => review.ToResponse())
+            .ToList();
+
+        var response = new PageOfResponse<ReviewResponse>(
+            reviewResponses,
+            pageOfReviews.Page,
+            pageOfReviews.PageSize,
+            pageOfReviews.TotalItems);
+        
+        return Result<PageOfResponse<ReviewResponse>>.Success(response);    
     }
 
     public async Task<Result<ReviewResponse>> GetByIdAsync(IdRequest request)

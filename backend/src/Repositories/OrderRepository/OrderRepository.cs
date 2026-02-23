@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.Entities;
 using EMerx.Infrastructure.MongoDb;
 using MongoDB.Bson;
@@ -9,9 +10,18 @@ public class OrderRepository(MongoContext context) : IOrderRepository
 {
     private readonly IMongoCollection<Order> _orders = context.Orders;
 
-    public async Task<IEnumerable<Order>> GetOrders()
+    public async Task<PageOf<Order>> GetOrders(int page, int pageSize)
     {
-        return await _orders.Find(order => true).ToListAsync();
+        var totalItems = await _orders.CountDocumentsAsync(Builders<Order>.Filter.Empty);
+        
+        var orders = await _orders
+            .Find(order => true)
+            .SortBy(order => order.Id)
+            .Skip((page - 1) * pageSize)
+            .Limit(pageSize)
+            .ToListAsync();
+        
+        return new PageOf<Order>(orders, page, pageSize, (int)totalItems);
     }
 
     public async Task<IEnumerable<Order>> GetOrdersForProduct(ObjectId productId)

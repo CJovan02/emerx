@@ -1,4 +1,5 @@
 using EMerx.Auth;
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
@@ -18,9 +19,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PageParams pageParams)
     {
-        return (await orderService.GetAllAsync()).ToActionResult();
+        return (await orderService.GetAllAsync(pageParams.Page, pageParams.PageSize)).ToActionResult();
     }
 
     [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]

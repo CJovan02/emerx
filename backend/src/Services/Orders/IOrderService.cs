@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
@@ -8,7 +9,7 @@ namespace EMerx.Services.Orders;
 public interface IOrderService
 {
     //Order Response Currently only gets id that can be changed
-    Task<Result<IEnumerable<OrderResponse>>> GetAllAsync();
+    Task<Result<PageOfResponse<OrderResponse>>> GetAllAsync(int page, int pageSize);
 
     Task<Result<OrderResponse>> GetByIdAsync(IdRequest request);
 

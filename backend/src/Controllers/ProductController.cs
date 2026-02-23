@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Products.Request;
 using EMerx.DTOs.Products.Response;
@@ -11,13 +12,14 @@ namespace EMerx.Controllers;
 [Route("[controller]")]
 public class ProductController(IProductService productService) : ControllerBase
 {
-    // Add pagination
-    [ProducesResponseType(typeof(IEnumerable<ProductResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageOfResponse<ProductResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PageParams pageParams)
     {
-        return (await productService.GetAllAsync()).ToActionResult();
+        var result = await productService.GetAllAsync(pageParams.Page, pageParams.PageSize);
+        
+        return result.ToActionResult();
     }
 
     [ProducesResponseType(typeof(ProductResponse), (StatusCodes.Status200OK))]

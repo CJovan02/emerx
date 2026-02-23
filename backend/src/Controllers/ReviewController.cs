@@ -1,3 +1,4 @@
+using EMerx.Common.Filters;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Reviews.Request;
 using EMerx.DTOs.Reviews.Response;
@@ -14,9 +15,9 @@ public class ReviewController(IReviewService reviewService) : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<ReviewResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PageParams pageParams)
     {
-        return (await reviewService.GetAllAsync()).ToActionResult();
+        return (await reviewService.GetAllAsync(pageParams.Page, pageParams.PageSize)).ToActionResult();
     }
 
     [ProducesResponseType(typeof(ReviewResponse), (StatusCodes.Status200OK))]
