@@ -1,9 +1,9 @@
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { Box, IconButton } from "@mui/material";
+import {DataGrid, type GridColDef, type GridRenderCellParams} from "@mui/x-data-grid";
+import {Box, IconButton, Rating} from "@mui/material";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useState } from "react";
+import {useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
 
 interface Props {
@@ -24,14 +24,15 @@ export default function ProductsGrid({
         pageSize: 10
     });
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef<ProductResponse>[] = [
         {
             field: "image",
             headerName: "",
             width: 70,
             filterable: false,
+            sortable: false,
             align: "center",
-            renderCell: () => <Inventory2OutlinedIcon />
+            renderCell: () => <Inventory2OutlinedIcon/>
         },
         {
             field: "name",
@@ -51,6 +52,13 @@ export default function ProductsGrid({
             valueFormatter: (params) => `€${params}`
         },
         {
+            field: 'averageRating',
+            headerName: "Rating",
+            flex: 1,
+            renderCell: (params: GridRenderCellParams<ProductResponse, number>) =>
+                <Rating value={params.value} precision={0.1} size='small' readOnly/>
+        },
+        {
             field: "actions",
             headerName: "Actions",
             width: 120,
@@ -63,7 +71,7 @@ export default function ProductsGrid({
                             console.log("edit", params.row.id);
                         }}
                     >
-                        <EditIcon />
+                        <EditIcon/>
                     </IconButton>
 
                     <IconButton
@@ -72,7 +80,7 @@ export default function ProductsGrid({
                             console.log("delete", params.row.id);
                         }}
                     >
-                        <DeleteIcon />
+                        <DeleteIcon/>
                     </IconButton>
                 </>
             )
@@ -80,7 +88,7 @@ export default function ProductsGrid({
     ];
 
     return (
-        <Box sx={{ height: 700, width: "100%" }}>
+        <Box sx={{height: 700, width: "100%"}}>
             <DataGrid
                 rows={data}
                 columns={columns}

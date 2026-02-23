@@ -15,4 +15,5 @@ export interface ProductResponse {
 	/** @nullable */
 	image?: string | null;
 	price: number;
+	averageRating: number;
 }
