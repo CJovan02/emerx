@@ -27,7 +27,8 @@ public static class ProductsExtensions
             Name = domain.Name,
             Category = domain.Category,
             Image = domain.Image,
-            Price = domain.Price
+            Price = domain.Price,
+            AverageRating = domain.AverageRating
         };
     }
 }

@@ -10,4 +10,5 @@ public sealed record ProductResponse
     [Required] public required string Category { get; init; }
     public string? Image { get; init; }
     [Required] public required decimal Price { get; init; }
+    [Required] public required double AverageRating { get; init; }
 }
