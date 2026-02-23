@@ -1,30 +1,33 @@
 import {DataGrid, type GridColDef, type GridRenderCellParams} from "@mui/x-data-grid";
-import {Box, IconButton, Rating} from "@mui/material";
+import {Box, IconButton} from "@mui/material";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import type {ProductResponse} from "../../api/openApi/model";
+import RatingMemo from "../reusable/ratingMemo.tsx";
 
 interface Props {
     data: ProductResponse[];
     totalItems: number;
     loading: boolean;
     fetchPage: (page: number, pageSize: number) => void;
+    openDrawer: (product: ProductResponse) => void;
 }
 
 export default function ProductsGrid({
                                          data,
                                          totalItems,
                                          loading,
-                                         fetchPage
+                                         fetchPage,
+                                         openDrawer,
                                      }: Props) {
     const [paginationModel, setPaginationModel] = useState({
         page: 0,
         pageSize: 10
     });
 
-    const columns: GridColDef<ProductResponse>[] = [
+    const columns = useMemo<GridColDef<ProductResponse>[]>(() => [
         {
             field: "image",
             headerName: "",
@@ -56,7 +59,7 @@ export default function ProductsGrid({
             headerName: "Rating",
             flex: 1,
             renderCell: (params: GridRenderCellParams<ProductResponse, number>) =>
-                <Rating value={params.value} precision={0.1} size='small' readOnly/>
+                <RatingMemo value={params.value}/>
         },
         {
             field: "actions",
@@ -68,7 +71,7 @@ export default function ProductsGrid({
                     <IconButton
                         onClick={(e) => {
                             e.stopPropagation();
-                            console.log("edit", params.row.id);
+                            openDrawer(params.row);
                         }}
                     >
                         <EditIcon/>
@@ -77,7 +80,6 @@ export default function ProductsGrid({
                     <IconButton
                         onClick={(e) => {
                             e.stopPropagation();
-                            console.log("delete", params.row.id);
                         }}
                     >
                         <DeleteIcon/>
@@ -85,11 +87,12 @@ export default function ProductsGrid({
                 </>
             )
         }
-    ];
+    ], []);
 
     return (
-        <Box sx={{height: 700, width: "100%"}}>
+        <Box sx={{width: "100%"}}>
             <DataGrid
+                autoHeight={false}
                 rows={data}
                 columns={columns}
                 getRowId={(row) => row.id}
@@ -104,6 +107,10 @@ export default function ProductsGrid({
                     fetchPage(model.page + 1, model.pageSize);
                 }}
                 pageSizeOptions={[5, 10, 20]}
+                sx={{
+                    height: '700px',
+                }}
+                disableRowSelectionOnClick
             />
         </Box>
     );
