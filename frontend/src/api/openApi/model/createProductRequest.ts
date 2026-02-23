@@ -5,12 +5,12 @@
  * OpenAPI spec version: v1
  */
 
-export interface ProductRequest {
+export interface CreateProductRequest {
 	/** @minLength 1 */
 	name: string;
 	/** @minLength 1 */
 	category: string;
-	/** @minLength 1 */
-	image: string;
+	/** @nullable */
+	image?: string | null;
 	price: number;
 }

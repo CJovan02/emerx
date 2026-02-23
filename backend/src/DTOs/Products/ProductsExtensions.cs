@@ -7,7 +7,7 @@ namespace EMerx.DTOs.Products;
 
 public static class ProductsExtensions
 {
-    public static Product ToDomain(this ProductRequest request)
+    public static Product ToDomain(this CreateProductRequest request)
     {
         return new Product
         {

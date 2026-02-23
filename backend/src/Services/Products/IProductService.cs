@@ -13,7 +13,7 @@ public interface IProductService
 
     Task<Result<ProductResponse>> GetByIdAsync(IdRequest request);
 
-    Task<Result<ProductResponse>> CreateAsync(ProductRequest request);
+    Task<Result<ProductResponse>> CreateAsync(CreateProductRequest request);
 
     Task<Result> PatchAsync(IdRequest idRequest, PatchProductRequest request);
 

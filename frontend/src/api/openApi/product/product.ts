@@ -21,10 +21,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+	CreateProductRequest,
 	PatchProductRequest,
 	ProblemDetails,
 	ProductGetPagedParams,
-	ProductRequest,
 	ProductResponse,
 	ProductResponsePageOfResponse,
 } from '.././model';
@@ -189,7 +189,7 @@ export function useProductGetPaged<
 }
 
 export const productCreate = (
-	productRequest: BodyType<ProductRequest>,
+	createProductRequest: BodyType<CreateProductRequest>,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
@@ -198,7 +198,7 @@ export const productCreate = (
 			url: `/Product`,
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			data: productRequest,
+			data: createProductRequest,
 			signal,
 		},
 		options
@@ -212,14 +212,14 @@ export const getProductCreateMutationOptions = <
 	mutation?: UseMutationOptions<
 		Awaited<ReturnType<typeof productCreate>>,
 		TError,
-		{ data: BodyType<ProductRequest> },
+		{ data: BodyType<CreateProductRequest> },
 		TContext
 	>;
 	request?: SecondParameter<typeof axiosInstance>;
 }): UseMutationOptions<
 	Awaited<ReturnType<typeof productCreate>>,
 	TError,
-	{ data: BodyType<ProductRequest> },
+	{ data: BodyType<CreateProductRequest> },
 	TContext
 > => {
 	const mutationKey = ['productCreate'];
@@ -233,7 +233,7 @@ export const getProductCreateMutationOptions = <
 
 	const mutationFn: MutationFunction<
 		Awaited<ReturnType<typeof productCreate>>,
-		{ data: BodyType<ProductRequest> }
+		{ data: BodyType<CreateProductRequest> }
 	> = props => {
 		const { data } = props ?? {};
 
@@ -246,7 +246,7 @@ export const getProductCreateMutationOptions = <
 export type ProductCreateMutationResult = NonNullable<
 	Awaited<ReturnType<typeof productCreate>>
 >;
-export type ProductCreateMutationBody = BodyType<ProductRequest>;
+export type ProductCreateMutationBody = BodyType<CreateProductRequest>;
 export type ProductCreateMutationError = ErrorType<ProblemDetails | void>;
 
 export const useProductCreate = <
@@ -257,7 +257,7 @@ export const useProductCreate = <
 		mutation?: UseMutationOptions<
 			Awaited<ReturnType<typeof productCreate>>,
 			TError,
-			{ data: BodyType<ProductRequest> },
+			{ data: BodyType<CreateProductRequest> },
 			TContext
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
@@ -266,7 +266,7 @@ export const useProductCreate = <
 ): UseMutationResult<
 	Awaited<ReturnType<typeof productCreate>>,
 	TError,
-	{ data: BodyType<ProductRequest> },
+	{ data: BodyType<CreateProductRequest> },
 	TContext
 > => {
 	return useMutation(getProductCreateMutationOptions(options), queryClient);

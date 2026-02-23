@@ -6,7 +6,7 @@ import {Routes} from "../../shared/common/constants/routeNames.ts";
 
 const drawerWidth = Drawers.Admin.Width;
 
-export default function AdminDrawer() {
+export default function AdminNavigationDrawer() {
     return (
         <Drawer
             variant="permanent"

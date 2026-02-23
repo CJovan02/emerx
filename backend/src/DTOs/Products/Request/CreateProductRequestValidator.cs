@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace EMerx.DTOs.Products.Request;
 
-public class ProductRequestValidator : AbstractValidator<ProductRequest>
+public class CreateProductRequestValidator : AbstractValidator<CreateProductRequest>
 {
-    public ProductRequestValidator()
+    public CreateProductRequestValidator()
     {
         RuleFor(x => x.Name)
             .Length(3, 30)

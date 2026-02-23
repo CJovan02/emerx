@@ -112,7 +112,7 @@ function ProductsGrid({
                 }}
                 pageSizeOptions={[5, 10, 20]}
                 sx={{
-                    height: '700px',
+                    height: '650px',
                 }}
                 disableRowSelectionOnClick
             />

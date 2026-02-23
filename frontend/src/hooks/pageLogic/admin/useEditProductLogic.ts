@@ -3,30 +3,32 @@ import type {
     PatchProductRequest,
     ProblemDetails,
     ProductResponse
-} from "../../api/openApi/model";
+} from "../../../api/openApi/model";
 import {useForm} from "react-hook-form";
 import z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useProductPatch} from "../../api/openApi/product/product.ts";
-import type {ErrorType} from "../../api/axiosInstance.ts";
+import {useProductPatch} from "../../../api/openApi/product/product.ts";
+import type {ErrorType} from "../../../api/axiosInstance.ts";
 import {isAxiosError} from "axios";
 import {useQueryClient} from "@tanstack/react-query";
-import {QueryKeys} from "../../shared/common/queryKeys.ts";
+import {QueryKeys} from "../../../shared/common/queryKeys.ts";
 
-export default function useAdminProductDrawerLogic(product: ProductResponse | null, page: number, pageSize: number) {
+export default function useEditProductLogic(product: ProductResponse | null, page: number, pageSize: number) {
     // form
     const formSchema = z.object({
         name: z
             .string()
+            .nonempty()
             .min(3, "Name must be at least 3 characters.")
             .max(30, "Name can't be larger than 30 characters."),
 
         category: z
             .string()
+            .nonempty()
             .min(3, "Category must be at least 3 characters.")
             .max(30, "Category can't be larger than 30 characters."),
 
-        price: z.number().min(0, "Price must be larger than 0."),
+        price: z.number().nonnegative(),
     })
 
     type FormValues = z.infer<typeof formSchema>;
@@ -42,8 +44,8 @@ export default function useAdminProductDrawerLogic(product: ProductResponse | nu
         mutation: {
             onError: handleError,
             // When we change the product, we refetch the page that contained that product
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({queryKey: QueryKeys.adminGetProductsPaged(page, pageSize)})
+            onSuccess: () => {
+                 queryClient.invalidateQueries({queryKey: QueryKeys.adminGetProductsPaged(page, pageSize)})
             }
         }
     });

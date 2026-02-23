@@ -1,4 +1,4 @@
-import useAdminsManagementLogic from "../../hooks/pageLogic/useAdminsManagementLogic.ts";
+import useAdminsManagementLogic from "../../hooks/pageLogic/admin/useAdminsManagementLogic.ts";
 import {useEffect} from "react";
 import {useSnackbar} from "notistack";
 import {Box, Button} from "@mui/material";

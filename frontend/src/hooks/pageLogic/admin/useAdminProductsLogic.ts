@@ -1,7 +1,7 @@
-import {useProductGetPaged} from "../../api/openApi/product/product.ts";
+import {useProductGetPaged} from "../../../api/openApi/product/product.ts";
 import {useCallback, useEffect, useState} from "react";
-import type {ProductResponse} from "../../api/openApi/model";
-import {QueryKeys} from "../../shared/common/queryKeys.ts";
+import type {ProductResponse} from "../../../api/openApi/model";
+import {QueryKeys} from "../../../shared/common/queryKeys.ts";
 
 export default function useAdminProductsLogic() {
     const [page, setPage] = useState<number>(0); // we use 0 since Data Grid uses 0-based index
@@ -23,17 +23,24 @@ export default function useAdminProductsLogic() {
     const {isError, error} = query
 
     // drawer UI logic
-    const [open, setOpen] = useState<boolean>(false);
+    const [editOpen, setEditOpen] = useState<boolean>(false);
+    const [addOpen, setAddOpen] = useState<boolean>(false);
 
-    const openDrawer = useCallback((product: ProductResponse) => {
+    const openEditDrawer = useCallback((product: ProductResponse) => {
         setProduct(product);
 
-        setOpen(true);
-    }, [setProduct, setOpen]);
+        setEditOpen(true);
+    }, [setProduct, setEditOpen]);
+    const openAddDrawer = useCallback(() => {
+        setAddOpen(true);
+    }, [setProduct, setAddOpen])
 
-    const closeDrawer = useCallback(() => {
-        setOpen(false);
-    }, [setOpen]);
+    const closeEditDrawer = useCallback(() => {
+        setEditOpen(false);
+    }, [setEditOpen]);
+    const closeAddDrawer = useCallback(() => {
+        setAddOpen(false);
+    }, [setAddOpen]);
 
     useEffect(() => {
         if (!isError) {
@@ -51,9 +58,12 @@ export default function useAdminProductsLogic() {
         page,
         pageSize,
         product,
-        open,
-        openDrawer,
-        closeDrawer,
+        editOpen,
+        addOpen,
+        openAddDrawer,
+        closeAddDrawer,
+        openEditDrawer,
+        closeEditDrawer,
         setProduct,
         setPage,
         setPageSize,

@@ -42,7 +42,7 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType((StatusCodes.Status400BadRequest))]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ProductRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {
         return (await productService.CreateAsync(request)).ToActionResult();
     }

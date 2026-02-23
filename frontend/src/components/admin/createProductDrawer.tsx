@@ -1,9 +1,8 @@
-import {Box, Button, Divider, Drawer, Stack, Toolbar, Typography} from "@mui/material";
-import {ArrowUpward, Inventory} from "@mui/icons-material";
-import type {ProductResponse} from "../../api/openApi/model";
-import useAdminProductDrawerLogic from "../../hooks/pageLogic/useAdminProductDrawerLogic.ts";
+import {useCreateProductLogic} from "../../hooks/pageLogic/admin/useCreateProductLogic.ts";
 import {useEffect} from "react";
 import {useSnackbar} from "notistack";
+import {Box, Button, Divider, Drawer, Stack, Toolbar, Typography} from "@mui/material";
+import {AddCircleOutlineOutlined, ArrowUpward} from "@mui/icons-material";
 import {FormProvider} from "react-hook-form";
 import TextInput from "../../shared/components/ui/textInput.tsx";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -11,22 +10,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 type Props = {
     open: boolean;
     handleClose: () => void;
-    product: ProductResponse | null;
     page: number;
     pageSize: number;
 }
 
-export default function AdminProductDrawer({open, handleClose, product, page, pageSize}: Props) {
-    const {
-        form,
-        submitEditForm,
-        isSuccess,
-        isError,
-        errorMessage,
-        isLoading,
-        allSet,
-        setAllSet
-    } = useAdminProductDrawerLogic(product, page, pageSize);
+export default function CreateProductDrawer({open, handleClose, pageSize, page}: Props) {
+    const {form, isError, errorMessage, isLoading, submitCreateForm, isSuccess} = useCreateProductLogic(page, pageSize);
     const {enqueueSnackbar} = useSnackbar();
 
     useEffect(() => {
@@ -38,17 +27,10 @@ export default function AdminProductDrawer({open, handleClose, product, page, pa
     useEffect(() => {
         if (!isSuccess) return;
 
-        enqueueSnackbar("Successfully updated product", {variant: "success"});
-        handleClose();
-    }, [isSuccess, enqueueSnackbar]);
-
-    useEffect(() => {
-        if (!allSet) return;
-
-        enqueueSnackbar("All set - there is noting to update.", {variant: 'info'})
-        setAllSet(false);
-        handleClose();
-    }, [allSet, handleClose, enqueueSnackbar, setAllSet]);
+        form.reset();
+        enqueueSnackbar("Successfully created product", {variant: "success"});
+        //handleClose();
+    }, [isSuccess, enqueueSnackbar, form.reset]);
 
     return (
         <Drawer
@@ -65,9 +47,9 @@ export default function AdminProductDrawer({open, handleClose, product, page, pa
                         gap: 3
                     }}
                 >
-                    <Inventory color='primary' fontSize='large'/>
+                    <AddCircleOutlineOutlined color='primary' fontSize='large'/>
                     <Typography variant='h6' color='primary' fontWeight={700}>
-                        Edit "{product?.name}"
+                        Create New Product
                     </Typography>
                 </Toolbar>
                 <Divider/>
@@ -75,8 +57,8 @@ export default function AdminProductDrawer({open, handleClose, product, page, pa
                 <Box mt={3} px={3}>
                     <FormProvider {...form}>
                         <form
-                            id='edit-product-form'
-                            onSubmit={submitEditForm}
+                            id='create-product-form'
+                            onSubmit={submitCreateForm}
                         >
                             <Stack spacing={3}>
                                 <TextInput id='name' label='Name' required fullWidth/>
@@ -88,7 +70,7 @@ export default function AdminProductDrawer({open, handleClose, product, page, pa
 
                                 <Button
                                     startIcon={<ArrowUpward/>}
-                                    form='edit-product-form'
+                                    form='create-product-form'
                                     type='submit'
                                     loading={isLoading}
                                     loadingIndicator={<CircularProgress size={26}/>}
@@ -99,7 +81,7 @@ export default function AdminProductDrawer({open, handleClose, product, page, pa
                                         fontSize: 15
                                     }}
                                 >
-                                    Submit Changes
+                                    Create Product
                                 </Button>
                             </Stack>
                         </form>
@@ -109,5 +91,4 @@ export default function AdminProductDrawer({open, handleClose, product, page, pa
             </Box>
         </Drawer>
     )
-
 }

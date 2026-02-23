@@ -43,7 +43,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return Result<ProductResponse>.Success(product.ToResponse());
     }
 
-    public async Task<Result<ProductResponse>> CreateAsync(ProductRequest request)
+    public async Task<Result<ProductResponse>> CreateAsync(CreateProductRequest request)
     {
         var product = request.ToDomain();
         await productRepository.CreateProduct(product);
