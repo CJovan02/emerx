@@ -1,10 +1,12 @@
 import {useProductGetPaged} from "../../api/openApi/product/product.ts";
 import {useEffect, useState} from "react";
+import type {ProductResponse} from "../../api/openApi/model";
 
 export default function useAdminProductsLogic() {
     const [page, setPage] = useState<number>(0); // we use 0 since Data Grid uses 0-based index
     const [pageSize, setPageSize] = useState<number>(10);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [product, setProduct] = useState<ProductResponse | null>(null);
 
     const query = useProductGetPaged(
         {
@@ -13,6 +15,19 @@ export default function useAdminProductsLogic() {
         },
     )
     const {isError, error} = query
+
+    // drawer UI logic
+    const [open, setOpen] = useState<boolean>(false);
+
+    const openDrawer = (product: ProductResponse) => {
+        setProduct(product);
+
+        setOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setOpen(false);
+    };
 
     useEffect(() => {
         if (!isError) {
@@ -29,6 +44,11 @@ export default function useAdminProductsLogic() {
         errorMessage,
         page,
         pageSize,
+        product,
+        open,
+        openDrawer,
+        closeDrawer,
+        setProduct,
         setPage,
         setPageSize,
     }

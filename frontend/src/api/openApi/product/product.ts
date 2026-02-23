@@ -21,6 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+	PatchProductRequest,
 	ProblemDetails,
 	ProductGetPagedParams,
 	ProductRequest,
@@ -409,6 +410,90 @@ export function useProductGetById<
 	return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export const productPatch = (
+	id: string,
+	patchProductRequest: BodyType<PatchProductRequest>,
+	options?: SecondParameter<typeof axiosInstance>,
+	signal?: AbortSignal
+) => {
+	return axiosInstance<void>(
+		{
+			url: `/Product/${id}`,
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			data: patchProductRequest,
+			signal,
+		},
+		options
+	);
+};
+
+export const getProductPatchMutationOptions = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof productPatch>>,
+		TError,
+		{ id: string; data: BodyType<PatchProductRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof productPatch>>,
+	TError,
+	{ id: string; data: BodyType<PatchProductRequest> },
+	TContext
+> => {
+	const mutationKey = ['productPatch'];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			'mutationKey' in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof productPatch>>,
+		{ id: string; data: BodyType<PatchProductRequest> }
+	> = props => {
+		const { id, data } = props ?? {};
+
+		return productPatch(id, data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ProductPatchMutationResult = NonNullable<
+	Awaited<ReturnType<typeof productPatch>>
+>;
+export type ProductPatchMutationBody = BodyType<PatchProductRequest>;
+export type ProductPatchMutationError = ErrorType<ProblemDetails | void>;
+
+export const useProductPatch = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof productPatch>>,
+			TError,
+			{ id: string; data: BodyType<PatchProductRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseMutationResult<
+	Awaited<ReturnType<typeof productPatch>>,
+	TError,
+	{ id: string; data: BodyType<PatchProductRequest> },
+	TContext
+> => {
+	return useMutation(getProductPatchMutationOptions(options), queryClient);
+};
 export const productDelete = (
 	id: string,
 	options?: SecondParameter<typeof axiosInstance>,

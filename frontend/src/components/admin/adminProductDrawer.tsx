@@ -1,14 +1,16 @@
 import {Box, Divider, Drawer, Toolbar, Typography} from "@mui/material";
 import {Inventory} from "@mui/icons-material";
 import type {ProductResponse} from "../../api/openApi/model";
+import useAdminProductDrawerLogic from "../../hooks/pageLogic/useAdminProductDrawerLogic.ts";
 
 type Props = {
     open: boolean;
     handleClose: () => void;
-    product: ProductResponse | null
+    product:  ProductResponse | null;
 }
 
 export default function AdminProductDrawer({open, handleClose, product}: Props) {
+    const {  } = useAdminProductDrawerLogic(product);
 
     return (
         <Drawer

@@ -4,11 +4,21 @@ import useAdminProductsLogic from "../../hooks/pageLogic/useAdminProductsLogic.t
 import {Refresh} from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
 import AdminProductDrawer from "../../components/admin/adminProductDrawer.tsx";
-import useAdminProductDrawerLogic from "../../hooks/pageLogic/useAdminProductDrawerLogic.ts";
 
 export default function AdminProductsPage() {
-    const {data, isSuccess, isError, errorMessage, isLoading, isPending, refetch} = useAdminProductsLogic();
-    const {closeDrawer, openDrawer, open, product} = useAdminProductDrawerLogic();
+    const {
+        data,
+        isSuccess,
+        isError,
+        errorMessage,
+        isLoading,
+        isPending,
+        refetch,
+        open,
+        openDrawer,
+        closeDrawer,
+        product
+    } = useAdminProductsLogic();
 
     return (
         <>
