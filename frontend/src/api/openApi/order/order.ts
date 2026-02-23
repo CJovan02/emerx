@@ -20,7 +20,12 @@ import type {
 	UseQueryResult,
 } from '@tanstack/react-query';
 
-import type { OrderRequest, OrderResponse, ProblemDetails } from '.././model';
+import type {
+	OrderGetAllParams,
+	OrderRequest,
+	OrderResponse,
+	ProblemDetails,
+} from '.././model';
 
 import { axiosInstance } from '../../axiosInstance';
 import type { ErrorType, BodyType } from '../../axiosInstance';
@@ -28,35 +33,39 @@ import type { ErrorType, BodyType } from '../../axiosInstance';
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const orderGetAll = (
+	params?: OrderGetAllParams,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
 	return axiosInstance<OrderResponse[]>(
-		{ url: `/Order`, method: 'GET', signal },
+		{ url: `/Order`, method: 'GET', params, signal },
 		options
 	);
 };
 
-export const getOrderGetAllQueryKey = () => {
-	return [`/Order`] as const;
+export const getOrderGetAllQueryKey = (params?: OrderGetAllParams) => {
+	return [`/Order`, ...(params ? [params] : [])] as const;
 };
 
 export const getOrderGetAllQueryOptions = <
 	TData = Awaited<ReturnType<typeof orderGetAll>>,
 	TError = ErrorType<void>,
->(options?: {
-	query?: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof orderGetAll>>, TError, TData>
-	>;
-	request?: SecondParameter<typeof axiosInstance>;
-}) => {
+>(
+	params?: OrderGetAllParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof orderGetAll>>, TError, TData>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	}
+) => {
 	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-	const queryKey = queryOptions?.queryKey ?? getOrderGetAllQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getOrderGetAllQueryKey(params);
 
 	const queryFn: QueryFunction<Awaited<ReturnType<typeof orderGetAll>>> = ({
 		signal,
-	}) => orderGetAll(requestOptions, signal);
+	}) => orderGetAll(params, requestOptions, signal);
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
 		Awaited<ReturnType<typeof orderGetAll>>,
@@ -74,6 +83,7 @@ export function useOrderGetAll<
 	TData = Awaited<ReturnType<typeof orderGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params: undefined | OrderGetAllParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof orderGetAll>>, TError, TData>
@@ -96,6 +106,7 @@ export function useOrderGetAll<
 	TData = Awaited<ReturnType<typeof orderGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params?: OrderGetAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof orderGetAll>>, TError, TData>
@@ -118,6 +129,7 @@ export function useOrderGetAll<
 	TData = Awaited<ReturnType<typeof orderGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params?: OrderGetAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof orderGetAll>>, TError, TData>
@@ -133,6 +145,7 @@ export function useOrderGetAll<
 	TData = Awaited<ReturnType<typeof orderGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params?: OrderGetAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof orderGetAll>>, TError, TData>
@@ -143,7 +156,7 @@ export function useOrderGetAll<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-	const queryOptions = getOrderGetAllQueryOptions(options);
+	const queryOptions = getOrderGetAllQueryOptions(params, options);
 
 	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
 		TData,
