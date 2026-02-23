@@ -11,24 +11,42 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserStore } from '../stores/userStore';
-import type { UserResponse } from '../api/openApi/model';
+import type { UpdateUserRequest } from '../api/openApi/model';
 import { useForm, Controller } from 'react-hook-form';
+import { useUserUpdate } from '../api/openApi/user/user';
 
 export default function MyProfilePage() {
 	const { user, setUser } = useUserStore();
 	const [isEditing, setIsEditing] = useState(false);
+	const { mutate: updateUser, isPending: isLoading } = useUserUpdate();
 
-	const { control, handleSubmit, reset } = useForm<UserResponse>({
+	const { control, handleSubmit, reset } = useForm<UpdateUserRequest>({
 		defaultValues: user || undefined,
 	});
 
+	useEffect(() => {
+		if (user) {
+			reset(user);
+		}
+	}, [user, reset]);
+
 	if (!user) return null;
 
-	const onSubmit = (data: UserResponse) => {
-		setUser(data);
-		setIsEditing(false);
+	const onSubmit = (data: UpdateUserRequest) => {
+		updateUser(
+			{ id: user.id, data },
+			{
+				onSuccess: updatedUser => {
+					setUser(updatedUser);
+					setIsEditing(false);
+				},
+				onError: error => {
+					console.error('Failed to update user:', error);
+				},
+			}
+		);
 	};
 
 	const handleEdit = () => {
@@ -159,8 +177,9 @@ export default function MyProfilePage() {
 												</Button>
 												<Button
 													type='submit'
-													variant='contained'>
-													Save
+													variant='contained'
+													disabled={isLoading}>
+													{isLoading ? 'Saving...' : 'Save'}
 												</Button>
 											</Stack>
 										</Stack>

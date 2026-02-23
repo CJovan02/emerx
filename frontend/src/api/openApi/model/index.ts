@@ -17,4 +17,5 @@ export * from './productResponse';
 export * from './registerUserRequest';
 export * from './reviewRequest';
 export * from './reviewResponse';
+export * from './updateUserRequest';
 export * from './userResponse';
