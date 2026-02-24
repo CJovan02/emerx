@@ -4,6 +4,6 @@ namespace EMerx.Repositories.CloudinaryRepository;
 
 public interface ICloudinaryRepository
 {
-    Task<ImageUploadResult> UploadProductImageAsync(int productId, string fileName, Stream payload);
+    Task<ImageUploadResult> UploadProductImageAsync(string productId, string fileName, Stream payload);
     Task<DeletionResult> DeleteProductImage(string publicId);
 }

@@ -5,7 +5,7 @@ namespace EMerx.Repositories.CloudinaryRepository;
 
 public class CloudinaryRepository(Cloudinary client) : ICloudinaryRepository
 {
-    public async Task<ImageUploadResult> UploadProductImageAsync(int productId, string fileName, Stream payload)
+    public async Task<ImageUploadResult> UploadProductImageAsync(string productId, string fileName, Stream payload)
     {
         var uploadParams = new ImageUploadParams
         {

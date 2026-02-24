@@ -1,21 +1,22 @@
-﻿namespace EMerx.Entities;
+﻿using EMerx.Domain.Models;
+
+namespace EMerx.Entities;
 
 public class Product : BaseEntity
 {
-    public required string Name { get; init; }
+    public required string Name { get; set; }
 
     //should be rediscussed about categories enum
-    public required string Category { get; init; }
+    public required string Category { get; set; }
 
-    //will be changed
-    public string? Image { get; init; }
-    public decimal Price { get; init; }
+    public ProductImage? Image { get; set; }
+    public required decimal Price { get; set; }
 
     /// <summary>
     /// Used for calculating AverageRating
     /// </summary>
-    public double SumRatings { get; init; } = 0;
-    public int ReviewsCount { get; init; } = 0;
+    public double SumRatings { get; set; } = 0;
 
-    public double AverageRating { get; init; } = 0;
+    public int ReviewsCount { get; set; } = 0;
+    public double AverageRating { get; set; } = 0;
 }
