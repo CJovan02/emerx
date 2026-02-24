@@ -35,6 +35,7 @@ function AuthUserSync() {
                 // Now we extract user roles from firebase jwt
                 // Backend can also do this logic, but I would like to avoid sending roles information through REST
                 const tokenResult = await user.getIdTokenResult()
+                // console.log(tokenResult.token);
                 const roles: number[] = (tokenResult.claims.roles) as number[] ?? [];
                 const appUser = mapResponseToUser(userResponse, roles);
 

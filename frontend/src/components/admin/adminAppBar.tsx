@@ -1,6 +1,6 @@
 import {AppBar, Toolbar, Typography} from "@mui/material";
 import {Drawers} from "../../shared/common/constants/drawers.ts";
-import {Spacer} from "../reusable/spacer.tsx";
+import {Spacer} from "../../shared/components/ui/spacer.tsx";
 import AvatarMenu from "../products/avatarMenu.tsx";
 import {useEffect, useState} from "react";
 import {useLocation} from "react-router";

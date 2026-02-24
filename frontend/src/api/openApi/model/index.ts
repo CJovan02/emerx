@@ -6,15 +6,20 @@
  */
 
 export * from './address';
+export * from './createProductRequest';
 export * from './objectId';
+export * from './orderGetAllParams';
 export * from './orderItem';
 export * from './orderItemRequest';
 export * from './orderRequest';
 export * from './orderResponse';
+export * from './patchProductRequest';
 export * from './problemDetails';
-export * from './productRequest';
+export * from './productGetPagedParams';
 export * from './productResponse';
+export * from './productResponsePageOfResponse';
 export * from './registerUserRequest';
+export * from './reviewGetAllParams';
 export * from './reviewRequest';
 export * from './reviewResponse';
 export * from './updateUserRequest';

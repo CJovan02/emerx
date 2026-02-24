@@ -9,7 +9,7 @@ import {
     Snackbar,
     Stack,
 } from "@mui/material";
-import TextInput from "../components/reusable/textInput.tsx";
+import TextInput from "../shared/components/ui/textInput.tsx";
 import useLoginLogic from "../hooks/pageLogic/useLoginLogic.ts";
 import {FormProvider} from "react-hook-form";
 import {useEffect, useState} from "react";

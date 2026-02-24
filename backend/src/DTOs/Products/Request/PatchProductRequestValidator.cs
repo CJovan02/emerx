@@ -2,16 +2,16 @@ using FluentValidation;
 
 namespace EMerx.DTOs.Products.Request;
 
-public class ProductRequestValidator : AbstractValidator<ProductRequest>
+public class PatchProductRequestValidator : AbstractValidator<PatchProductRequest>
 {
-    public ProductRequestValidator()
+    public PatchProductRequestValidator()
     {
         RuleFor(x => x.Name)
-            .Length(5, 30)
+            .Length(3, 30)
             .WithMessage("Product name must be between 5 and 30 characters long.");
 
         RuleFor(x => x.Category)
-            .Length(5, 30)
+            .Length(3, 30)
             .WithMessage("Category name must be between 5 and 30 characters long.");
 
         RuleFor(x => x.Price)

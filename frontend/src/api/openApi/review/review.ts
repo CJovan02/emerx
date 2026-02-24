@@ -20,7 +20,12 @@ import type {
 	UseQueryResult,
 } from '@tanstack/react-query';
 
-import type { ProblemDetails, ReviewRequest, ReviewResponse } from '.././model';
+import type {
+	ProblemDetails,
+	ReviewGetAllParams,
+	ReviewRequest,
+	ReviewResponse,
+} from '.././model';
 
 import { axiosInstance } from '../../axiosInstance';
 import type { ErrorType, BodyType } from '../../axiosInstance';
@@ -28,35 +33,39 @@ import type { ErrorType, BodyType } from '../../axiosInstance';
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const reviewGetAll = (
+	params?: ReviewGetAllParams,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
 	return axiosInstance<ReviewResponse[]>(
-		{ url: `/Review`, method: 'GET', signal },
+		{ url: `/Review`, method: 'GET', params, signal },
 		options
 	);
 };
 
-export const getReviewGetAllQueryKey = () => {
-	return [`/Review`] as const;
+export const getReviewGetAllQueryKey = (params?: ReviewGetAllParams) => {
+	return [`/Review`, ...(params ? [params] : [])] as const;
 };
 
 export const getReviewGetAllQueryOptions = <
 	TData = Awaited<ReturnType<typeof reviewGetAll>>,
 	TError = ErrorType<void>,
->(options?: {
-	query?: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
-	>;
-	request?: SecondParameter<typeof axiosInstance>;
-}) => {
+>(
+	params?: ReviewGetAllParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	}
+) => {
 	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-	const queryKey = queryOptions?.queryKey ?? getReviewGetAllQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getReviewGetAllQueryKey(params);
 
 	const queryFn: QueryFunction<Awaited<ReturnType<typeof reviewGetAll>>> = ({
 		signal,
-	}) => reviewGetAll(requestOptions, signal);
+	}) => reviewGetAll(params, requestOptions, signal);
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
 		Awaited<ReturnType<typeof reviewGetAll>>,
@@ -74,6 +83,7 @@ export function useReviewGetAll<
 	TData = Awaited<ReturnType<typeof reviewGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params: undefined | ReviewGetAllParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
@@ -96,6 +106,7 @@ export function useReviewGetAll<
 	TData = Awaited<ReturnType<typeof reviewGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params?: ReviewGetAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
@@ -118,6 +129,7 @@ export function useReviewGetAll<
 	TData = Awaited<ReturnType<typeof reviewGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params?: ReviewGetAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
@@ -133,6 +145,7 @@ export function useReviewGetAll<
 	TData = Awaited<ReturnType<typeof reviewGetAll>>,
 	TError = ErrorType<void>,
 >(
+	params?: ReviewGetAllParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof reviewGetAll>>, TError, TData>
@@ -143,7 +156,7 @@ export function useReviewGetAll<
 ): UseQueryResult<TData, TError> & {
 	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-	const queryOptions = getReviewGetAllQueryOptions(options);
+	const queryOptions = getReviewGetAllQueryOptions(params, options);
 
 	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
 		TData,

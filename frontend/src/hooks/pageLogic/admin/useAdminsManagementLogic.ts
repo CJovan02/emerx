@@ -1,12 +1,12 @@
-import {useUserGrantAdminRole, useUserRemoveAdminRole} from "../../api/openApi/user/user.ts";
+import {useUserGrantAdminRole, useUserRemoveAdminRole} from "../../../api/openApi/user/user.ts";
 import {useForm} from "react-hook-form";
 import z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import type {ErrorType} from "../../api/axiosInstance.ts";
-import type {ProblemDetails} from "../../api/openApi/model";
+import type {ErrorType} from "../../../api/axiosInstance.ts";
+import type {ProblemDetails} from "../../../api/openApi/model";
 import {isAxiosError} from "axios";
 import {useCallback, useState} from "react";
-import {useUserStore} from "../../stores/userStore.ts";
+import {useUserStore} from "../../../stores/userStore.ts";
 
 export default function useAdminsManagementLogic() {
     // Form

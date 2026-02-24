@@ -1,4 +1,4 @@
-import AdminDrawer from "../../components/admin/adminDrawer.tsx";
+import AdminNavigationDrawer from "../../components/admin/adminNavigationDrawer.tsx";
 import {AdminAppBar} from "../../components/admin/adminAppBar.tsx";
 import {Box, Toolbar} from "@mui/material";
 import {Outlet} from "react-router/internal/react-server-client";
@@ -6,7 +6,7 @@ import {Outlet} from "react-router/internal/react-server-client";
 export default function AdminLayout() {
     return (
         <Box display='flex'>
-            <AdminDrawer/>
+            <AdminNavigationDrawer/>
             <AdminAppBar/>
 
             <Box

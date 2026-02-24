@@ -23,6 +23,7 @@ export default function DrawerNavLinkButton({to, icon, text}: Props): ReactNode 
             component={Link}
             to={to}
             selected={isActive}
+            replace
         >
             <ListItemIcon>
                 {icon}

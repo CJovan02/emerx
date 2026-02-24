@@ -4,10 +4,10 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from './objectId';
 
 export interface ProductResponse {
-	id: ObjectId;
+	/** @minLength 1 */
+	id: string;
 	/** @minLength 1 */
 	name: string;
 	/** @minLength 1 */
@@ -15,4 +15,5 @@ export interface ProductResponse {
 	/** @nullable */
 	image?: string | null;
 	price: number;
+	averageRating: number;
 }
