@@ -4,12 +4,12 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { Address } from './address';
+import type { AddressDto } from './addressDto';
 
 export interface UpdateUserRequest {
 	/** @minLength 1 */
 	name: string;
 	/** @minLength 1 */
 	surname: string;
-	address?: Address;
+	address?: AddressDto;
 }

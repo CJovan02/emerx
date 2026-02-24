@@ -5,6 +5,7 @@ import {
 	Button,
 	Card,
 	CardContent,
+	CircularProgress,
 	Container,
 	Divider,
 	Stack,
@@ -16,14 +17,39 @@ import { useUserStore } from '../stores/userStore';
 import type { UpdateUserRequest } from '../api/openApi/model';
 import { useForm, Controller } from 'react-hook-form';
 import { useUserUpdate } from '../api/openApi/user/user';
+import AppUser from '../domain/models/appUser';
 
 export default function MyProfilePage() {
 	const { user, setUser } = useUserStore();
 	const [isEditing, setIsEditing] = useState(false);
 	const { mutate: updateUser, isPending: isLoading } = useUserUpdate();
 
+	const updateAppUserValues = (updatedUser: UpdateUserRequest) => {
+		if (!user) return;
+
+		const updatedAppUser = new AppUser(
+			user.id,
+			updatedUser.name,
+			updatedUser.surname,
+			user.email, // email not being updated
+			updatedUser.address ?? user.address,
+			user.roles
+		);
+
+		setUser(updatedAppUser);
+	};
+	console.log(user);
+
 	const { control, handleSubmit, reset } = useForm<UpdateUserRequest>({
-		defaultValues: user || undefined,
+		defaultValues: {
+			name: user?.name || '',
+			surname: user?.surname || '',
+			address: {
+				city: user?.address?.city || '',
+				street: user?.address?.street || '',
+				houseNumber: user?.address?.houseNumber || '',
+			},
+		},
 	});
 
 	useEffect(() => {
@@ -39,7 +65,7 @@ export default function MyProfilePage() {
 			{ id: user.id, data },
 			{
 				onSuccess: updatedUser => {
-					setUser(updatedUser);
+					updateAppUserValues(updatedUser);
 					setIsEditing(false);
 				},
 				onError: error => {
@@ -63,8 +89,13 @@ export default function MyProfilePage() {
 		<Container
 			maxWidth='md'
 			sx={{ mt: 6 }}>
-			<Card sx={{ borderRadius: 4, boxShadow: 4 }}>
-				<CardContent>
+			<Card
+				sx={{
+					borderRadius: 4,
+					boxShadow: 4,
+					position: 'relative',
+				}}>
+				<CardContent sx={{ opacity: isLoading ? 0.5 : 1 }}>
 					<Stack spacing={4}>
 						<Stack
 							direction='row'
@@ -91,7 +122,7 @@ export default function MyProfilePage() {
 												<b>Street:</b> {user.address?.street || 'Not provided'}
 											</Typography>
 											<Typography color='text.secondary'>
-												<b>House number:</b>
+												<b>House number:</b>{' '}
 												{user.address?.houseNumber || 'Not provided'}
 											</Typography>
 										</Box>
@@ -179,7 +210,7 @@ export default function MyProfilePage() {
 													type='submit'
 													variant='contained'
 													disabled={isLoading}>
-													{isLoading ? 'Saving...' : 'Save'}
+													Save
 												</Button>
 											</Stack>
 										</Stack>
@@ -199,6 +230,20 @@ export default function MyProfilePage() {
 						<Divider />
 					</Stack>
 				</CardContent>
+
+				{/* Spinner Overlay */}
+				{isLoading && (
+					<Box
+						sx={{
+							position: 'absolute',
+							inset: 0,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}>
+						<CircularProgress />
+					</Box>
+				)}
 			</Card>
 		</Container>
 	);

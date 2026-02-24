@@ -5,7 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export interface Address {
+export interface AddressDto {
 	/** @nullable */
 	city?: string | null;
 	/** @nullable */

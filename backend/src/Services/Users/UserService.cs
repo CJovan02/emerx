@@ -1,3 +1,4 @@
+using EMerx.DTOs.Address;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users;
 using EMerx.DTOs.Users.Request;
@@ -175,7 +176,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
             Name = updateUserRequest.Name,
             Surname = updateUserRequest.Surname,
             FirebaseUid = user.FirebaseUid,
-            Address = updateUserRequest.Address
+            Address = updateUserRequest.Address.ToEntity()
         };
         
         await userRepository.UpdateUser(user);

@@ -18,6 +18,7 @@ import PublicOnlyGuard from '../pages/guards/PublicOnlyGuard.tsx';
 import RequireAuthGuard from '../pages/guards/RequireAuthGuard.tsx';
 import RequireRolesGuard from '../pages/guards/RequireRolesGuard.tsx';
 import { UserRoles } from '../domain/models/userRoles.ts';
+import MyProfilePage from '../pages/MyProfile.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
 							{
 								path: Routes.Cart,
 								Component: ProductsPage,
+							},
+							{
+								path: Routes.MyProfile,
+								Component: MyProfilePage,
 							},
 						],
 					},

@@ -4,7 +4,7 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { Address } from './address';
+import type { AddressDto } from './addressDto';
 
 export interface UserResponse {
 	/** @minLength 1 */
@@ -15,5 +15,5 @@ export interface UserResponse {
 	surname: string;
 	/** @minLength 1 */
 	email: string;
-	address: Address;
+	address: AddressDto;
 }

@@ -1,3 +1,4 @@
+using EMerx.DTOs.Address;
 using EMerx.DTOs.Users.Response;
 using EMerx.Entities;
 
@@ -13,7 +14,7 @@ public static class UsersExtensions
             Name = domain.Name,
             Surname = domain.Surname,
             Email = domain.Email,
-            Address = domain.Address,
+            Address = domain.Address.ToDto(),
         };
     }
 }
