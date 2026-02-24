@@ -33,7 +33,7 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ MongoDb connection could not be established.");
+            _logger.LogError(ex, "❌ MongoDb ping failed.");
             throw ex;
         }
     }

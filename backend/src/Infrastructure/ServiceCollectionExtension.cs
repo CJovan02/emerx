@@ -1,8 +1,10 @@
+using CloudinaryDotNet;
 using EMerx.Common;
 using EMerx.Common.Exceptions;
 using EMerx.ExceptionHandlers;
 using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.AuthRepository;
+using EMerx.Repositories.CloudinaryRepository;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.ReviewRepository;
@@ -28,7 +30,8 @@ public static class ServiceCollectionExtension
             .AddScoped<IProductRepository, ProductRepository>()
             .AddScoped<IReviewRepository, ReviewRepository>()
             .AddScoped<IOrderRepository, OrderRepository>()
-            .AddScoped<IAuthRepository, AuthRepository>();
+            .AddScoped<IAuthRepository, AuthRepository>()
+            .AddScoped<ICloudinaryRepository, CloudinaryRepository>();
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
@@ -49,8 +52,20 @@ public static class ServiceCollectionExtension
         });
 
         services.AddSingleton<MongoContext>();
-
         return services;
+    }
+
+    public static IServiceCollection AddCloudinary(this IServiceCollection services)
+    {
+        var account = new Account(
+            DotNetEnv.Env.GetString(Constants.EnvVariables.CloudinaryCloudName),
+            DotNetEnv.Env.GetString(Constants.EnvVariables.CloudinaryApiKey),
+            DotNetEnv.Env.GetString(Constants.EnvVariables.CloudinaryApiSecret)
+        );
+        var cloudinary = new Cloudinary(account);
+        cloudinary.Api.Secure = true;
+
+        return services.AddSingleton(cloudinary);
     }
 
     public static IServiceCollection AddSwaggerWithAuth(this IServiceCollection services)

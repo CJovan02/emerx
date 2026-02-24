@@ -5,5 +5,8 @@ public static class Constants
     public static class EnvVariables
     {
         public static string Database = "MONGO_EMERX_CONNECTION_STRING";
+        public static string CloudinaryCloudName = "CLOUDINARY_CLOUD_NAME";
+        public static string CloudinaryApiKey = "CLOUDINARY_API_KEY";
+        public static string CloudinaryApiSecret = "CLOUDINARY_API_SECRET";
     }
 }
