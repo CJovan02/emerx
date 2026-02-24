@@ -5,6 +5,7 @@ import {Add, Refresh} from "@mui/icons-material";
 import EditProductDrawer from "../../components/admin/editProductDrawer.tsx";
 import {Spacer} from "../../shared/components/ui/spacer.tsx";
 import CreateProductDrawer from "../../components/admin/createProductDrawer.tsx";
+import DeleteProductDialog from "../../components/admin/deleteProductDialog.tsx";
 
 export default function AdminProductsPage() {
     const {
@@ -19,6 +20,9 @@ export default function AdminProductsPage() {
         refetch,
         addOpen,
         editOpen,
+        deleteOpen,
+        openDeleteDialog,
+        closeDeleteDialog,
         openEditDrawer,
         closeEditDrawer,
         openAddDrawer,
@@ -38,6 +42,14 @@ export default function AdminProductsPage() {
             <EditProductDrawer
                 open={editOpen}
                 handleClose={closeEditDrawer}
+                product={product}
+                page={page}
+                pageSize={pageSize}
+            />
+
+            <DeleteProductDialog
+                open={deleteOpen}
+                onClose={closeDeleteDialog}
                 product={product}
                 page={page}
                 pageSize={pageSize}
@@ -74,6 +86,7 @@ export default function AdminProductsPage() {
                     </Button>
                 </Box>
                 <ProductsGrid
+                    openDeleteDialog={openDeleteDialog}
                     openDrawer={openEditDrawer}
                     data={data?.items}
                     totalItems={data?.totalItems}

@@ -25,6 +25,7 @@ export default function useAdminProductsLogic() {
     // drawer UI logic
     const [editOpen, setEditOpen] = useState<boolean>(false);
     const [addOpen, setAddOpen] = useState<boolean>(false);
+    const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
 
     const openEditDrawer = useCallback((product: ProductResponse) => {
         setProduct(product);
@@ -33,7 +34,11 @@ export default function useAdminProductsLogic() {
     }, [setProduct, setEditOpen]);
     const openAddDrawer = useCallback(() => {
         setAddOpen(true);
-    }, [setProduct, setAddOpen])
+    }, [setAddOpen])
+    const openDeleteDialog = useCallback((product: ProductResponse) => {
+        setProduct(product);
+        setDeleteOpen(true)
+    }, [setDeleteOpen, setProduct])
 
     const closeEditDrawer = useCallback(() => {
         setEditOpen(false);
@@ -41,6 +46,9 @@ export default function useAdminProductsLogic() {
     const closeAddDrawer = useCallback(() => {
         setAddOpen(false);
     }, [setAddOpen]);
+    const closeDeleteDialog = useCallback(() => {
+        setDeleteOpen(false);
+    }, [setDeleteOpen]);
 
     useEffect(() => {
         if (!isError) {
@@ -60,6 +68,9 @@ export default function useAdminProductsLogic() {
         product,
         editOpen,
         addOpen,
+        deleteOpen,
+        openDeleteDialog,
+        closeDeleteDialog,
         openAddDrawer,
         closeAddDrawer,
         openEditDrawer,

@@ -79,6 +79,8 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return Result.Success();
     }
 
+    // TODO delete all of the reviews for the product as well
+    // Orders for this product should not be deleted
     public async Task<Result> DeleteAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);

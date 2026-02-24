@@ -17,6 +17,7 @@ interface Props {
     pageSize: number;
     setPage: (page: number) => void;
     setPageSize: (pageSize: number) => void;
+    openDeleteDialog: (product: ProductResponse) => void;
 }
 
 function ProductsGrid({
@@ -28,6 +29,7 @@ function ProductsGrid({
                           pageSize,
                           setPage,
                           setPageSize,
+                          openDeleteDialog,
                       }: Props) {
     const columns = useMemo<GridColDef<ProductResponse>[]>(() => [
         {
@@ -65,7 +67,7 @@ function ProductsGrid({
                     <RatingMemo value={params.value}/>
                     <Typography variant='body2' color='textSecondary'>({params.value})</Typography>
                 </Box>
-                )
+            )
         },
         {
             field: "actions",
@@ -79,7 +81,7 @@ function ProductsGrid({
                             e.stopPropagation();
                             openDrawer(params.row);
                         }}
-                        disableRipple // disable ripple for data grid performance
+                        // disableRipple // disable ripple for data grid performance
                     >
                         <EditIcon/>
                     </IconButton>
@@ -87,9 +89,9 @@ function ProductsGrid({
                     <IconButton
                         onClick={(e) => {
                             e.stopPropagation();
-                            console.log(params.row.id);
+                            openDeleteDialog(params.row);
                         }}
-                        disableRipple // disable ripple for data grid performance
+                        // disableRipple // disable ripple for data grid performance
                     >
                         <DeleteIcon/>
                     </IconButton>
@@ -113,7 +115,7 @@ function ProductsGrid({
                     setPage(model.page);
                     setPageSize(model.pageSize)
                 }}
-                pageSizeOptions={[5, 10, 20]}
+                pageSizeOptions={[10, 20, 50]}
                 sx={{
                     height: '650px',
                 }}
