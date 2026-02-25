@@ -5,11 +5,11 @@
  * OpenAPI spec version: v1
  */
 
-export interface Address {
+export interface AddressDto {
 	/** @nullable */
-	city: string | null;
+	city?: string | null;
 	/** @nullable */
-	street: string | null;
+	street?: string | null;
 	/** @nullable */
-	houseNumber: string | null;
+	houseNumber?: string | null;
 }

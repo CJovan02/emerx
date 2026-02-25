@@ -1,4 +1,4 @@
-import {blue, purple} from "@mui/material/colors";
+import { blue, purple } from '@mui/material/colors';
 
 export const Colors = {
 	Primary: {
@@ -8,5 +8,5 @@ export const Colors = {
 	},
 	Secondary: {
 		Main: purple[500],
-	}
+	},
 } as const;

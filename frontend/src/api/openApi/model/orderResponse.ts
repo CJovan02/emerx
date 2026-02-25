@@ -4,7 +4,7 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { Address } from './address';
+import type { AddressDto } from './addressDto';
 import type { ObjectId } from './objectId';
 import type { OrderItem } from './orderItem';
 
@@ -12,7 +12,7 @@ export interface OrderResponse {
 	id: ObjectId;
 	userId: ObjectId;
 	items: OrderItem[];
-	address: Address;
+	address: AddressDto;
 	price: number;
 	placedAt: string;
 }

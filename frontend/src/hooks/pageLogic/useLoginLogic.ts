@@ -34,11 +34,7 @@ function useLoginLogic() {
 				if (state === 'loading') return;
 				setState('loading');
 
-				await signInWithEmailAndPassword(
-					auth,
-					values.email,
-					values.password
-				);
+				await signInWithEmailAndPassword(auth, values.email, values.password);
 
 				setState('success');
 			} catch (error) {

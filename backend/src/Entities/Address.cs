@@ -1,9 +1,9 @@
 ﻿namespace EMerx.Entities;
 
 // Change to record
-public class Address
+public record Address
 {
-    public required string City { get; init; }
-    public required string Street { get; init; }
-    public required string HouseNumber { get; init; }
+    public string City { get; init; }
+    public string Street { get; init; }
+    public string HouseNumber { get; init; }
 }

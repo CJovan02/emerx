@@ -1,3 +1,4 @@
+using EMerx.DTOs.Address;
 using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
 using EMerx.Entities;
@@ -14,7 +15,7 @@ public static class OrdersExtensions
             Id = order.Id,
             UserId = order.UserId,
             Items = order.Items,
-            Address = order.Address,
+            Address = order.Address.ToDto(),
             Price = order.Price,
             PlacedAt = order.PlacedAt
         };
@@ -44,7 +45,7 @@ public static class OrdersExtensions
             Id = ObjectId.GenerateNewId(),
             UserId = ObjectId.Parse(order.UserId),
             Items = domainItems,
-            Address = order.Address,
+            Address = order.Address.ToEntity(),
             Price = domainItems.Sum(x => x.PriceAtOrder * x.Quantity)
         };
     }
