@@ -3,6 +3,8 @@ import {useDropzone} from "react-dropzone";
 import {Box, Typography, IconButton} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import {useSnackbar} from "notistack";
+import imageCompression from "browser-image-compression";
 
 type Props = {
     // File object is when we upload the file through web
@@ -13,17 +15,21 @@ type Props = {
     // this way the component stays stateless
     onChange: (value: File | null) => void;
 
+    id?: string;
+
     width?: number;
     height?: number;
 };
 
 // Dropzone currently supports one image
 // Parent is the one holding the image value object, this component is pretty much stateless
-export default function ProductImageDropzone({value, onChange, width, height}: Props) {
+export default function ProductImageDropzone({value, onChange, width, height, id}: Props) {
     // When we upload a file object we need to generate url in order to show the image
     // this state is used for that.
     // If the 'value' prop is the url than this stays null, since it's only used when 'value' is File type
     const [objectUrl, setObjectUrl] = useState<string | null>(null);
+
+    const {enqueueSnackbar} = useSnackbar();
 
     useEffect(() => {
         if (value instanceof File) {
@@ -48,14 +54,30 @@ export default function ProductImageDropzone({value, onChange, width, height}: P
                 ? value
                 : null;
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
-            if (acceptedFiles.length > 0) {
-                // we notify the parent about the selected File
-                onChange(acceptedFiles[0]);
-            }
+            const file = acceptedFiles[0];
+            const originalSizeMb = file.size / 1024 / 1024;
+            console.log(`Original image size: ${originalSizeMb.toFixed(3)}MB`);
+
+            // we notify the parent about the selected File
+            const compressedFile = await compressFile(file)
+            const compressedFileSizeMb = compressedFile.size / 1024 / 1024
+            console.log(`compressed file size: ${compressedFileSizeMb.toFixed(3)}MB`);
+            console.log(`Total reduction is: ${((originalSizeMb - compressedFileSizeMb) * 1024).toFixed(3)}KB`);
+
+            onChange(compressedFile);
         }
     }, [onChange]);
+
+    async function compressFile(file: File) {
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+        }
+        return await imageCompression(file, options);
+    }
 
     const handleRemove = () => {
         onChange(null);
@@ -67,7 +89,13 @@ export default function ProductImageDropzone({value, onChange, width, height}: P
             "image/*": []
         },
         maxFiles: 1,
-        multiple: false
+        multiple: false,
+        maxSize: 1024 * 1024,
+        onDropRejected: (fileRejections) => {
+            fileRejections.forEach(({file, errors}) => {
+                errors.forEach(e => enqueueSnackbar(`File ${file.name} rejected: ${e.message}`, {variant: 'error'}));
+            });
+        }
     });
 
     return (
@@ -88,7 +116,7 @@ export default function ProductImageDropzone({value, onChange, width, height}: P
                         }
                     }}
                 >
-                    <input {...getInputProps()} />
+                    <input id={id} {...getInputProps()} />
                     <CloudUploadIcon sx={{fontSize: 40, mb: 1}}/>
                     <Typography variant="body1">
                         {isDragActive

@@ -5,7 +5,7 @@ import {useQueryClient} from "@tanstack/react-query";
 import {useProductCreate} from "../../../api/openApi/product/product.ts";
 import {QueryKeys} from "../../../shared/common/queryKeys.ts";
 import {useState} from "react";
-import type {CreateProductRequest, ProblemDetails} from "../../../api/openApi/model";
+import type {ProblemDetails, ProductCreateBody} from "../../../api/openApi/model";
 import type {ErrorType} from "../../../api/axiosInstance.ts";
 import {isAxiosError} from "axios";
 
@@ -25,6 +25,8 @@ export function useCreateProductLogic(page: number, pageSize: number) {
             .max(30, "Category can't be larger than 30 characters."),
 
         price: z.number().nonnegative(),
+
+        image: z.file().optional(),
     })
 
     type FormValues = z.infer<typeof formSchema>;
@@ -46,9 +48,8 @@ export function useCreateProductLogic(page: number, pageSize: number) {
     });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const submitCreateForm = form.handleSubmit(async ({name, category, price}: FormValues) => {
-        // If the initial field names are not changed there is no need to send them
-        const request: CreateProductRequest = {name, category, price};
+    const submitCreateForm = form.handleSubmit(async ({name, category, price, image}: FormValues) => {
+        const request: ProductCreateBody = {Name: name, Category: category, Price: price, Image: image};
 
         await mutateAsync({data: request});
     })

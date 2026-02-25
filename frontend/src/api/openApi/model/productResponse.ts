@@ -4,6 +4,7 @@
  * Demo API
  * OpenAPI spec version: v1
  */
+import type { ProductImageResponse } from './productImageResponse';
 
 export interface ProductResponse {
 	/** @minLength 1 */
@@ -12,8 +13,7 @@ export interface ProductResponse {
 	name: string;
 	/** @minLength 1 */
 	category: string;
-	/** @nullable */
-	image?: string | null;
+	image?: ProductImageResponse;
 	price: number;
 	averageRating: number;
 }
