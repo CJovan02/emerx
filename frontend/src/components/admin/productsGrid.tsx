@@ -1,12 +1,20 @@
 import {DataGrid, type GridColDef, type GridRenderCellParams} from "@mui/x-data-grid";
-import {Box, IconButton, Typography} from "@mui/material";
+import {Box, IconButton, styled, Typography} from "@mui/material";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useMemo} from "react";
-import type {ProductResponse} from "../../api/openApi/model";
+import type {ProductImageResponse, ProductResponse} from "../../api/openApi/model";
 import RatingMemo from "../../shared/components/ui/ratingMemo.tsx";
 import * as React from "react";
+import ImageLightbox from "../../shared/components/ui/imageLightbox.tsx";
+
+const ProductImage = styled('img')({
+    width: 60,
+    height: 60,
+    objectFit: 'cover',
+    borderRadius: 12,
+});
 
 interface Props {
     data?: ProductResponse[];
@@ -35,11 +43,20 @@ function ProductsGrid({
         {
             field: "image",
             headerName: "",
-            width: 70,
+            minWidth: 100,
             filterable: false,
             sortable: false,
             align: "center",
-            renderCell: () => <Inventory2OutlinedIcon/>
+            // renderCell: () => <Inventory2OutlinedIcon/>
+            renderCell: (params: GridRenderCellParams<ProductResponse, ProductImageResponse>) => {
+                // console.log(params.value);
+                if (!params.value)
+                    return <Inventory2OutlinedIcon sx={{fontSize: 28}}/>
+
+                return (
+                    <ImageLightbox src={params.value.url} alt={params.value.publicId}/>
+                );
+            }
         },
         {
             field: "name",
@@ -104,6 +121,7 @@ function ProductsGrid({
         <Box sx={{width: "100%"}}>
             <DataGrid
                 autoHeight={false}
+                rowHeight={80}
                 rows={data}
                 columns={columns}
                 getRowId={(row) => row.id}

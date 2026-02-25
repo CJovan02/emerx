@@ -22,7 +22,14 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
         var pageOfProducts = await productRepository.GetProducts(page, pageSize);
         var productResponses = pageOfProducts
             .Items
-            .Select(product => product.ToResponse())
+            .Select(product =>
+            {
+                string imgUrl = null;
+                if (product.Image is not null)
+                    imgUrl = cloudinaryRepository.BuildImageUrl(product.Image.PublicId);
+
+                return product.ToResponse(imgUrl);
+            })
             .ToList();
 
         var response = new PageOfResponse<ProductResponse>(
