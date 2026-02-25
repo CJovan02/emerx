@@ -107,9 +107,10 @@ function ProductsGrid({
                 rows={data}
                 columns={columns}
                 getRowId={(row) => row.id}
-                rowCount={totalItems}
-                loading={loading}
                 paginationMode="server"
+                rowCount={totalItems}
+                onRowCountChange={setPageSize}
+                loading={loading}
                 paginationModel={{page, pageSize}}
                 onPaginationModelChange={(model) => {
                     setPage(model.page);

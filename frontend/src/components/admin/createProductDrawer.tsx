@@ -1,11 +1,12 @@
 import {useCreateProductLogic} from "../../hooks/pageLogic/admin/useCreateProductLogic.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useSnackbar} from "notistack";
 import {Box, Button, Divider, Drawer, Stack, Toolbar, Typography} from "@mui/material";
 import {AddCircleOutlineOutlined, ArrowUpward} from "@mui/icons-material";
 import {FormProvider} from "react-hook-form";
 import TextInput from "../../shared/components/ui/textInput.tsx";
 import CircularProgress from "@mui/material/CircularProgress";
+import ProductImageDropzone from "../../shared/components/ui/productImageDropzone.tsx";
 
 type Props = {
     open: boolean;
@@ -17,6 +18,8 @@ type Props = {
 export default function CreateProductDrawer({open, handleClose, pageSize, page}: Props) {
     const {form, isError, errorMessage, isLoading, submitCreateForm, isSuccess} = useCreateProductLogic(page, pageSize);
     const {enqueueSnackbar} = useSnackbar();
+
+    const [image, setImage] = useState<File | string | null>(null);
 
     useEffect(() => {
         if (!isError) return;
@@ -61,6 +64,8 @@ export default function CreateProductDrawer({open, handleClose, pageSize, page}:
                             onSubmit={submitCreateForm}
                         >
                             <Stack spacing={3}>
+                                <ProductImageDropzone value={image} onChange={value => setImage(value)}/>
+
                                 <TextInput id='name' label='Name' required fullWidth/>
 
                                 <TextInput id='category' label='Category' required fullWidth/>

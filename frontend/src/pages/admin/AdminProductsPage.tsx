@@ -30,6 +30,23 @@ export default function AdminProductsPage() {
         product
     } = useAdminProductsLogic();
 
+    if (isError) {
+        return (
+            <Stack spacing={4} maxWidth='25rem' mx='auto'>
+                <Alert severity='error'>{errorMessage}</Alert>
+                <Button
+                    startIcon={<Refresh/>}
+                    onClick={() => refetch()}
+                    sx={{
+                        height: 45,
+                    }}
+                >
+                    Refresh
+                </Button>
+            </Stack>
+        )
+    }
+
     return (
         <>
             <CreateProductDrawer
@@ -56,21 +73,6 @@ export default function AdminProductsPage() {
             />
 
             <Container>
-                {isError && (
-                    <Stack spacing={4} maxWidth='25rem' mx='auto'>
-                        <Alert severity='error'>{errorMessage}</Alert>
-                        <Button
-                            startIcon={<Refresh/>}
-                            onClick={() => refetch()}
-                            sx={{
-                                height: 45,
-                            }}
-                        >
-                            Refresh
-                        </Button>
-                    </Stack>
-                )}
-
                 <Box display='flex' mb={2}>
                     <Spacer/>
                     <Button
