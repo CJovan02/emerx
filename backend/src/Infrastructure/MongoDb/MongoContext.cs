@@ -13,8 +13,6 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
 
     public void Connect()
     {
-        _logger.LogInformation("Connecting to MongoDB...");
-
         var settings = options.Value;
 
         var mongoSettings = MongoClientSettings.FromConnectionString(settings.ConnectionString);
@@ -26,10 +24,11 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
 
     public async Task PingAsync()
     {
+        _logger.LogInformation("Pinging MongoDB connection...");
         try
         {
             await _client.GetDatabase("admin").RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1));
-            _logger.LogInformation("✅ Pinged your deployment. You successfully connected to MongoDB!");
+            _logger.LogInformation("✅ Pinged your deployment. You successfully connected to MongoDB.");
         }
         catch (Exception ex)
         {

@@ -1,10 +1,18 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using EMerx.Infrastructure.CloudinaryContext;
 
 namespace EMerx.Repositories.CloudinaryRepository;
 
-public class CloudinaryRepository(Cloudinary client) : ICloudinaryRepository
+public class CloudinaryRepository(CloudinaryContext cloudinaryContext) : ICloudinaryRepository
 {
+    private readonly Cloudinary _client = cloudinaryContext.Client;
+
+    public string BuildImageUrl(string publicId)
+    {
+        return _client.Api.UrlImgUp.Secure(true).BuildUrl(publicId);
+    }
+
     public async Task<ImageUploadResult> UploadProductImageAsync(string productId, string fileName, Stream payload)
     {
         var uploadParams = new ImageUploadParams
@@ -15,7 +23,7 @@ public class CloudinaryRepository(Cloudinary client) : ICloudinaryRepository
             Overwrite = false,
         };
 
-        var result = await client.UploadAsync(uploadParams);
+        var result = await _client.UploadAsync(uploadParams);
         if (result.Error != null)
             throw new Exception(result.Error.Message);
 
@@ -24,7 +32,7 @@ public class CloudinaryRepository(Cloudinary client) : ICloudinaryRepository
 
     public async Task<DeletionResult> DeleteProductImage(string publicId)
     {
-        var result = await client.DestroyAsync(new DeletionParams(publicId));
+        var result = await _client.DestroyAsync(new DeletionParams(publicId));
         if (result.Error != null)
             throw new Exception(result.Error.Message);
 

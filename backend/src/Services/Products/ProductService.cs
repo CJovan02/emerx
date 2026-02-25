@@ -54,6 +54,7 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
         var productId = ObjectId.GenerateNewId();
 
         ProductImage productImage = null;
+        string imageUrl = null;
         if (request.Image is not null && request.Image.Length != 0)
         {
             await using var stream = request.Image.OpenReadStream();
@@ -66,12 +67,13 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
                 isThumbnail = true,
                 Order = 0,
             };
+            imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId);
         }
 
         var product = request.ToDomain(productImage, productId);
         await productRepository.CreateProduct(product);
 
-        return Result<ProductResponse>.Success(product.ToResponse());
+        return Result<ProductResponse>.Success(product.ToResponse(imageUrl));
     }
 
     // TODO implement image replacement

@@ -1,6 +1,5 @@
-using CloudinaryDotNet;
 using EMerx.DTOs.Id;
-using EMerx.Infrastructure;
+using EMerx.Infrastructure.CloudinaryContext;
 using EMerx.Infrastructure.MongoDb;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -20,7 +19,7 @@ builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddFirebaseAuthentication(builder.Configuration);
 
-builder.Services.AddCloudinary();
+builder.Services.AddCloudinaryContext();
 builder.Services
     .AddRepository()
     .AddServices();
@@ -37,7 +36,8 @@ mongoContext.Connect();
 await mongoContext.PingAsync();
 
 // Ping Cloudinary
-var cloudinary = app.Services.GetRequiredService<Cloudinary>();
+var cloudinary = app.Services.GetRequiredService<CloudinaryContext>();
+cloudinary.Connect();
 await cloudinary.PingAsync();
 
 if (app.Environment.IsDevelopment())
