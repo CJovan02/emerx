@@ -15,7 +15,7 @@ import { Routes } from '../shared/common/constants/routeNames';
 import { Link as RouterLink, useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
-import TextInput from "../shared/components/ui/textInput.tsx";
+import TextInput from '../shared/components/ui/textInput.tsx';
 
 export default function RegisterPage() {
 	const {

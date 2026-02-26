@@ -1,7 +1,5 @@
-import {Box} from "@mui/material";
+import { Box } from '@mui/material';
 
 export function Spacer() {
-    return (
-        <Box sx={{flexGrow: 1}}/>
-    )
+	return <Box sx={{ flexGrow: 1 }} />;
 }

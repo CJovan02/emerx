@@ -1,5 +1,6 @@
 using EMerx.Auth;
 using EMerx.DTOs.Email;
+using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.DTOs.Users.Response;
 using EMerx.ResultPattern;
@@ -99,5 +100,17 @@ public class UserController(IUserService userService) : ControllerBase
         var result = await userService.DeleteByFirebaseIdAsync(uid);
 
         return result.ToActionResult();
+    }
+
+    [Authorize]
+    [HttpPatch("{id}")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateUserRequest dto)
+    {
+        var request = new IdRequest { Id = id };
+        
+        return (await userService.UpdateAsync(request, dto)).ToActionResult();
     }
 }

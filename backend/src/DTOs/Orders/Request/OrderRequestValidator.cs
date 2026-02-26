@@ -1,4 +1,3 @@
-using EMerx.DTOs.Addresses;
 using EMerx.DTOs.OrderItems.Request;
 using EMerx.Entities;
 using FluentValidation;
@@ -21,8 +20,8 @@ public class OrderRequestValidator : AbstractValidator<OrderRequest>
         RuleForEach(x => x.Items)
             .SetValidator(new OrderItemRequestValidator());
 
-        RuleFor(x => x.Address)
-            .SetValidator(new AddressValidator());
+        // RuleFor(x => x.Address)
+        //     .SetValidator(new AddressValidator());
     }
 }
 

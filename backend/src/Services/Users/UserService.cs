@@ -1,3 +1,4 @@
+using EMerx.DTOs.Address;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users;
 using EMerx.DTOs.Users.Request;
@@ -160,5 +161,25 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         }
 
         return Result.Success();
+    }
+
+    public async Task<Result<UserResponse>> UpdateAsync(IdRequest request, UpdateUserRequest updateUserRequest)
+    {
+        var user = await userRepository.GetUserById(ObjectId.Parse(request.Id));
+        if (user is null)
+            return Result<UserResponse>.Failure(UserErrors.NotFound(request.Id));
+        
+        var updatedUser = new User
+        {
+            Id = ObjectId.Parse(request.Id),
+            Email = user.Email,
+            Name = updateUserRequest.Name,
+            Surname = updateUserRequest.Surname,
+            FirebaseUid = user.FirebaseUid,
+            Address = updateUserRequest.Address.ToEntity()
+        };
+        
+        await userRepository.UpdateUser(user);
+        return Result<UserResponse>.Success(user.ToResponse());
     }
 }

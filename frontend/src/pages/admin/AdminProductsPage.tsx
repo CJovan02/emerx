@@ -1,34 +1,34 @@
-import {Alert, Box, Button, Container, Stack} from "@mui/material";
-import ProductsGrid from "../../components/admin/productsGrid.tsx";
-import useAdminProductsLogic from "../../hooks/pageLogic/admin/useAdminProductsLogic.ts";
-import {Add, Refresh} from "@mui/icons-material";
-import EditProductDrawer from "../../components/admin/editProductDrawer.tsx";
-import {Spacer} from "../../shared/components/ui/spacer.tsx";
-import CreateProductDrawer from "../../components/admin/createProductDrawer.tsx";
-import DeleteProductDialog from "../../components/admin/deleteProductDialog.tsx";
+import { Alert, Box, Button, Container, Stack } from '@mui/material';
+import ProductsGrid from '../../components/admin/productsGrid.tsx';
+import useAdminProductsLogic from '../../hooks/pageLogic/admin/useAdminProductsLogic.ts';
+import { Add, Refresh } from '@mui/icons-material';
+import EditProductDrawer from '../../components/admin/editProductDrawer.tsx';
+import { Spacer } from '../../shared/components/ui/spacer.tsx';
+import CreateProductDrawer from '../../components/admin/createProductDrawer.tsx';
+import DeleteProductDialog from '../../components/admin/deleteProductDialog.tsx';
 
 export default function AdminProductsPage() {
-    const {
-        data,
-        page,
-        pageSize,
-        setPage,
-        setPageSize,
-        isError,
-        errorMessage,
-        isFetching,
-        refetch,
-        addOpen,
-        editOpen,
-        deleteOpen,
-        openDeleteDialog,
-        closeDeleteDialog,
-        openEditDrawer,
-        closeEditDrawer,
-        openAddDrawer,
-        closeAddDrawer,
-        product
-    } = useAdminProductsLogic();
+	const {
+		data,
+		page,
+		pageSize,
+		setPage,
+		setPageSize,
+		isError,
+		errorMessage,
+		isFetching,
+		refetch,
+		addOpen,
+		editOpen,
+		deleteOpen,
+		openDeleteDialog,
+		closeDeleteDialog,
+		openEditDrawer,
+		closeEditDrawer,
+		openAddDrawer,
+		closeAddDrawer,
+		product,
+	} = useAdminProductsLogic();
 
     if (isError) {
         return (
@@ -56,21 +56,21 @@ export default function AdminProductsPage() {
                 pageSize={pageSize}
             />
 
-            <EditProductDrawer
-                open={editOpen}
-                handleClose={closeEditDrawer}
-                product={product}
-                page={page}
-                pageSize={pageSize}
-            />
+			<EditProductDrawer
+				open={editOpen}
+				handleClose={closeEditDrawer}
+				product={product}
+				page={page}
+				pageSize={pageSize}
+			/>
 
-            <DeleteProductDialog
-                open={deleteOpen}
-                onClose={closeDeleteDialog}
-                product={product}
-                page={page}
-                pageSize={pageSize}
-            />
+			<DeleteProductDialog
+				open={deleteOpen}
+				onClose={closeDeleteDialog}
+				product={product}
+				page={page}
+				pageSize={pageSize}
+			/>
 
             <Container>
                 <Box display='flex' mb={2}>

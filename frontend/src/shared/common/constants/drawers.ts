@@ -1,8 +1,8 @@
 export const Drawers = {
-    Store: {
-        Width: 250
-    },
-    Admin: {
-        Width: 260
-    }
-}
+	Store: {
+		Width: 250,
+	},
+	Admin: {
+		Width: 260,
+	},
+};

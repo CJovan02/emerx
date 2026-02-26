@@ -5,7 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export * from './address';
+export * from './addressDto';
 export * from './objectId';
 export * from './orderGetAllParams';
 export * from './orderItem';
@@ -23,4 +23,5 @@ export * from './registerUserRequest';
 export * from './reviewGetAllParams';
 export * from './reviewRequest';
 export * from './reviewResponse';
+export * from './updateUserRequest';
 export * from './userResponse';
