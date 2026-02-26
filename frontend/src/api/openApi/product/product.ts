@@ -21,10 +21,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-	PatchProductRequest,
 	ProblemDetails,
 	ProductCreateBody,
 	ProductGetPagedParams,
+	ProductPatchBody,
 	ProductResponse,
 	ProductResponsePageOfResponse,
 } from '.././model';
@@ -420,16 +420,36 @@ export function useProductGetById<
 
 export const productPatch = (
 	id: string,
-	patchProductRequest: BodyType<PatchProductRequest>,
+	productPatchBody: BodyType<ProductPatchBody>,
 	options?: SecondParameter<typeof axiosInstance>,
 	signal?: AbortSignal
 ) => {
+	const formData = new FormData();
+	if (productPatchBody.Name !== undefined) {
+		formData.append(`Name`, productPatchBody.Name);
+	}
+	if (productPatchBody.Category !== undefined) {
+		formData.append(`Category`, productPatchBody.Category);
+	}
+	if (productPatchBody['Image.HasValue'] !== undefined) {
+		formData.append(
+			`Image.HasValue`,
+			productPatchBody['Image.HasValue'].toString()
+		);
+	}
+	if (productPatchBody['Image.Value'] !== undefined) {
+		formData.append(`Image.Value`, productPatchBody['Image.Value']);
+	}
+	if (productPatchBody.Price !== undefined) {
+		formData.append(`Price`, productPatchBody.Price.toString());
+	}
+
 	return axiosInstance<void>(
 		{
 			url: `/Product/${id}`,
 			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			data: patchProductRequest,
+			headers: { 'Content-Type': 'multipart/form-data' },
+			data: formData,
 			signal,
 		},
 		options
@@ -443,14 +463,14 @@ export const getProductPatchMutationOptions = <
 	mutation?: UseMutationOptions<
 		Awaited<ReturnType<typeof productPatch>>,
 		TError,
-		{ id: string; data: BodyType<PatchProductRequest> },
+		{ id: string; data: BodyType<ProductPatchBody> },
 		TContext
 	>;
 	request?: SecondParameter<typeof axiosInstance>;
 }): UseMutationOptions<
 	Awaited<ReturnType<typeof productPatch>>,
 	TError,
-	{ id: string; data: BodyType<PatchProductRequest> },
+	{ id: string; data: BodyType<ProductPatchBody> },
 	TContext
 > => {
 	const mutationKey = ['productPatch'];
@@ -464,7 +484,7 @@ export const getProductPatchMutationOptions = <
 
 	const mutationFn: MutationFunction<
 		Awaited<ReturnType<typeof productPatch>>,
-		{ id: string; data: BodyType<PatchProductRequest> }
+		{ id: string; data: BodyType<ProductPatchBody> }
 	> = props => {
 		const { id, data } = props ?? {};
 
@@ -477,7 +497,7 @@ export const getProductPatchMutationOptions = <
 export type ProductPatchMutationResult = NonNullable<
 	Awaited<ReturnType<typeof productPatch>>
 >;
-export type ProductPatchMutationBody = BodyType<PatchProductRequest>;
+export type ProductPatchMutationBody = BodyType<ProductPatchBody>;
 export type ProductPatchMutationError = ErrorType<ProblemDetails | void>;
 
 export const useProductPatch = <
@@ -488,7 +508,7 @@ export const useProductPatch = <
 		mutation?: UseMutationOptions<
 			Awaited<ReturnType<typeof productPatch>>,
 			TError,
-			{ id: string; data: BodyType<PatchProductRequest> },
+			{ id: string; data: BodyType<ProductPatchBody> },
 			TContext
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
@@ -497,7 +517,7 @@ export const useProductPatch = <
 ): UseMutationResult<
 	Awaited<ReturnType<typeof productPatch>>,
 	TError,
-	{ id: string; data: BodyType<PatchProductRequest> },
+	{ id: string; data: BodyType<ProductPatchBody> },
 	TContext
 > => {
 	return useMutation(getProductPatchMutationOptions(options), queryClient);

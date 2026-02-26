@@ -1,5 +1,6 @@
 import {Controller, useFormContext} from "react-hook-form";
 import ProductImageDropzone from "./ui/productImageDropzone.tsx";
+import {Typography} from "@mui/material";
 
 type Props = {
     id: string;
@@ -22,7 +23,7 @@ export function ProductImageDropzoneInput({id}: Props) {
                         value={field.value}
                         onChange={field.onChange}
                     />
-                    {fieldState.error && <span>{fieldState.error.message}</span>}
+                    {fieldState.error && <Typography sx={{color: 'error.main'}}>{fieldState.error.message}</Typography>}
                 </>
             )}
         >

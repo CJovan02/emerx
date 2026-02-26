@@ -1,5 +1,4 @@
 using EMerx.Common.Filters;
-using EMerx.Domain.Models;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Products;
 using EMerx.DTOs.Products.Request;
@@ -14,7 +13,10 @@ using MongoDB.Driver;
 
 namespace EMerx.Services.Products;
 
-public class ProductService(IProductRepository productRepository, ICloudinaryRepository cloudinaryRepository)
+public class ProductService(
+    IProductRepository productRepository,
+    ICloudinaryRepository cloudinaryRepository,
+    ILogger<ProductService> logger)
     : IProductService
 {
     public async Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize)
@@ -25,13 +27,13 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
             .Select(product =>
             {
                 string imgUrl = null;
-                if (product.Image is not null)
-                    imgUrl = cloudinaryRepository.BuildImageUrl(product.Image.PublicId);
+                if (product.ImageVersion != null)
+                    imgUrl = cloudinaryRepository.BuildProductThumbnailImageUrl(product.Id.ToString(),
+                        product.ImageVersion);
 
                 return product.ToResponse(imgUrl);
             })
             .ToList();
-
         var response = new PageOfResponse<ProductResponse>(
             productResponses,
             pageOfProducts.Page,
@@ -60,65 +62,93 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
         // But this approach saves us one database call
         var productId = ObjectId.GenerateNewId();
 
-        ProductImage productImage = null;
+        var hasImage = request.Image is not null && request.Image.Length != 0;
         string imageUrl = null;
-        if (request.Image is not null && request.Image.Length != 0)
+        string? imageVersion = null;
+        if (hasImage)
         {
             await using var stream = request.Image.OpenReadStream();
             var imageResult =
-                await cloudinaryRepository.UploadProductImageAsync(productId.ToString(), "image", stream);
+                await cloudinaryRepository.UploadProductThumbnailAsync(productId.ToString(), stream);
 
-            productImage = new ProductImage
-            {
-                PublicId = imageResult.PublicId,
-                isThumbnail = true,
-                Order = 0,
-            };
-            imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId);
+            imageVersion = imageResult.Version;
+            imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId, imageResult.Version);
         }
 
-        var product = request.ToDomain(productImage, productId);
+        var product = request.ToDomain(productId, imageVersion);
         await productRepository.CreateProduct(product);
 
         return Result<ProductResponse>.Success(product.ToResponse(imageUrl));
     }
 
-    // TODO implement image replacement
     public async Task<Result> PatchAsync(IdRequest idRequest, PatchProductRequest request)
     {
         var id = ObjectId.Parse(idRequest.Id);
 
-        if (!await productRepository.ProductExists(id))
+        var product = await productRepository.GetProductById(id);
+        if (product is null)
             return Result.Failure(ProductErrors.NotFound(id));
 
-        // create update definition to pass to repo layer
-        // maybe this will break separation of concerns, since now service layer knows that repo layer
-        // uses mongo for db implementation, idk. :)
+        var isReplace = request.Image.IsReplaceOperation();
+        var isDelete = request.Image.IsDeleteOperation();
+        var isNothing = request.Image.IsNothing();
+
+        if (isDelete)
+        {
+            await cloudinaryRepository.DeleteProductThumbnail(id.ToString());
+        }
+
+        string? imageVersion = null;
+        if (isReplace)
+        {
+            await using var stream = request.Image.Value!.OpenReadStream();
+            // set overwrite to true to overwrite the original image
+            var result = await cloudinaryRepository.UploadProductThumbnailAsync(id.ToString(), stream, overwrite: true);
+            imageVersion = result.Version;
+        }
+
         var updates = new List<UpdateDefinition<Product>>();
+        if (isDelete)
+            updates.Add(Builders<Product>.Update.Set(x => x.ImageVersion, null));
+        if (isReplace) // we need to replace the old version. This will invalidate the old image cache
+            updates.Add(Builders<Product>.Update.Set(x => x.ImageVersion, imageVersion));
         if (request.Name is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Name, request.Name));
         if (request.Category is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Category, request.Category));
-        // if (request.Image is not null)
-        //     updates.Add(Builders<Product>.Update.Set(x => x.Image, request.Image));
         if (request.Price is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Price, request.Price));
 
-        if (updates.Count == 0)
+        if (updates.Count == 0 && isNothing)
             return Result.Failure(ProductErrors.NoUpdates(id));
 
-        var updateDef = Builders<Product>.Update.Combine(updates);
-        await productRepository.UpdateProduct(id, updateDef);
+        if (updates.Count > 0)
+        {
+            var updateDef = Builders<Product>.Update.Combine(updates);
+            await productRepository.UpdateProduct(id, updateDef);
+        }
 
         return Result.Success();
     }
 
-    // TODO delete all of the reviews for the product as well
+    // TODO delete all of the reviews for the product
     // Orders for this product should not be deleted
     public async Task<Result> DeleteAsync(IdRequest request)
     {
-        var objectId = ObjectId.Parse(request.Id);
-        await productRepository.DeleteProduct(objectId);
+        var id = ObjectId.Parse(request.Id);
+
+        var product = await productRepository.GetProductById(id);
+        if (product is null)
+            return Result.Failure(ProductErrors.NotFound(id));
+
+        // This call won't fail if product has no images
+        await cloudinaryRepository.DeleteProductImages(id.ToString());
+        
+        // But this will fail if the folder doesn't exist
+        if (product.ImageVersion is not null)
+            await cloudinaryRepository.DeleteProductFolder(id.ToString());
+        await productRepository.DeleteProduct(id);
+
         return Result.Success();
     }
 }

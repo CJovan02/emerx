@@ -16,6 +16,7 @@ import { FormProvider } from 'react-hook-form';
 import TextInput from '../../shared/components/ui/textInput.tsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import EditIcon from '@mui/icons-material/Edit';
+import { ProductImageDropzoneInput } from '../../shared/components/productImageDropzoneInput.tsx';
 
 type Props = {
 	open: boolean;
@@ -101,6 +102,8 @@ export default function EditProductDrawer({
 							id='edit-product-form'
 							onSubmit={submitEditForm}>
 							<Stack spacing={3}>
+								<ProductImageDropzoneInput id='image' />
+
 								<TextInput
 									id='name'
 									label='Name'

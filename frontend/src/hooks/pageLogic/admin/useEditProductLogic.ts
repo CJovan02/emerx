@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type {
-	PatchProductRequest,
 	ProblemDetails,
+	ProductPatchBody,
 	ProductResponse,
 } from '../../../api/openApi/model';
 import { useForm } from 'react-hook-form';
@@ -33,6 +33,15 @@ export default function useEditProductLogic(
 			.max(30, "Category can't be larger than 30 characters."),
 
 		price: z.number().nonnegative(),
+
+		image: z
+			.union([z.file(), z.url()])
+			.optional()
+			.nullable()
+			// server expects undefined value and not null, we need to transform.
+			// We also accept this to be null or undefined, since server can load undefined imageUrl and
+			// image dropzone when deleting image is loading null value. It's stuped but whatever.
+			.transform(val => val ?? undefined),
 	});
 
 	type FormValues = z.infer<typeof formSchema>;
@@ -59,22 +68,37 @@ export default function useEditProductLogic(
 	const [allSet, setAllSet] = useState<boolean>(false);
 
 	const submitEditForm = form.handleSubmit(
-		async ({ name, category, price }: FormValues) => {
+		async ({ name, category, price, image }: FormValues) => {
 			setAllSet(false);
 
 			if (!product) {
 				throw new Error('Product is null when submitting the form');
 			}
 
+			// It's VERY important to use != instead of !== operator
+			// image can be undefined and thumbnailUrl can be null
+			// if image is undefined and url is null we treat that as the same, so we use != operator since !== will give 'false'
+			const imageChanged = image != product.thumbnailUrl;
+			const imageNotUrl = typeof image !== 'string';
+
 			// If the initial field names are not changed there is no need to send them
-			const request: PatchProductRequest = {
-				name: name !== product.name ? name : null,
-				category: category !== product.category ? category : null,
-				price: price !== product.price ? price : null,
+			const request: ProductPatchBody = {
+				Name: name !== product.name ? name : undefined,
+				Category: category !== product.category ? category : undefined,
+				Price: price !== product.price ? price : undefined,
+				'Image.HasValue': imageChanged,
+				'Image.Value': imageChanged && imageNotUrl ? image : undefined,
 			};
 
-			const isEmptyRequest = Object.values(request).every(val => val === null);
-			if (isEmptyRequest) {
+			// console.log(request);
+
+			const notingIsChanged =
+				request.Name === undefined &&
+				request.Category === undefined &&
+				request.Price === undefined &&
+				request['Image.HasValue'] === false &&
+				request['Image.Value'] === undefined;
+			if (notingIsChanged) {
 				setAllSet(true);
 				return;
 			}
@@ -115,6 +139,7 @@ export default function useEditProductLogic(
 		form.setValue('name', product.name);
 		form.setValue('category', product.category);
 		form.setValue('price', product.price);
+		form.setValue('image', product.thumbnailUrl ?? undefined);
 	}, [product, setAllSet]);
 
 	return {
