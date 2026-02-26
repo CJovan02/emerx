@@ -28,14 +28,16 @@ public class CloudinaryRepository(CloudinaryContext cloudinaryContext) : ICloudi
         return BuildImageUrl(GenerateProductThumbnailPublicId(productId));
     }
 
-    public async Task<ImageUploadResult> UploadProductThumbnailAsync(string productId, Stream payload)
+    public async Task<ImageUploadResult> UploadProductThumbnailAsync(string productId, Stream payload,
+        bool overwrite = false)
     {
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription("thumbnail", payload),
             AssetFolder = GenerateProductFolder(productId),
             PublicId = GenerateProductThumbnailPublicId(productId),
-            Overwrite = false,
+            Overwrite = overwrite,
+            Invalidate = overwrite
         };
 
         var result = await _client.UploadAsync(uploadParams);
@@ -45,8 +47,9 @@ public class CloudinaryRepository(CloudinaryContext cloudinaryContext) : ICloudi
         return result;
     }
 
-    public async Task<DeletionResult> DeleteProductImage(string publicId)
+    public async Task<DeletionResult> DeleteProductThumbnail(string productId)
     {
+        var publicId = GenerateProductThumbnailPublicId(productId);
         var result = await _client.DestroyAsync(new DeletionParams(publicId));
         if (result.Error != null)
             throw new Exception(result.Error.Message);

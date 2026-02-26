@@ -9,8 +9,9 @@ public sealed record PatchProductRequest
     public IFormFile? Image { get; init; }
 
     // Since this is a patch method, every field is optional.
-    // If the image field is null, server doesn't know if th1`e image should be deleted or left untouched.
+    // If the image field is null, server doesn't know if the image should be deleted or left untouched.
     // We use this prop to determine if we should delete the image or not.
+    // If this is true we delete the image and ignore the Image prop
     [Required] public required bool DeleteImageOnly { get; init; }
     public decimal? Price { get; init; }
 }
