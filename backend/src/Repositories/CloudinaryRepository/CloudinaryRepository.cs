@@ -18,14 +18,14 @@ public class CloudinaryRepository(CloudinaryContext cloudinaryContext) : ICloudi
         return $"products/{productId}/thumbnail";
     }
 
-    public string BuildImageUrl(string publicId)
+    public string BuildImageUrl(string publicId, string version)
     {
-        return _client.Api.UrlImgUp.Secure(true).BuildUrl(publicId);
+        return _client.Api.UrlImgUp.Secure(true).Version(version).BuildUrl(publicId);
     }
 
-    public string BuildProductThumbnailImageUrl(string productId)
+    public string BuildProductThumbnailImageUrl(string productId, string version)
     {
-        return BuildImageUrl(GenerateProductThumbnailPublicId(productId));
+        return BuildImageUrl(GenerateProductThumbnailPublicId(productId), version);
     }
 
     public async Task<ImageUploadResult> UploadProductThumbnailAsync(string productId, Stream payload,

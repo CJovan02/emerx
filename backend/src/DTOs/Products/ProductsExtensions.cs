@@ -8,7 +8,8 @@ namespace EMerx.DTOs.Products;
 
 public static class ProductsExtensions
 {
-    public static Product ToDomain(this CreateProductRequest request, ObjectId? objectId = null, bool hasImage = false)
+    public static Product ToDomain(this CreateProductRequest request, ObjectId? objectId = null,
+        string? imageVersion = null)
     {
         return new Product
         {
@@ -16,7 +17,7 @@ public static class ProductsExtensions
             Name = request.Name,
             Category = request.Category,
             Price = request.Price,
-            HasImage = hasImage,
+            ImageVersion = imageVersion,
         };
     }
 

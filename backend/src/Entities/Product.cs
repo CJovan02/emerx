@@ -9,9 +9,12 @@ public class Product : BaseEntity
 
     /// <summary>
     /// Using the ProductId we can easily find the image in asset library. But we still need to store the information
-    /// about the image existing or not.
+    /// about the image existing or not. If the image version is null, product doesn't have an image, if it's not null
+    /// product has the image. Previously I just used bool value for this purpose but in order to invalidate the cache of
+    /// the old image Cloudinary requires us to store the version of the image
     /// </summary>
-    public required bool HasImage { get; set; } = false;
+    public required string? ImageVersion { get; set; } = null;
+
     public required decimal Price { get; set; }
 
     /// <summary>

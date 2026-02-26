@@ -27,9 +27,9 @@ public class ProductService(
             .Select(product =>
             {
                 string imgUrl = null;
-                // This check is the main reason why we store HasImage in the db
-                if (product.HasImage)
-                    imgUrl = cloudinaryRepository.BuildProductThumbnailImageUrl(product.Id.ToString());
+                if (product.ImageVersion != null)
+                    imgUrl = cloudinaryRepository.BuildProductThumbnailImageUrl(product.Id.ToString(),
+                        product.ImageVersion);
 
                 return product.ToResponse(imgUrl);
             })
@@ -64,16 +64,18 @@ public class ProductService(
 
         var hasImage = request.Image is not null && request.Image.Length != 0;
         string imageUrl = null;
+        string? imageVersion = null;
         if (hasImage)
         {
             await using var stream = request.Image.OpenReadStream();
             var imageResult =
                 await cloudinaryRepository.UploadProductThumbnailAsync(productId.ToString(), stream);
 
-            imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId);
+            imageVersion = imageResult.Version;
+            imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId, imageResult.Version);
         }
 
-        var product = request.ToDomain(productId, hasImage);
+        var product = request.ToDomain(productId, imageVersion);
         await productRepository.CreateProduct(product);
 
         return Result<ProductResponse>.Success(product.ToResponse(imageUrl));
@@ -83,7 +85,7 @@ public class ProductService(
     {
         var id = ObjectId.Parse(idRequest.Id);
 
-        var product = await  productRepository.GetProductById(id);
+        var product = await productRepository.GetProductById(id);
         if (product is null)
             return Result.Failure(ProductErrors.NotFound(id));
 
@@ -96,18 +98,20 @@ public class ProductService(
             await cloudinaryRepository.DeleteProductThumbnail(id.ToString());
         }
 
+        string? imageVersion = null;
         if (isReplace)
         {
             await using var stream = request.Image.Value!.OpenReadStream();
             // set overwrite to true to overwrite the original image
-            await cloudinaryRepository.UploadProductThumbnailAsync(id.ToString(), stream, overwrite: true);
+            var result = await cloudinaryRepository.UploadProductThumbnailAsync(id.ToString(), stream, overwrite: true);
+            imageVersion = result.Version;
         }
 
         var updates = new List<UpdateDefinition<Product>>();
         if (isDelete)
-            updates.Add(Builders<Product>.Update.Set(x => x.HasImage, false));
-        if (isReplace && !product.HasImage)
-            updates.Add(Builders<Product>.Update.Set(x => x.HasImage, true));
+            updates.Add(Builders<Product>.Update.Set(x => x.ImageVersion, null));
+        if (isReplace) // we need to replace the old version. This will invalidate the old image cache
+            updates.Add(Builders<Product>.Update.Set(x => x.ImageVersion, imageVersion));
         if (request.Name is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Name, request.Name));
         if (request.Category is not null)
