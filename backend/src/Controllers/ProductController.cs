@@ -54,7 +54,7 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType((StatusCodes.Status400BadRequest))]
     [ProducesResponseType((StatusCodes.Status500InternalServerError))]
     [HttpPatch("{id}")]
-    public async Task<IActionResult> Patch([FromRoute] IdRequest idRequest, [FromBody] PatchProductRequest request)
+    public async Task<IActionResult> Patch([FromRoute] IdRequest idRequest, [FromForm] PatchProductRequest request)
     {
         return (await productService.PatchAsync(idRequest, request)).ToActionResult();
     }

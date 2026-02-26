@@ -1,5 +1,4 @@
 using EMerx.Common.Filters;
-using EMerx.Domain.Models;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Products;
 using EMerx.DTOs.Products.Request;
@@ -14,7 +13,10 @@ using MongoDB.Driver;
 
 namespace EMerx.Services.Products;
 
-public class ProductService(IProductRepository productRepository, ICloudinaryRepository cloudinaryRepository)
+public class ProductService(
+    IProductRepository productRepository,
+    ICloudinaryRepository cloudinaryRepository,
+    ILogger<ProductService> logger)
     : IProductService
 {
     public async Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize)
@@ -25,13 +27,13 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
             .Select(product =>
             {
                 string imgUrl = null;
-                if (product.Image is not null)
-                    imgUrl = cloudinaryRepository.BuildImageUrl(product.Image.PublicId);
+                // This check is the main reason why we store HasImage in the db
+                if (product.HasImage)
+                    imgUrl = cloudinaryRepository.BuildProductThumbnailImageUrl(product.Id.ToString());
 
                 return product.ToResponse(imgUrl);
             })
             .ToList();
-
         var response = new PageOfResponse<ProductResponse>(
             productResponses,
             pageOfProducts.Page,
@@ -60,30 +62,23 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
         // But this approach saves us one database call
         var productId = ObjectId.GenerateNewId();
 
-        ProductImage productImage = null;
+        var hasImage = request.Image is not null && request.Image.Length != 0;
         string imageUrl = null;
-        if (request.Image is not null && request.Image.Length != 0)
+        if (hasImage)
         {
             await using var stream = request.Image.OpenReadStream();
             var imageResult =
-                await cloudinaryRepository.UploadProductImageAsync(productId.ToString(), "image", stream);
+                await cloudinaryRepository.UploadProductThumbnailAsync(productId.ToString(), stream);
 
-            productImage = new ProductImage
-            {
-                PublicId = imageResult.PublicId,
-                isThumbnail = true,
-                Order = 0,
-            };
             imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId);
         }
 
-        var product = request.ToDomain(productImage, productId);
+        var product = request.ToDomain(productId, hasImage);
         await productRepository.CreateProduct(product);
 
         return Result<ProductResponse>.Success(product.ToResponse(imageUrl));
     }
 
-    // TODO implement image replacement
     public async Task<Result> PatchAsync(IdRequest idRequest, PatchProductRequest request)
     {
         var id = ObjectId.Parse(idRequest.Id);
@@ -91,16 +86,11 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
         if (!await productRepository.ProductExists(id))
             return Result.Failure(ProductErrors.NotFound(id));
 
-        // create update definition to pass to repo layer
-        // maybe this will break separation of concerns, since now service layer knows that repo layer
-        // uses mongo for db implementation, idk. :)
         var updates = new List<UpdateDefinition<Product>>();
         if (request.Name is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Name, request.Name));
         if (request.Category is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Category, request.Category));
-        // if (request.Image is not null)
-        //     updates.Add(Builders<Product>.Update.Set(x => x.Image, request.Image));
         if (request.Price is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Price, request.Price));
 
@@ -113,7 +103,7 @@ public class ProductService(IProductRepository productRepository, ICloudinaryRep
         return Result.Success();
     }
 
-    // TODO delete all of the reviews for the product as well
+    // TODO delete all of the reviews for the product as well as the image
     // Orders for this product should not be deleted
     public async Task<Result> DeleteAsync(IdRequest request)
     {

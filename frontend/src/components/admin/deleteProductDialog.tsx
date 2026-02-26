@@ -7,7 +7,7 @@ import {
 	DialogContent,
 	DialogTitle,
 } from '@mui/material';
-import useDeleteProductLogic from '../../hooks/pageLogic/admin/useDeleteProductLogic.tsx';
+import useDeleteProductLogic from '../../hooks/pageLogic/admin/useDeleteProductLogic.ts';
 import { useEffect } from 'react';
 import { useSnackbar } from 'notistack';
 

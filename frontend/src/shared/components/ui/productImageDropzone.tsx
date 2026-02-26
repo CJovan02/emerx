@@ -76,7 +76,9 @@ export default function ProductImageDropzone({value, onChange, width, height, id
             maxWidthOrHeight: 1920,
             useWebWorker: true,
         }
-        return await imageCompression(file, options);
+        // Ts says that this function returns File, but it's actually blob
+        const blob = await imageCompression(file, options);
+        return new File([blob], file.name, {type: blob.type, lastModified: Date.now()});
     }
 
     const handleRemove = () => {
@@ -104,6 +106,7 @@ export default function ProductImageDropzone({value, onChange, width, height, id
                 <Box
                     {...getRootProps()}
                     sx={{
+                        width: "100%",
                         border: "2px dashed",
                         borderColor: isDragActive ? "primary.main" : "grey.400",
                         borderRadius: 2,

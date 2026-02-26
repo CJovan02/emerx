@@ -1,6 +1,4 @@
-﻿using EMerx.Domain.Models;
-
-namespace EMerx.Entities;
+﻿namespace EMerx.Entities;
 
 public class Product : BaseEntity
 {
@@ -9,7 +7,11 @@ public class Product : BaseEntity
     //should be rediscussed about categories enum
     public required string Category { get; set; }
 
-    public ProductImage? Image { get; set; }
+    /// <summary>
+    /// Using the ProductId we can easily find the image in asset library. But we still need to store the information
+    /// about the image existing or not.
+    /// </summary>
+    public required bool HasImage { get; set; } = false;
     public required decimal Price { get; set; }
 
     /// <summary>
