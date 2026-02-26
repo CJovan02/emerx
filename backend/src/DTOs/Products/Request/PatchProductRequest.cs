@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using EMerx.Common;
 
 namespace EMerx.DTOs.Products.Request;
 
@@ -6,12 +7,6 @@ public sealed record PatchProductRequest
 {
     public string? Name { get; init; }
     public string? Category { get; init; }
-    public IFormFile? Image { get; init; }
-
-    // Since this is a patch method, every field is optional.
-    // If the image field is null, server doesn't know if the image should be deleted or left untouched.
-    // We use this prop to determine if we should delete the image or not.
-    // If this is true we delete the image and ignore the Image prop
-    [Required] public required bool DeleteImageOnly { get; init; }
+    [Required] public required OptionalField<IFormFile> Image { get; init; }
     public decimal? Price { get; init; }
 }

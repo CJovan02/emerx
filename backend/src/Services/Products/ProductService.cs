@@ -86,21 +86,20 @@ public class ProductService(
         if (!await productRepository.ProductExists(id))
             return Result.Failure(ProductErrors.NotFound(id));
 
-        // DeleteImageOnly takes priority over the request.Image payload. If this is true we ONLY DELETE the image
-        if (request.DeleteImageOnly)
+        if (request.Image.IsDeleteOperation)
         {
             await cloudinaryRepository.DeleteProductThumbnail(id.ToString());
         }
 
-        if (!request.DeleteImageOnly && request.Image is not null)
+        if (request.Image.IsReplaceOperation)
         {
-            await using var stream = request.Image.OpenReadStream();
+            await using var stream = request.Image.Value!.OpenReadStream();
             // set overwrite to true to overwrite the original image
             await cloudinaryRepository.UploadProductThumbnailAsync(id.ToString(), stream, overwrite: true);
         }
 
         var updates = new List<UpdateDefinition<Product>>();
-        if (request.DeleteImageOnly)
+        if (request.Image.IsDeleteOperation)
             updates.Add(Builders<Product>.Update.Set(x => x.HasImage, false));
         if (request.Name is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Name, request.Name));
