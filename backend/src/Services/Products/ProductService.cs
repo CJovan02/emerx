@@ -131,12 +131,15 @@ public class ProductService(
         return Result.Success();
     }
 
-    // TODO delete all of the reviews for the product as well as the image
+    // TODO delete all of the reviews for the product
     // Orders for this product should not be deleted
     public async Task<Result> DeleteAsync(IdRequest request)
     {
-        var objectId = ObjectId.Parse(request.Id);
-        await productRepository.DeleteProduct(objectId);
+        var id = ObjectId.Parse(request.Id);
+
+        await cloudinaryRepository.DeleteProductFolder(id.ToString());
+        await productRepository.DeleteProduct(id);
+
         return Result.Success();
     }
 }

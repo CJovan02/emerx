@@ -5,7 +5,6 @@ import { createBrowserRouter, Navigate } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import LoginPage from '../pages/LoginPage.tsx';
 import RootLayout from '../pages/layouts/RootLayout.tsx';
-import SplashPage from '../pages/SplashPage.tsx';
 import ProductsPage from '../pages/ProductsPage.tsx';
 import { Routes } from '../shared/common/constants/routeNames.ts';
 import RegisterPage from '../pages/RegisterPage.tsx';
