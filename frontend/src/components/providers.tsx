@@ -31,7 +31,12 @@ const router = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						Component: SplashPage,
+						Component: () => (
+							<Navigate
+								to={Routes.Login}
+								replace
+							/>
+						),
 					},
 					{
 						path: Routes.Login,

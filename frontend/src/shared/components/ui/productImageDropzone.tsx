@@ -9,7 +9,7 @@ import imageCompression from "browser-image-compression";
 type Props = {
     // File object is when we upload the file through web
     // string object is when we get back the imageUrl from the server
-    value: File | string | null;
+    value: File | string | undefined;
 
     // This function is used to notify the parent component that image was changed
     // this way the component stays stateless

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace EMerx.Common;
 
 /// <summary>
@@ -6,10 +8,14 @@ namespace EMerx.Common;
 /// - Replace => HasValue: true && Value != null
 /// - Delete => HasValue: true && Value == null
 /// </summary>
-public struct OptionalField<T>
+public class OptionalField<T>
 {
-    private bool HasValue { get; }
-    public T? Value { get; }
+    public bool HasValue { get; set; }
+    public T? Value { get; set; }
+
+    public OptionalField()
+    {
+    }
 
     public OptionalField(T? value)
     {
@@ -17,6 +23,7 @@ public struct OptionalField<T>
         Value = value;
     }
 
-    public bool IsDeleteOperation => HasValue && Value == null;
-    public bool IsReplaceOperation => HasValue && Value != null;
+    public bool IsDeleteOperation() => HasValue && Value == null;
+    public bool IsReplaceOperation() => HasValue && Value != null;
+    public bool IsNothing() => !HasValue;
 }

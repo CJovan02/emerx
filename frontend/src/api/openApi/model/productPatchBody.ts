@@ -8,7 +8,7 @@
 export type ProductPatchBody = {
 	Name?: string;
 	Category?: string;
-	Image?: Blob;
-	DeleteImageOnly: boolean;
+	'Image.HasValue'?: boolean;
+	'Image.Value'?: Blob;
 	Price?: number;
 };

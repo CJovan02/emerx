@@ -431,13 +431,15 @@ export const productPatch = (
 	if (productPatchBody.Category !== undefined) {
 		formData.append(`Category`, productPatchBody.Category);
 	}
-	if (productPatchBody.Image !== undefined) {
-		formData.append(`Image`, productPatchBody.Image);
+	if (productPatchBody['Image.HasValue'] !== undefined) {
+		formData.append(
+			`Image.HasValue`,
+			productPatchBody['Image.HasValue'].toString()
+		);
 	}
-	formData.append(
-		`DeleteImageOnly`,
-		productPatchBody.DeleteImageOnly.toString()
-	);
+	if (productPatchBody['Image.Value'] !== undefined) {
+		formData.append(`Image.Value`, productPatchBody['Image.Value']);
+	}
 	if (productPatchBody.Price !== undefined) {
 		formData.append(`Price`, productPatchBody.Price.toString());
 	}

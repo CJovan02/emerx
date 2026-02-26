@@ -83,15 +83,20 @@ public class ProductService(
     {
         var id = ObjectId.Parse(idRequest.Id);
 
-        if (!await productRepository.ProductExists(id))
+        var product = await  productRepository.GetProductById(id);
+        if (product is null)
             return Result.Failure(ProductErrors.NotFound(id));
 
-        if (request.Image.IsDeleteOperation)
+        var isReplace = request.Image.IsReplaceOperation();
+        var isDelete = request.Image.IsDeleteOperation();
+        var isNothing = request.Image.IsNothing();
+
+        if (isDelete)
         {
             await cloudinaryRepository.DeleteProductThumbnail(id.ToString());
         }
 
-        if (request.Image.IsReplaceOperation)
+        if (isReplace)
         {
             await using var stream = request.Image.Value!.OpenReadStream();
             // set overwrite to true to overwrite the original image
@@ -99,8 +104,10 @@ public class ProductService(
         }
 
         var updates = new List<UpdateDefinition<Product>>();
-        if (request.Image.IsDeleteOperation)
+        if (isDelete)
             updates.Add(Builders<Product>.Update.Set(x => x.HasImage, false));
+        if (isReplace && !product.HasImage)
+            updates.Add(Builders<Product>.Update.Set(x => x.HasImage, true));
         if (request.Name is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Name, request.Name));
         if (request.Category is not null)
@@ -108,11 +115,14 @@ public class ProductService(
         if (request.Price is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Price, request.Price));
 
-        if (updates.Count == 0)
+        if (updates.Count == 0 && isNothing)
             return Result.Failure(ProductErrors.NoUpdates(id));
 
-        var updateDef = Builders<Product>.Update.Combine(updates);
-        await productRepository.UpdateProduct(id, updateDef);
+        if (updates.Count > 0)
+        {
+            var updateDef = Builders<Product>.Update.Combine(updates);
+            await productRepository.UpdateProduct(id, updateDef);
+        }
 
         return Result.Success();
     }
