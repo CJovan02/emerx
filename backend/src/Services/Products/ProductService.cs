@@ -137,7 +137,16 @@ public class ProductService(
     {
         var id = ObjectId.Parse(request.Id);
 
-        await cloudinaryRepository.DeleteProductFolder(id.ToString());
+        var product = await productRepository.GetProductById(id);
+        if (product is null)
+            return Result.Failure(ProductErrors.NotFound(id));
+
+        // This call won't fail if product has no images
+        await cloudinaryRepository.DeleteProductImages(id.ToString());
+        
+        // But this will fail if the folder doesn't exist
+        if (product.ImageVersion is not null)
+            await cloudinaryRepository.DeleteProductFolder(id.ToString());
         await productRepository.DeleteProduct(id);
 
         return Result.Success();

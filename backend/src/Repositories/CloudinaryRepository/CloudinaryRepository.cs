@@ -13,9 +13,14 @@ public class CloudinaryRepository(CloudinaryContext cloudinaryContext) : ICloudi
         return $"emerx/products/{productId}";
     }
 
+    private static string GenerateProductPublicUrlPrefix(string productId)
+    {
+        return $"products/{productId}";
+    }
+
     private static string GenerateProductThumbnailPublicId(string productId)
     {
-        return $"products/{productId}/thumbnail";
+        return $"{GenerateProductPublicUrlPrefix(productId)}/thumbnail";
     }
 
     public string BuildImageUrl(string publicId, string version)
@@ -51,6 +56,15 @@ public class CloudinaryRepository(CloudinaryContext cloudinaryContext) : ICloudi
     {
         var publicId = GenerateProductThumbnailPublicId(productId);
         var result = await _client.DestroyAsync(new DeletionParams(publicId));
+        if (result.Error != null)
+            throw new Exception(result.Error.Message);
+
+        return result;
+    }
+
+    public async Task<DelResResult> DeleteProductImages(string productId)
+    {
+        var result = await _client.DeleteResourcesByPrefixAsync(GenerateProductPublicUrlPrefix(productId));
         if (result.Error != null)
             throw new Exception(result.Error.Message);
 
