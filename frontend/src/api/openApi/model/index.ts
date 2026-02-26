@@ -6,7 +6,6 @@
  */
 
 export * from './addressDto';
-export * from './createProductRequest';
 export * from './objectId';
 export * from './orderGetAllParams';
 export * from './orderItem';
@@ -15,7 +14,9 @@ export * from './orderRequest';
 export * from './orderResponse';
 export * from './patchProductRequest';
 export * from './problemDetails';
+export * from './productCreateBody';
 export * from './productGetPagedParams';
+export * from './productImageResponse';
 export * from './productResponse';
 export * from './productResponsePageOfResponse';
 export * from './registerUserRequest';

@@ -30,14 +30,31 @@ export default function AdminProductsPage() {
 		product,
 	} = useAdminProductsLogic();
 
-	return (
-		<>
-			<CreateProductDrawer
-				open={addOpen}
-				handleClose={closeAddDrawer}
-				page={data ? data.totalPages - 1 : 0} // -1 because we transform from 1-based to 0-based index
-				pageSize={pageSize}
-			/>
+    if (isError) {
+        return (
+            <Stack spacing={4} maxWidth='25rem' mx='auto'>
+                <Alert severity='error'>{errorMessage}</Alert>
+                <Button
+                    startIcon={<Refresh/>}
+                    onClick={() => refetch()}
+                    sx={{
+                        height: 45,
+                    }}
+                >
+                    Refresh
+                </Button>
+            </Stack>
+        )
+    }
+
+    return (
+        <>
+            <CreateProductDrawer
+                open={addOpen}
+                handleClose={closeAddDrawer}
+                page={data ? data.totalPages - 1 : 0} // -1 because we transform from 1-based to 0-based index
+                pageSize={pageSize}
+            />
 
 			<EditProductDrawer
 				open={editOpen}
@@ -55,51 +72,33 @@ export default function AdminProductsPage() {
 				pageSize={pageSize}
 			/>
 
-			<Container>
-				{isError && (
-					<Stack
-						spacing={4}
-						maxWidth='25rem'
-						mx='auto'>
-						<Alert severity='error'>{errorMessage}</Alert>
-						<Button
-							startIcon={<Refresh />}
-							onClick={() => refetch()}
-							sx={{
-								height: 45,
-							}}>
-							Refresh
-						</Button>
-					</Stack>
-				)}
-
-				<Box
-					display='flex'
-					mb={2}>
-					<Spacer />
-					<Button
-						startIcon={<Add />}
-						onClick={openAddDrawer}
-						disabled={isFetching}
-						sx={{
-							height: 45,
-							fontWeight: 700,
-						}}>
-						Create Product
-					</Button>
-				</Box>
-				<ProductsGrid
-					openDeleteDialog={openDeleteDialog}
-					openDrawer={openEditDrawer}
-					data={data?.items}
-					totalItems={data?.totalItems}
-					loading={isFetching}
-					page={page}
-					pageSize={pageSize}
-					setPage={setPage}
-					setPageSize={setPageSize}
-				/>
-			</Container>
-		</>
-	);
+            <Container>
+                <Box display='flex' mb={2}>
+                    <Spacer/>
+                    <Button
+                        startIcon={<Add/>}
+                        onClick={openAddDrawer}
+                        disabled={isFetching}
+                        sx={{
+                            height: 45,
+                            fontWeight: 700,
+                        }}
+                    >
+                        Create Product
+                    </Button>
+                </Box>
+                <ProductsGrid
+                    openDeleteDialog={openDeleteDialog}
+                    openDrawer={openEditDrawer}
+                    data={data?.items}
+                    totalItems={data?.totalItems}
+                    loading={isFetching}
+                    page={page}
+                    pageSize={pageSize}
+                    setPage={setPage}
+                    setPageSize={setPageSize}
+                />
+            </Container>
+        </>
+    )
 }

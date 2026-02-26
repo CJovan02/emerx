@@ -1,8 +1,10 @@
 using EMerx.Common;
 using EMerx.Common.Exceptions;
 using EMerx.ExceptionHandlers;
+using EMerx.Infrastructure.CloudinaryContext;
 using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.AuthRepository;
+using EMerx.Repositories.CloudinaryRepository;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.ReviewRepository;
@@ -17,7 +19,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace EMerx.Infrastructure;
+namespace EMerx.Infrastructure.CloudinaryContext;
 
 public static class ServiceCollectionExtension
 {
@@ -28,7 +30,8 @@ public static class ServiceCollectionExtension
             .AddScoped<IProductRepository, ProductRepository>()
             .AddScoped<IReviewRepository, ReviewRepository>()
             .AddScoped<IOrderRepository, OrderRepository>()
-            .AddScoped<IAuthRepository, AuthRepository>();
+            .AddScoped<IAuthRepository, AuthRepository>()
+            .AddScoped<ICloudinaryRepository, CloudinaryRepository>();
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
@@ -44,13 +47,27 @@ public static class ServiceCollectionExtension
     {
         services.Configure<MongoDbSettings>(settings =>
         {
-            settings.ConnectionString = Environment.GetEnvironmentVariable(Constants.EnvVariables.Database) ??
+            settings.ConnectionString = DotNetEnv.Env.GetString(Constants.EnvVariables.Database) ??
                                         throw new EnvVariableNotFoundException(Constants.EnvVariables.Database);
         });
 
         services.AddSingleton<MongoContext>();
-
         return services;
+    }
+
+    public static IServiceCollection AddCloudinaryContext(this IServiceCollection services)
+    {
+        services.Configure<CloudinarySettings>(settings =>
+        {
+            settings.CloudName = DotNetEnv.Env.GetString(Constants.EnvVariables.CloudinaryCloudName) ??
+                                 throw new EnvVariableNotFoundException(Constants.EnvVariables.CloudinaryCloudName);
+            settings.ApiSecret = DotNetEnv.Env.GetString(Constants.EnvVariables.CloudinaryApiSecret) ??
+                                 throw new EnvVariableNotFoundException(Constants.EnvVariables.CloudinaryApiSecret);
+            settings.ApiKey = DotNetEnv.Env.GetString(Constants.EnvVariables.CloudinaryApiKey) ??
+                              throw new EnvVariableNotFoundException(Constants.EnvVariables.CloudinaryApiKey);
+        });
+
+        return services.AddSingleton<CloudinaryContext>();
     }
 
     public static IServiceCollection AddSwaggerWithAuth(this IServiceCollection services)

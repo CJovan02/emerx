@@ -1,9 +1,11 @@
 using EMerx.Common.Filters;
+using EMerx.Domain.Models;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Products;
 using EMerx.DTOs.Products.Request;
 using EMerx.DTOs.Products.Response;
 using EMerx.Entities;
+using EMerx.Repositories.CloudinaryRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
@@ -12,14 +14,22 @@ using MongoDB.Driver;
 
 namespace EMerx.Services.Products;
 
-public class ProductService(IProductRepository productRepository) : IProductService
+public class ProductService(IProductRepository productRepository, ICloudinaryRepository cloudinaryRepository)
+    : IProductService
 {
     public async Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize)
     {
         var pageOfProducts = await productRepository.GetProducts(page, pageSize);
         var productResponses = pageOfProducts
             .Items
-            .Select(product => product.ToResponse())
+            .Select(product =>
+            {
+                string imgUrl = null;
+                if (product.Image is not null)
+                    imgUrl = cloudinaryRepository.BuildImageUrl(product.Image.PublicId);
+
+                return product.ToResponse(imgUrl);
+            })
             .ToList();
 
         var response = new PageOfResponse<ProductResponse>(
@@ -45,11 +55,35 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public async Task<Result<ProductResponse>> CreateAsync(CreateProductRequest request)
     {
-        var product = request.ToDomain();
+        // I manually generate object id since uploading image requires it
+        // I could also create a product first, use that id to upload image and then update the product with the new image
+        // But this approach saves us one database call
+        var productId = ObjectId.GenerateNewId();
+
+        ProductImage productImage = null;
+        string imageUrl = null;
+        if (request.Image is not null && request.Image.Length != 0)
+        {
+            await using var stream = request.Image.OpenReadStream();
+            var imageResult =
+                await cloudinaryRepository.UploadProductImageAsync(productId.ToString(), "image", stream);
+
+            productImage = new ProductImage
+            {
+                PublicId = imageResult.PublicId,
+                isThumbnail = true,
+                Order = 0,
+            };
+            imageUrl = cloudinaryRepository.BuildImageUrl(imageResult.PublicId);
+        }
+
+        var product = request.ToDomain(productImage, productId);
         await productRepository.CreateProduct(product);
-        return Result<ProductResponse>.Success(product.ToResponse());
+
+        return Result<ProductResponse>.Success(product.ToResponse(imageUrl));
     }
 
+    // TODO implement image replacement
     public async Task<Result> PatchAsync(IdRequest idRequest, PatchProductRequest request)
     {
         var id = ObjectId.Parse(idRequest.Id);
@@ -65,8 +99,8 @@ public class ProductService(IProductRepository productRepository) : IProductServ
             updates.Add(Builders<Product>.Update.Set(x => x.Name, request.Name));
         if (request.Category is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Category, request.Category));
-        if (request.Image is not null)
-            updates.Add(Builders<Product>.Update.Set(x => x.Image, request.Image));
+        // if (request.Image is not null)
+        //     updates.Add(Builders<Product>.Update.Set(x => x.Image, request.Image));
         if (request.Price is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Price, request.Price));
 
