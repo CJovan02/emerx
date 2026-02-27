@@ -2,13 +2,13 @@ import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useCallback, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { auth } from '../../config/firebase.ts';
+import { auth } from '../../../config/firebase.ts';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import {
 	LogicStates,
 	type LogicState,
-} from '../../shared/common/states/logicStatesConst.ts';
+} from '../../../shared/common/states/logicStatesConst.ts';
 
 function useLoginLogic() {
 	const formSchema = z.object({

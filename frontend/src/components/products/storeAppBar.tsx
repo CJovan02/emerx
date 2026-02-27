@@ -6,6 +6,8 @@ import { Drawers } from '../../shared/common/constants/drawers.ts';
 import useScreenSize from '../../hooks/useScreenSize.ts';
 import { useStoreDrawerStore } from '../../stores/storeDrawerStore.tsx';
 import AvatarMenu from './avatarMenu.tsx';
+import { useLocation } from 'react-router';
+import { Routes } from '../../shared/common/constants/routeNames.ts';
 
 const drawerWidth = Drawers.Store.Width;
 
@@ -13,11 +15,14 @@ export default function StoreAppBar() {
 	const { isDesktop } = useScreenSize();
 	const openDrawer = useStoreDrawerStore(state => state.open);
 
+	const location = useLocation();
+	const isProductsRoute = location.pathname === Routes.Products;
+
 	return (
 		<AppBar
 			position='fixed'
 			sx={
-				isDesktop
+				isDesktop && isProductsRoute
 					? { width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }
 					: {}
 			}>
@@ -48,9 +53,9 @@ export default function StoreAppBar() {
 				</Typography>
 
 				{/* Navigation Links */}
-				<Box sx={{ display: 'flex', gap: 2, ml: 5 }}>
-					<StoreTabs />
-				</Box>
+				{/*<Box sx={{ display: 'flex', gap: 2, ml: 5 }}>*/}
+				{/*	<StoreTabs />*/}
+				{/*</Box>*/}
 
 				<Spacer />
 

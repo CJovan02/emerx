@@ -12,7 +12,7 @@ import {
 	Stack,
 } from '@mui/material';
 import TextInput from '../shared/components/ui/textInput.tsx';
-import useLoginLogic from '../hooks/pageLogic/useLoginLogic.ts';
+import useLoginLogic from '../hooks/pageLogic/auth/useLoginLogic.ts';
 import { FormProvider } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router';

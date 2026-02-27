@@ -49,6 +49,10 @@ export default function EditProductDrawer({
 	const { enqueueSnackbar } = useSnackbar();
 
 	useEffect(() => {
+		console.log(product?.id);
+	}, [product]);
+
+	useEffect(() => {
 		if (!isError) return;
 
 		enqueueSnackbar(errorMessage, { variant: 'error' });
