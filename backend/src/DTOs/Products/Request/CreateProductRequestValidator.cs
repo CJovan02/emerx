@@ -7,11 +7,11 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
     public CreateProductRequestValidator()
     {
         RuleFor(x => x.Name)
-            .Length(3, 30)
+            .Length(3, 50)
             .WithMessage("Product name must be between 5 and 30 characters long.");
 
         RuleFor(x => x.Category)
-            .Length(3, 30)
+            .Length(3, 20)
             .WithMessage("Category name must be between 5 and 30 characters long.");
 
         RuleFor(x => x.Price)

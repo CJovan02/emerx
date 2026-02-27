@@ -24,7 +24,7 @@ export default function useEditProductLogic(
 			.string()
 			.nonempty('Name is required')
 			.min(3, 'Name must be at least 3 characters.')
-			.max(30, "Name can't be larger than 30 characters."),
+			.max(50, "Name can't be larger than 30 characters."),
 
 		description: z
 			.string()
@@ -36,7 +36,7 @@ export default function useEditProductLogic(
 			.string()
 			.nonempty()
 			.min(3, 'Category must be at least 3 characters.')
-			.max(30, "Category can't be larger than 30 characters."),
+			.max(20, "Category can't be larger than 30 characters."),
 
 		price: z.number().nonnegative(),
 

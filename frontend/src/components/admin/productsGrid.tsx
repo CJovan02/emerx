@@ -48,7 +48,7 @@ function ProductsGrid({
 			{
 				field: 'thumbnailUrl',
 				headerName: '',
-				minWidth: 100,
+				maxWidth: 90,
 				filterable: false,
 				sortable: false,
 				align: 'center',
@@ -68,19 +68,34 @@ function ProductsGrid({
 				field: 'name',
 				headerName: 'Name',
 				flex: 1,
+				minWidth: 230,
+				renderCell: (params: GridRenderCellParams<ProductResponse, string>) => {
+					const description = params.value;
+					if (!description) return '-';
+
+					const length = 50;
+					const truncated =
+						description.length > length
+							? description.substring(0, length) + '...'
+							: description;
+
+					return <span title={description}>{truncated}</span>;
+				},
 			},
 			{
 				field: 'description',
 				headerName: 'Description',
-				flex: 1.1,
+				minWidth: 170,
+				flex: 1,
 				renderCell: (params: GridRenderCellParams<ProductResponse, string>) => {
 					const description = params.value;
 					if (!description) return '-';
 
 					const length = 20;
-					const truncated = description.length > length
-						? description.substring(0, length) + "..."
-						: description;
+					const truncated =
+						description.length > length
+							? description.substring(0, length) + '...'
+							: description;
 
 					return <span title={description}>{truncated}</span>;
 				},
@@ -98,10 +113,17 @@ function ProductsGrid({
 			},
 			{
 				//$ €
+				// fr-FR for spaces
+				// de-DE for commas
 				field: 'price',
 				headerName: 'Price',
 				flex: 1,
-				valueFormatter: params => `€${params}`,
+				valueFormatter: params => {
+					return new Intl.NumberFormat('fr-FR', {
+						style: 'currency',
+						currency: 'EUR',
+					}).format(params);
+				},
 			},
 			{
 				field: 'averageRating',
