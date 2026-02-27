@@ -13,7 +13,7 @@ export default function ProductDetailsCta({ inStock }: Props) {
 			justifyContent='center'
 			gap={3}>
 			<InputStepper
-				title="Item Quantity"
+				title='Item Quantity'
 				value={10}
 				setValue={() => {}}
 				disabled={!inStock}
