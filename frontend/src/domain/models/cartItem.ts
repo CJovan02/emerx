@@ -6,7 +6,7 @@ export type CartItem = {
 };
 
 export function getPriceForCartItem(item: CartItem): number {
-	return item.quantity * item.quantity;
+	return item.quantity * item.product.price;
 }
 
 export function getCartTotalPrice(cart: CartItem[]): number {

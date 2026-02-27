@@ -7,9 +7,10 @@ import ProductDetailsCta from './productDetailsCta.tsx';
 
 type Props = {
 	product: ProductResponse;
+	onAddToCart: (quantity: number) => void;
 };
 
-export default function ProductDetails({ product }: Props) {
+export default function ProductDetails({ product, onAddToCart }: Props) {
 	const {
 		thumbnailUrl,
 		name,
@@ -98,7 +99,10 @@ export default function ProductDetails({ product }: Props) {
 
 					<Divider sx={{ my: 3 }} />
 
-					<ProductDetailsCta inStock={stock > 0} />
+					<ProductDetailsCta
+						stock={stock}
+						onAddToCart={onAddToCart}
+					/>
 				</Grid>
 			</Grid>
 		</Box>

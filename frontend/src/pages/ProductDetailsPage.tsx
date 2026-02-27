@@ -3,8 +3,8 @@ import { Routes } from '../shared/common/constants/routeNames.ts';
 import useProductDetailsLogic from '../hooks/pageLogic/useProductDetailsLogic.ts';
 import { Alert, Box, Button, Container } from '@mui/material';
 import { ArrowBack, Refresh } from '@mui/icons-material';
-import CircularProgress from "@mui/material/CircularProgress";
-import ProductDetails from "../components/productDetails/productDetails.tsx";
+import CircularProgress from '@mui/material/CircularProgress';
+import ProductDetails from '../components/productDetails/productDetails.tsx';
 
 export function ProductDetailsPage() {
 	const { id } = useParams();
@@ -18,12 +18,23 @@ export function ProductDetailsPage() {
 			/>
 		);
 
-	const { isError, errorMessage, refetch, isRefetching, productNotFound, isPending, data } =
-		useProductDetailsLogic(id);
+	const {
+		isError,
+		errorMessage,
+		refetch,
+		isRefetching,
+		productNotFound,
+		isPending,
+		data,
+		addToCart,
+	} = useProductDetailsLogic(id);
 
 	if (isPending) {
 		return (
-			<Box width='100%' display='flex' justifyContent='center'>
+			<Box
+				width='100%'
+				display='flex'
+				justifyContent='center'>
 				<CircularProgress size={45} />
 			</Box>
 		);
@@ -68,5 +79,10 @@ export function ProductDetailsPage() {
 		);
 	}
 
-	return <ProductDetails product={data} />;
+	return (
+		<ProductDetails
+			product={data}
+			onAddToCart={addToCart}
+		/>
+	);
 }

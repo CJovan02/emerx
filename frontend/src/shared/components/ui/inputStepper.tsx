@@ -3,18 +3,19 @@ import { Add, Remove } from '@mui/icons-material';
 
 export default function InputStepper({
 	value,
-	setValue,
+	onIncrement,
+	onDecrement,
 	title,
 	disabled,
+	isMaximum
 }: {
 	value: number;
-	setValue: (q: number) => void;
+	isMaximum?: boolean;
 	disabled?: boolean;
+	onIncrement: () => void;
+	onDecrement: () => void;
 	title?: string;
 }) {
-	const handleDecrement = () => setValue(Math.max(1, value - 1));
-	const handleIncrement = () => setValue(value + 1);
-
 	return (
 		<Box
 			display='flex'
@@ -33,7 +34,7 @@ export default function InputStepper({
 				<IconButton
 					color='primary'
 					size='small'
-					onClick={handleDecrement}
+					onClick={onDecrement}
 					disabled={!disabled ? value <= 1 : true}>
 					<Remove />
 				</IconButton>
@@ -48,8 +49,8 @@ export default function InputStepper({
 				<IconButton
 					color='primary'
 					size='small'
-					disabled={disabled}
-					onClick={handleIncrement}>
+					disabled={disabled || isMaximum}
+					onClick={onIncrement}>
 					<Add />
 				</IconButton>
 			</Box>

@@ -29,8 +29,9 @@ export const useCartStore = create<CartStore>()(
 
 // Handlers
 function handleAddToCart(state: CartStore, item: CartItem): Partial<CartStore> {
-	// only allow cart to have 10 unique items
-	if (state.items.length >= 10) return state;
+	// // only allow cart to have 10 unique items
+	// if (state.items.length >= 10) return state;
+	if (item.quantity < 1) return state;
 
 	const existing = state.items.find(i => i.product.id === item.product.id);
 
