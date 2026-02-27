@@ -15,20 +15,19 @@ import {
 	Logout,
 	Person,
 	Settings,
-	ShoppingCart,
 	Verified,
 } from '@mui/icons-material';
 import { auth } from '../../config/firebase.ts';
 import { useEffect, useState } from 'react';
-import * as React from 'react';
 import { useUserStore } from '../../stores/userStore.ts';
 import type AppUser from '../../domain/models/appUser.ts';
 import { useLocation, useNavigate } from 'react-router';
 import { Routes } from '../../shared/common/constants/routeNames.ts';
+import useMenuState from "../../hooks/useMenuState.tsx";
 
 export default function AvatarMenu() {
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-	const open = Boolean(anchorEl);
+	const { open, openMenu, closeMenu, anchorEl } = useMenuState();
+
 	const storeUser = useUserStore(state => state.user);
 	// When we log out there will be a brief moment when where user store will have empty user and redirect will not trigger
 	// leaving user menu to show undefined user info, we use this state as a cache for user info
@@ -36,12 +35,8 @@ export default function AvatarMenu() {
 	const navigate = useNavigate();
 	const isAdminPage = useLocation().pathname.includes(Routes.Admin.Base);
 
-	const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-
 	const handleMenuAction = (callback?: () => void) => {
-		setAnchorEl(null);
+		closeMenu();
 
 		if (callback) callback();
 	};
@@ -63,7 +58,7 @@ export default function AvatarMenu() {
 				aria-controls={open ? 'account-menu' : undefined}
 				aria-haspopup='true'
 				aria-expanded={open ? 'true' : undefined}
-				onClick={handleOpenUserMenu}>
+				onClick={openMenu}>
 				<Person sx={{ height: 32, width: 32 }} />
 			</IconButton>
 
@@ -132,12 +127,12 @@ export default function AvatarMenu() {
 					</MenuItem>
 				)}
 				{user?.isAdmin && <Divider />}
-				<MenuItem onClick={() => handleMenuAction()}>
-					<ListItemIcon>
-						<ShoppingCart fontSize='small' />
-					</ListItemIcon>
-					<ListItemText primary='Cart' />
-				</MenuItem>
+				{/*<MenuItem onClick={() => handleMenuAction()}>*/}
+				{/*	<ListItemIcon>*/}
+				{/*		<ShoppingCart fontSize='small' />*/}
+				{/*	</ListItemIcon>*/}
+				{/*	<ListItemText primary='Cart' />*/}
+				{/*</MenuItem>*/}
 				<MenuItem
 					onClick={() => handleMenuAction(() => auth.signOut())}
 					sx={{ color: 'error.main' }}>

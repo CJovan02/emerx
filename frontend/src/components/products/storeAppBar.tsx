@@ -8,13 +8,13 @@ import {
 } from '@mui/material';
 import { FilterAlt } from '@mui/icons-material';
 import { Spacer } from '../../shared/components/ui/spacer.tsx';
-import StoreTabs from './storeTabs.tsx';
 import { Drawers } from '../../shared/common/constants/drawers.ts';
 import useScreenSize from '../../hooks/useScreenSize.ts';
 import { useStoreDrawerStore } from '../../stores/storeDrawerStore.tsx';
 import AvatarMenu from './avatarMenu.tsx';
 import { useLocation } from 'react-router';
 import { Routes } from '../../shared/common/constants/routeNames.ts';
+import CartMenu from './cartMenu.tsx';
 
 const drawerWidth = Drawers.Store.Width;
 
@@ -37,7 +37,8 @@ export default function StoreAppBar() {
 				<Container maxWidth='lg'>
 					<Box
 						display='flex'
-						alignItems='center'>
+						alignItems='center'
+						gap={1}>
 						{/* Drawer Toggle */}
 						{!isDesktop && (
 							<IconButton
@@ -71,6 +72,7 @@ export default function StoreAppBar() {
 						<Spacer />
 
 						<AvatarMenu />
+						<CartMenu />
 					</Box>
 				</Container>
 			</Toolbar>
