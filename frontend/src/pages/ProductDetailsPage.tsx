@@ -4,6 +4,7 @@ import useProductDetailsLogic from '../hooks/pageLogic/useProductDetailsLogic.ts
 import { Alert, Box, Button, Container } from '@mui/material';
 import { ArrowBack, Refresh } from '@mui/icons-material';
 import CircularProgress from "@mui/material/CircularProgress";
+import ProductDetails from "../components/productDetails/productDetails.tsx";
 
 export function ProductDetailsPage() {
 	const { id } = useParams();
@@ -17,7 +18,7 @@ export function ProductDetailsPage() {
 			/>
 		);
 
-	const { isError, errorMessage, refetch, isRefetching, productNotFound, isPending } =
+	const { isError, errorMessage, refetch, isRefetching, productNotFound, isPending, data } =
 		useProductDetailsLogic(id);
 
 	if (isPending) {
@@ -67,5 +68,5 @@ export function ProductDetailsPage() {
 		);
 	}
 
-	return <div></div>;
+	return <ProductDetails product={data} />;
 }

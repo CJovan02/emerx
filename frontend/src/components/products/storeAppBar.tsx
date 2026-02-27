@@ -1,4 +1,11 @@
-import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material';
+import {
+	AppBar,
+	Box,
+	Container,
+	IconButton,
+	Toolbar,
+	Typography,
+} from '@mui/material';
 import { FilterAlt } from '@mui/icons-material';
 import { Spacer } from '../../shared/components/ui/spacer.tsx';
 import StoreTabs from './storeTabs.tsx';
@@ -26,40 +33,46 @@ export default function StoreAppBar() {
 					? { width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }
 					: {}
 			}>
-			<Toolbar>
-				{/* Drawer Toggle */}
-				{!isDesktop && (
-					<IconButton
-						size='large'
-						edge='start'
-						color='inherit'
-						aria-label='open filters drawer'
-						onClick={openDrawer}
-						sx={{
-							mr: 5,
-						}}>
-						<FilterAlt />
-					</IconButton>
-				)}
+			<Toolbar disableGutters>
+				<Container maxWidth='lg'>
+					<Box
+						display='flex'
+						alignItems='center'>
+						{/* Drawer Toggle */}
+						{!isDesktop && (
+							<IconButton
+								size='large'
+								edge='start'
+								color='inherit'
+								aria-label='open filters drawer'
+								onClick={openDrawer}
+								sx={{
+									mr: 5,
+								}}>
+								<FilterAlt />
+							</IconButton>
+						)}
 
-				{/* Logo */}
-				<Typography
-					variant='h6'
-					sx={{
-						fontWeight: 700,
-						letterSpacing: '.2rem',
-					}}>
-					EMERX
-				</Typography>
+						{/* Logo */}
+						<Typography
+							variant='h6'
+							sx={{
+								fontWeight: 700,
+								letterSpacing: '.2rem',
+							}}>
+							EMERX
+						</Typography>
 
-				{/* Navigation Links */}
-				{/*<Box sx={{ display: 'flex', gap: 2, ml: 5 }}>*/}
-				{/*	<StoreTabs />*/}
-				{/*</Box>*/}
+						{/* Navigation Links */}
+						{/*<Box sx={{ display: 'flex', gap: 2, ml: 5 }}>*/}
+						{/*	<StoreTabs />*/}
+						{/*</Box>*/}
 
-				<Spacer />
+						<Spacer />
 
-				<AvatarMenu />
+						<AvatarMenu />
+					</Box>
+				</Container>
 			</Toolbar>
 		</AppBar>
 	);
