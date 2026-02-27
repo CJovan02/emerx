@@ -61,6 +61,9 @@ function ProductsGrid({
 						<ImageLightbox
 							src={params.value}
 							alt={params.value}
+							width={60}
+							height={60}
+							borderRadius={0.5}
 						/>
 					);
 				},
