@@ -11,9 +11,13 @@ export interface ProductResponse {
 	/** @minLength 1 */
 	name: string;
 	/** @minLength 1 */
+	description: string;
+	/** @minLength 1 */
 	category: string;
 	/** @nullable */
 	thumbnailUrl?: string | null;
-	price: number;
 	averageRating: number;
+	reviewCount: number;
+	price: number;
+	stock: number;
 }

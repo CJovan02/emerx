@@ -3,11 +3,12 @@ import {
 	Button,
 	Divider,
 	Drawer,
+	IconButton,
 	Stack,
 	Toolbar,
 	Typography,
 } from '@mui/material';
-import { ArrowUpward } from '@mui/icons-material';
+import { ArrowUpward, Refresh } from '@mui/icons-material';
 import type { ProductResponse } from '../../api/openApi/model';
 import useEditProductLogic from '../../hooks/pageLogic/admin/useEditProductLogic.ts';
 import { useEffect } from 'react';
@@ -17,6 +18,7 @@ import TextInput from '../../shared/components/ui/textInput.tsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import EditIcon from '@mui/icons-material/Edit';
 import { ProductImageDropzoneInput } from '../../shared/components/productImageDropzoneInput.tsx';
+import { Spacer } from '../../shared/components/ui/spacer.tsx';
 
 type Props = {
 	open: boolean;
@@ -42,6 +44,7 @@ export default function EditProductDrawer({
 		isLoading,
 		allSet,
 		setAllSet,
+		loadInitDataToForm,
 	} = useEditProductLogic(product, page, pageSize);
 	const { enqueueSnackbar } = useSnackbar();
 
@@ -74,7 +77,9 @@ export default function EditProductDrawer({
 			onClose={handleClose}
 			anchor='right'
 			variant='temporary'>
-			<Box width='450px'>
+			<Box
+				width='450px'
+				pb={3}>
 				<Toolbar
 					sx={{
 						display: 'flex',
@@ -83,7 +88,7 @@ export default function EditProductDrawer({
 					}}>
 					<EditIcon
 						color='primary'
-						fontSize='large'
+						sx={{ fontSize: 32 }}
 					/>
 					<Typography
 						variant='h6'
@@ -91,6 +96,10 @@ export default function EditProductDrawer({
 						fontWeight={700}>
 						Edit "{product?.name}"
 					</Typography>
+					<Spacer />
+					<IconButton onClick={loadInitDataToForm}>
+						<Refresh sx={{ fontSize: 28 }} />
+					</IconButton>
 				</Toolbar>
 				<Divider />
 
@@ -112,6 +121,16 @@ export default function EditProductDrawer({
 								/>
 
 								<TextInput
+									id='description'
+									label='Description'
+									minRows={3}
+									maxRows={10}
+									multiline
+									required
+									fullWidth
+								/>
+
+								<TextInput
 									id='category'
 									label='Category'
 									required
@@ -121,6 +140,14 @@ export default function EditProductDrawer({
 								<TextInput
 									id='price'
 									label='Price'
+									type='number'
+									required
+									fullWidth
+								/>
+
+								<TextInput
+									id='stock'
+									label='Stock'
 									type='number'
 									required
 									fullWidth

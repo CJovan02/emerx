@@ -4,6 +4,8 @@ public class Product : BaseEntity
 {
     public required string Name { get; set; }
 
+    public required string Description { get; set; }
+
     //should be rediscussed about categories enum
     public required string Category { get; set; }
 
@@ -22,6 +24,8 @@ public class Product : BaseEntity
     /// </summary>
     public double SumRatings { get; set; } = 0;
 
-    public int ReviewsCount { get; set; } = 0;
+    public int ReviewCount { get; set; } = 0;
     public double AverageRating { get; set; } = 0;
+
+    public int Stock { get; set; }
 }

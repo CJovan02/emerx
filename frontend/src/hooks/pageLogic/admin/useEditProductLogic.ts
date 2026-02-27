@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type {
 	ProblemDetails,
 	ProductPatchBody,
@@ -22,9 +22,15 @@ export default function useEditProductLogic(
 	const formSchema = z.object({
 		name: z
 			.string()
-			.nonempty()
+			.nonempty('Name is required')
 			.min(3, 'Name must be at least 3 characters.')
 			.max(30, "Name can't be larger than 30 characters."),
+
+		description: z
+			.string()
+			.nonempty('Description is required')
+			.min(10, 'Description must be at least 3 characters.')
+			.max(300, "Description can't be larger than 300 characters."),
 
 		category: z
 			.string()
@@ -33,6 +39,8 @@ export default function useEditProductLogic(
 			.max(30, "Category can't be larger than 30 characters."),
 
 		price: z.number().nonnegative(),
+
+		stock: z.number().nonnegative(),
 
 		image: z
 			.union([z.file(), z.url()])
@@ -68,7 +76,14 @@ export default function useEditProductLogic(
 	const [allSet, setAllSet] = useState<boolean>(false);
 
 	const submitEditForm = form.handleSubmit(
-		async ({ name, category, price, image }: FormValues) => {
+		async ({
+			name,
+			category,
+			price,
+			image,
+			stock,
+			description,
+		}: FormValues) => {
 			setAllSet(false);
 
 			if (!product) {
@@ -84,6 +99,9 @@ export default function useEditProductLogic(
 			// If the initial field names are not changed there is no need to send them
 			const request: ProductPatchBody = {
 				Name: name !== product.name ? name : undefined,
+				Description:
+					description !== product.description ? description : undefined,
+				Stock: stock !== product.stock ? stock : undefined,
 				Category: category !== product.category ? category : undefined,
 				Price: price !== product.price ? price : undefined,
 				'Image.HasValue': imageChanged,
@@ -92,12 +110,8 @@ export default function useEditProductLogic(
 
 			// console.log(request);
 
-			const notingIsChanged =
-				request.Name === undefined &&
-				request.Category === undefined &&
-				request.Price === undefined &&
-				request['Image.HasValue'] === false &&
-				request['Image.Value'] === undefined;
+			const notingIsChanged = isProductPatchRequestEmpty(request);
+
 			if (notingIsChanged) {
 				setAllSet(true);
 				return;
@@ -131,15 +145,24 @@ export default function useEditProductLogic(
 		setErrorMessage('Unexpected error occurred, please try again.');
 	}
 
+	const loadInitDataToForm = useCallback(() => {
+		if (!product) return;
+
+		form.reset();
+		form.setValue('name', product.name);
+		form.setValue('description', product.description);
+		form.setValue('category', product.category);
+		form.setValue('price', product.price);
+		form.setValue('stock', product.stock);
+		form.setValue('image', product.thumbnailUrl ?? undefined);
+	}, [product, form.setValue]);
+
 	useEffect(() => {
 		if (!product) return;
 
 		setAllSet(false);
 
-		form.setValue('name', product.name);
-		form.setValue('category', product.category);
-		form.setValue('price', product.price);
-		form.setValue('image', product.thumbnailUrl ?? undefined);
+		loadInitDataToForm();
 	}, [product, setAllSet]);
 
 	return {
@@ -151,5 +174,18 @@ export default function useEditProductLogic(
 		errorMessage,
 		isLoading: isPending,
 		submitEditForm,
+		loadInitDataToForm,
 	};
+}
+
+function isProductPatchRequestEmpty(request: ProductPatchBody) {
+	return (
+		request.Name === undefined &&
+		request.Description === undefined &&
+		request.Stock === undefined &&
+		request.Category === undefined &&
+		request.Price === undefined &&
+		request['Image.HasValue'] === false &&
+		request['Image.Value'] === undefined
+	);
 }

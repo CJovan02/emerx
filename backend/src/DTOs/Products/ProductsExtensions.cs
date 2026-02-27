@@ -17,6 +17,8 @@ public static class ProductsExtensions
             Name = request.Name,
             Category = request.Category,
             Price = request.Price,
+            Description = request.Description,
+            Stock =  request.Stock,
             ImageVersion = imageVersion,
         };
     }
@@ -30,6 +32,9 @@ public static class ProductsExtensions
             Category = domain.Category,
             Price = domain.Price,
             AverageRating = domain.AverageRating,
+            Description = domain.Description,
+            ReviewCount =  domain.ReviewCount,
+            Stock = domain.Stock,
             ThumbnailUrl = imageUrl,
         };
     }

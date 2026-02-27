@@ -158,7 +158,7 @@ public class ReviewService(
 
     private async Task CalculateAndIncreaseProductRating(Product product, double rating, IClientSessionHandle session)
     {
-        var newReviewsCount = product.ReviewsCount + 1;
+        var newReviewsCount = product.ReviewCount + 1;
         var newSumRatings = product.SumRatings + rating;
         var newAvgRating = newSumRatings / newReviewsCount;
         await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount, session);
@@ -166,7 +166,7 @@ public class ReviewService(
 
     private async Task CalculateAndDecreaseProductRating(Product product, double rating, IClientSessionHandle session)
     {
-        var newReviewsCount = product.ReviewsCount - 1;
+        var newReviewsCount = product.ReviewCount - 1;
         var newSumRatings = product.SumRatings - rating;
         double newAvgRating;
         if (newReviewsCount > 0)

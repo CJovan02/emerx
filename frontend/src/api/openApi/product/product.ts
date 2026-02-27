@@ -195,11 +195,13 @@ export const productCreate = (
 ) => {
 	const formData = new FormData();
 	formData.append(`Name`, productCreateBody.Name);
+	formData.append(`Description`, productCreateBody.Description);
 	formData.append(`Category`, productCreateBody.Category);
 	if (productCreateBody.Image !== undefined) {
 		formData.append(`Image`, productCreateBody.Image);
 	}
 	formData.append(`Price`, productCreateBody.Price.toString());
+	formData.append(`Stock`, productCreateBody.Stock.toString());
 
 	return axiosInstance<ProductResponse>(
 		{
@@ -428,6 +430,9 @@ export const productPatch = (
 	if (productPatchBody.Name !== undefined) {
 		formData.append(`Name`, productPatchBody.Name);
 	}
+	if (productPatchBody.Description !== undefined) {
+		formData.append(`Description`, productPatchBody.Description);
+	}
 	if (productPatchBody.Category !== undefined) {
 		formData.append(`Category`, productPatchBody.Category);
 	}
@@ -442,6 +447,9 @@ export const productPatch = (
 	}
 	if (productPatchBody.Price !== undefined) {
 		formData.append(`Price`, productPatchBody.Price.toString());
+	}
+	if (productPatchBody.Stock !== undefined) {
+		formData.append(`Stock`, productPatchBody.Stock.toString());
 	}
 
 	return axiosInstance<void>(

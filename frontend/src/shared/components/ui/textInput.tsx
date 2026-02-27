@@ -10,6 +10,10 @@ interface TextInputProps {
 	required?: boolean;
 	disabled?: boolean;
 	fullWidth?: boolean;
+	multiline?: boolean;
+	rows?: number;
+	minRows?: number;
+	maxRows?: number;
 }
 
 const TextInput = ({
@@ -21,6 +25,10 @@ const TextInput = ({
 	type,
 	description,
 	fullWidth,
+	multiline,
+	rows,
+	minRows,
+	maxRows,
 }: TextInputProps) => {
 	const { control } = useFormContext();
 	return (
@@ -50,6 +58,10 @@ const TextInput = ({
 							helperText={
 								fieldState.invalid ? fieldState.error?.message : description
 							}
+							multiline={multiline}
+							rows={rows}
+							minRows={minRows}
+							maxRows={maxRows}
 						/>
 					</>
 				);

@@ -71,7 +71,7 @@ public class ProductRepository(MongoContext context) : IProductRepository
         var update = Builders<Product>.Update
             .Set(p => p.AverageRating, averageRating)
             .Set(p => p.SumRatings, sumRatings)
-            .Set(p => p.ReviewsCount, reviewsCount);
+            .Set(p => p.ReviewCount, reviewsCount);
 
         if (session is not null)
         {

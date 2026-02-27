@@ -17,9 +17,15 @@ export function useCreateProductLogic(page: number, pageSize: number) {
 	const formSchema = z.object({
 		name: z
 			.string()
-			.nonempty()
+			.nonempty("Name is required")
 			.min(3, 'Name must be at least 3 characters.')
 			.max(30, "Name can't be larger than 30 characters."),
+
+		description: z
+			.string()
+			.nonempty("Description is required")
+			.min(10, 'Description must be at least 3 characters.')
+			.max(300, "Description can't be larger than 300 characters."),
 
 		category: z
 			.string()
@@ -28,6 +34,8 @@ export function useCreateProductLogic(page: number, pageSize: number) {
 			.max(30, "Category can't be larger than 30 characters."),
 
 		price: z.number().nonnegative(),
+
+		stock: z.number().nonnegative(),
 
 		image: z
 			.file()
@@ -58,8 +66,17 @@ export function useCreateProductLogic(page: number, pageSize: number) {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const submitCreateForm = form.handleSubmit(
-		async ({ name, category, price, image }: FormValues) => {
+		async ({
+			name,
+			category,
+			price,
+			image,
+			stock,
+			description,
+		}: FormValues) => {
 			const request: ProductCreateBody = {
+				Description: description,
+				Stock: stock,
 				Name: name,
 				Category: category,
 				Price: price,

@@ -15,8 +15,7 @@ namespace EMerx.Services.Products;
 
 public class ProductService(
     IProductRepository productRepository,
-    ICloudinaryRepository cloudinaryRepository,
-    ILogger<ProductService> logger)
+    ICloudinaryRepository cloudinaryRepository)
     : IProductService
 {
     public async Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize)
@@ -26,7 +25,7 @@ public class ProductService(
             .Items
             .Select(product =>
             {
-                string imgUrl = null;
+                string? imgUrl = null;
                 if (product.ImageVersion != null)
                     imgUrl = cloudinaryRepository.BuildProductThumbnailImageUrl(product.Id.ToString(),
                         product.ImageVersion);
@@ -63,11 +62,11 @@ public class ProductService(
         var productId = ObjectId.GenerateNewId();
 
         var hasImage = request.Image is not null && request.Image.Length != 0;
-        string imageUrl = null;
+        string? imageUrl = null;
         string? imageVersion = null;
         if (hasImage)
         {
-            await using var stream = request.Image.OpenReadStream();
+            await using var stream = request.Image!.OpenReadStream();
             var imageResult =
                 await cloudinaryRepository.UploadProductThumbnailAsync(productId.ToString(), stream);
 
@@ -118,6 +117,10 @@ public class ProductService(
             updates.Add(Builders<Product>.Update.Set(x => x.Category, request.Category));
         if (request.Price is not null)
             updates.Add(Builders<Product>.Update.Set(x => x.Price, request.Price));
+        if (request.Description is not null)
+            updates.Add(Builders<Product>.Update.Set(x => x.Description, request.Description));
+        if (request.Stock is not null)
+            updates.Add(Builders<Product>.Update.Set(x => x.Stock, request.Stock));
 
         if (updates.Count == 0 && isNothing)
             return Result.Failure(ProductErrors.NoUpdates(id));
@@ -143,7 +146,7 @@ public class ProductService(
 
         // This call won't fail if product has no images
         await cloudinaryRepository.DeleteProductImages(id.ToString());
-        
+
         // But this will fail if the folder doesn't exist
         if (product.ImageVersion is not null)
             await cloudinaryRepository.DeleteProductFolder(id.ToString());

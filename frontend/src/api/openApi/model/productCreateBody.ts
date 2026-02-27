@@ -7,7 +7,9 @@
 
 export type ProductCreateBody = {
 	Name: string;
+	Description: string;
 	Category: string;
 	Image?: Blob;
 	Price: number;
+	Stock: number;
 };

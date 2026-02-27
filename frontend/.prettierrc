@@ -14,5 +14,5 @@
 	"endOfLine": "lf",
 	"embeddedLanguageFormatting": "auto",
 	"singleAttributePerLine": true,
-	"printWidth": 80
+	"printWidth": 80,
 }
