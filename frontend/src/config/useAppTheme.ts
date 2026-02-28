@@ -21,7 +21,7 @@ function useAppTheme() {
 				subtle: alpha(Colors.Primary.Main, 0.03),
 				muted: alpha(Colors.Primary.Main, 0.06),
 				elevated: alpha('#000', 0.02),
-				hover: alpha(Colors.Primary.Main, 0.08),
+				hover: alpha(Colors.Primary.Main, 0.1),
 			},
 
 			brand: {

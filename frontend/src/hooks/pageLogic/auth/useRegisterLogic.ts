@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
-import { useUserRegister } from '../../api/openApi/user/user.ts';
+import { useUserRegister } from '../../../api/openApi/user/user.ts';
 import type {
 	ProblemDetails,
 	RegisterUserRequest,
-} from '../../api/openApi/model';
-import type { ErrorType } from '../../api/axiosInstance.ts';
+} from '../../../api/openApi/model';
+import type { ErrorType } from '../../../api/axiosInstance.ts';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 

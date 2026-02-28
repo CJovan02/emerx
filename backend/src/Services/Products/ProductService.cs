@@ -45,13 +45,16 @@ public class ProductService(
     public async Task<Result<ProductResponse>> GetByIdAsync(IdRequest request)
     {
         var objectId = ObjectId.Parse(request.Id);
+
         var product = await productRepository.GetProductById(objectId);
         if (product is null)
-        {
             return Result<ProductResponse>.Failure(ProductErrors.NotFound(objectId));
-        }
 
-        return Result<ProductResponse>.Success(product.ToResponse());
+        var imageUrl = product.ImageVersion != null
+            ? cloudinaryRepository.BuildProductThumbnailImageUrl(objectId.ToString(), product.ImageVersion)
+            : null;
+
+        return Result<ProductResponse>.Success(product.ToResponse(imageUrl));
     }
 
     public async Task<Result<ProductResponse>> CreateAsync(CreateProductRequest request)

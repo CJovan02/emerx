@@ -10,7 +10,7 @@ const StoreTabs = () => {
 		<Tabs
 			value={location.pathname}
 			aria-label='products tabs'
-			onChange={(_, value) => navigate(value)}
+			onChange={(_, value) => navigate(value, { replace: true })}
 			textColor='inherit'>
 			<Tab
 				value={Routes.Products}

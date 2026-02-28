@@ -18,6 +18,7 @@ import RequireAuthGuard from '../pages/guards/RequireAuthGuard.tsx';
 import RequireRolesGuard from '../pages/guards/RequireRolesGuard.tsx';
 import { UserRoles } from '../domain/models/userRoles.ts';
 import MyProfilePage from '../pages/MyProfile.tsx';
+import {ProductDetailsPage} from "../pages/ProductDetailsPage.tsx";
 
 const router = createBrowserRouter([
 	{
@@ -58,7 +59,16 @@ const router = createBrowserRouter([
 						children: [
 							{
 								path: Routes.Products,
-								Component: ProductsPage,
+								children: [
+									{
+										index: true,
+										Component: ProductsPage,
+									},
+									{
+										path:":id",
+										Component: ProductDetailsPage
+									},
+								],
 							},
 							{
 								path: Routes.Cart,

@@ -12,6 +12,7 @@ import type { ProductResponse } from '../../api/openApi/model';
 import RatingMemo from '../../shared/components/ui/ratingMemo.tsx';
 import * as React from 'react';
 import ImageLightbox from '../../shared/components/ui/imageLightbox.tsx';
+import {formatCurrency} from "../../utils/utils.ts";
 
 // const ProductImage = styled('img')({
 //     width: 60,
@@ -60,6 +61,9 @@ function ProductsGrid({
 						<ImageLightbox
 							src={params.value}
 							alt={params.value}
+							width={60}
+							height={60}
+							borderRadius={0.5}
 						/>
 					);
 				},
@@ -119,10 +123,7 @@ function ProductsGrid({
 				headerName: 'Price',
 				flex: 1,
 				valueFormatter: params => {
-					return new Intl.NumberFormat('fr-FR', {
-						style: 'currency',
-						currency: 'EUR',
-					}).format(params);
+					return formatCurrency(params);
 				},
 			},
 			{
