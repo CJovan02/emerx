@@ -5,6 +5,8 @@ import { Alert, Box, Button, Container } from '@mui/material';
 import { ArrowBack, Refresh } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import ProductDetails from '../components/productDetails/productDetails.tsx';
+import { useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 
 export function ProductDetailsPage() {
 	const { id } = useParams();
@@ -19,15 +21,31 @@ export function ProductDetailsPage() {
 		);
 
 	const {
-		isError,
 		errorMessage,
+		isError,
+		quantityNotAvailableMessage,
+		clearQuantityMessage,
 		refetch,
 		isRefetching,
 		productNotFound,
 		isPending,
 		data,
 		addToCart,
+		itemAddedSignal
 	} = useProductDetailsLogic(id);
+	const { enqueueSnackbar } = useSnackbar();
+
+	useEffect(() => {
+		if (!quantityNotAvailableMessage) return;
+
+		enqueueSnackbar(quantityNotAvailableMessage, { variant: 'warning', autoHideDuration: 8000 });
+		clearQuantityMessage();
+	}, [enqueueSnackbar, quantityNotAvailableMessage, clearQuantityMessage]);
+
+	useEffect(() => {
+		enqueueSnackbar("Successfully added item to cart", {variant: 'success'});
+	}, [itemAddedSignal]);
+
 
 	if (isPending) {
 		return (
@@ -81,7 +99,7 @@ export function ProductDetailsPage() {
 
 	return (
 		<ProductDetails
-			product={data}
+			product={data!}
 			onAddToCart={addToCart}
 		/>
 	);

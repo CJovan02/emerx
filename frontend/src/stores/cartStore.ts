@@ -54,3 +54,11 @@ function handleRemoveFromCart(state: CartStore, productId: string) {
 		items: state.items.filter(i => i.product.id !== productId),
 	};
 }
+
+// utils
+export function getQuantityForProduct(
+	items: CartItem[],
+	productId: string
+): number | undefined {
+	return items.find(i => i.product.id === productId)?.quantity;
+}
