@@ -32,6 +32,11 @@ export default function CartMenu() {
 		closeMenu();
 	};
 
+	const navigateToCheckout = () => {
+		navigate(Routes.Checkout);
+		closeMenu();
+	};
+
 	return (
 		<Box>
 			<IconButton
@@ -123,6 +128,8 @@ export default function CartMenu() {
 							<Button
 								startIcon={<Payment />}
 								variant='contained'
+								onClick={navigateToCheckout}
+								disabled={cartItems.length === 0}
 								fullWidth>
 								Checkout
 							</Button>

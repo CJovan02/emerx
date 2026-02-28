@@ -6,6 +6,7 @@
  */
 
 export * from './addressDto';
+export * from './addressRequiredDto';
 export * from './objectId';
 export * from './orderGetAllParams';
 export * from './orderItem';

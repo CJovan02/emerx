@@ -18,7 +18,8 @@ import RequireAuthGuard from '../pages/guards/RequireAuthGuard.tsx';
 import RequireRolesGuard from '../pages/guards/RequireRolesGuard.tsx';
 import { UserRoles } from '../domain/models/userRoles.ts';
 import MyProfilePage from '../pages/MyProfilePage.tsx';
-import {ProductDetailsPage} from "../pages/ProductDetailsPage.tsx";
+import { ProductDetailsPage } from '../pages/ProductDetailsPage.tsx';
+import CheckoutPage from '../pages/CheckoutPage.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -65,8 +66,8 @@ const router = createBrowserRouter([
 										Component: ProductsPage,
 									},
 									{
-										path:":id",
-										Component: ProductDetailsPage
+										path: ':id',
+										Component: ProductDetailsPage,
 									},
 								],
 							},
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
 							{
 								path: Routes.MyProfile,
 								Component: MyProfilePage,
+							},
+							{
+								path: Routes.Checkout,
+								Component: CheckoutPage,
 							},
 						],
 					},

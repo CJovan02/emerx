@@ -4,12 +4,10 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { AddressDto } from './addressDto';
+import type { AddressRequiredDto } from './addressRequiredDto';
 import type { OrderItemRequest } from './orderItemRequest';
 
 export interface OrderRequest {
-	/** @minLength 1 */
-	userId: string;
 	items: OrderItemRequest[];
-	address: AddressDto;
+	address: AddressRequiredDto;
 }

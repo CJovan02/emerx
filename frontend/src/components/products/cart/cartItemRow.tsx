@@ -2,6 +2,7 @@ import { Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { CartItem } from '../../../domain/models/cartItem.ts';
 import {formatCurrency} from "../../../utils/utils.ts";
+import ImagePlaceholder from "../../../shared/components/ui/imagePlaceholder.tsx";
 
 interface CartItemRowProps {
 	item: CartItem;
@@ -35,18 +36,28 @@ export default function CartItemRow({
                 px={2}
             >
 				{/* Thumbnail */}
-				<Box
-					component='img'
-					src={product.thumbnailUrl || '/placeholder.png'}
-					alt={product.name}
-					sx={{
-						width: 64,
-						height: 64,
-						objectFit: 'cover',
-						borderRadius: 0.5,
-						flexShrink: 0,
-					}}
-				/>
+				{product.thumbnailUrl && (
+					<Box
+						component='img'
+						src={product.thumbnailUrl}
+						alt={product.name}
+						sx={{
+							width: 64,
+							height: 64,
+							boxShadow: 1,
+							objectFit: 'cover',
+							borderRadius: 0.5,
+							flexShrink: 0,
+						}}
+					/>
+				)}
+				{!product.thumbnailUrl && (
+					<ImagePlaceholder
+						width={64}
+						height={64}
+						borderRadius={0.5}
+					/>
+				)}
 
 				{/* Info */}
 				<Box
