@@ -22,7 +22,6 @@ public class OrderService(
 {
     public async Task<Result<PageOfResponse<OrderResponse>>> GetAllAsync(int page, int pageSize)
     {
-        
         var pageOfOrders = await orderRepository.GetOrders(page, pageSize);
         var productResponses = pageOfOrders
             .Items
@@ -34,7 +33,7 @@ public class OrderService(
             pageOfOrders.Page,
             pageOfOrders.PageSize,
             pageOfOrders.TotalItems);
-        
+
         return Result<PageOfResponse<OrderResponse>>.Success(response);
     }
 
@@ -51,7 +50,7 @@ public class OrderService(
         return Result<OrderResponse>.Success(order.ToResponse());
     }
 
-    public async Task<Result<OrderResponse>> CreateAsync(OrderRequest request)
+    public async Task<Result<OrderResponse>> CreateAsync(string userIdString, OrderRequest request)
     {
         using var session = await mongoContext.StartSessionAsync();
 
@@ -59,7 +58,7 @@ public class OrderService(
         {
             session.StartTransaction();
 
-            var userId = ObjectId.Parse(request.UserId);
+            var userId = ObjectId.Parse(userIdString);
             var user = await userRepository.GetUserById(userId, session);
             if (user is null)
             {
@@ -68,7 +67,7 @@ public class OrderService(
             }
 
             // We normalize ordered items, we sum up the quantities of items that have the same id
-            // If some bug on frontend happens and duplicate items get sent
+            // if some bug on frontend happens and duplicate items get sent
             var normalizedItems = request.Items
                 .GroupBy(x => x.ProductId)
                 .Select(g => new OrderItemRequest
@@ -94,7 +93,7 @@ public class OrderService(
                 return Result<OrderResponse>.Failure(OrderErrors.NotFound(missingProducts));
             }
 
-            var order = normalizedRequest.ToDomain(products);
+            var order = normalizedRequest.ToDomain(products, userId);
             await orderRepository.CreateOrder(order, session);
 
             await session.CommitTransactionAsync();

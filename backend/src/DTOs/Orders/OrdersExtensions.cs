@@ -21,7 +21,7 @@ public static class OrdersExtensions
         };
     }
 
-    public static Order ToDomain(this OrderRequest order, IEnumerable<Product> products)
+    public static Order ToDomain(this OrderRequest order, IEnumerable<Product> products, ObjectId userId)
     {
         // We create lookup (or dictionary) for easy access by the productId
         var productsLookup = products.ToLookup(x => x.Id);
@@ -43,7 +43,7 @@ public static class OrdersExtensions
         return new Order
         {
             Id = ObjectId.GenerateNewId(),
-            UserId = ObjectId.Parse(order.UserId),
+            UserId = userId,
             Items = domainItems,
             Address = order.Address.ToEntity(),
             Price = domainItems.Sum(x => x.PriceAtOrder * x.Quantity)

@@ -17,7 +17,7 @@ import PublicOnlyGuard from '../pages/guards/PublicOnlyGuard.tsx';
 import RequireAuthGuard from '../pages/guards/RequireAuthGuard.tsx';
 import RequireRolesGuard from '../pages/guards/RequireRolesGuard.tsx';
 import { UserRoles } from '../domain/models/userRoles.ts';
-import MyProfilePage from '../pages/MyProfile.tsx';
+import MyProfilePage from '../pages/MyProfilePage.tsx';
 import {ProductDetailsPage} from "../pages/ProductDetailsPage.tsx";
 
 const router = createBrowserRouter([

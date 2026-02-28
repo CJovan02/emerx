@@ -13,7 +13,7 @@ public interface IOrderService
 
     Task<Result<OrderResponse>> GetByIdAsync(IdRequest request);
 
-    Task<Result<OrderResponse>> CreateAsync(OrderRequest request);
+    Task<Result<OrderResponse>> CreateAsync(string userId, OrderRequest request);
 
     Task<Result> DeleteAsync(IdRequest request);
 }
