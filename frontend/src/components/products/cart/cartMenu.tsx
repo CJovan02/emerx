@@ -1,5 +1,5 @@
-import useCartLogic from '../../hooks/pageLogic/useCartLogic.ts';
-import useMenuState from '../../hooks/useMenuState.tsx';
+import useCartLogic from '../../../hooks/pageLogic/useCartLogic.ts';
+import useMenuState from '../../../hooks/useMenuState.tsx';
 import {
 	Box,
 	Button,
@@ -10,17 +10,24 @@ import {
 	Typography,
 } from '@mui/material';
 import { Payment, ShoppingCart } from '@mui/icons-material';
-import { getCartTotalPrice } from '../../domain/models/cartItem.ts';
+import { getCartTotalPrice } from '../../../domain/models/cartItem.ts';
 import { useMemo } from 'react';
-import { formatCurrency } from '../../utils/utils.ts';
+import { formatCurrency } from '../../../utils/utils.ts';
+import CartItemRow from './cartItemRow.tsx';
+import { useNavigate } from 'react-router';
+import { Routes } from '../../../shared/common/constants/routeNames.ts';
 
 export default function CartMenu() {
 	const { openMenu, open, closeMenu, anchorEl } = useMenuState();
-	const { cartItems } = useCartLogic();
+	const { cartItems, removeFromCart } = useCartLogic();
+	const navigate = useNavigate();
 
 	const totalPrice = useMemo(() => {
 		return formatCurrency(getCartTotalPrice(cartItems));
 	}, [cartItems]);
+
+	const navigateToProduct = (productId: string) =>
+		navigate(Routes.ProductDetails(productId));
 
 	return (
 		<Box>
@@ -49,35 +56,48 @@ export default function CartMenu() {
 					display='flex'
 					flexDirection='column'
 					height='100%'
-					minWidth={320}>
+					minWidth={320}
+					maxWidth={450}>
 					{/* Header */}
 					<Box
 						px={2}
 						py={1.5}>
 						<Typography fontWeight={600}>
-							My Cart ({cartItems.length} items)
+							My Cart{' '}
+							<Typography
+								component='span'
+								fontWeight={300}
+								color='textSecondary'>
+								({cartItems.length} items)
+							</Typography>
 						</Typography>
 					</Box>
 
 					<Divider />
 
 					{/* Scrollable Items Area */}
-					<Box
-						px={2}
-						py={1}
-						sx={{
-							maxHeight: '50vh',
-							overflowY: 'auto',
-						}}>
-						{/* OVDJE IDE LISTA CART ITEM-A */}
-						<Typography
-							variant='body2'
-							color='text.secondary'>
-							Cart items go here...
-						</Typography>
-					</Box>
-
-					<Divider />
+					{cartItems.length > 0 && (
+						<>
+							<Box
+								// px={2}
+								py={1}
+								sx={{
+									maxHeight: '50vh',
+									overflowY: 'auto',
+								}}>
+								{cartItems.map(item => {
+									return (
+										<CartItemRow
+											item={item}
+											onRemove={removeFromCart}
+											onClick={navigateToProduct}
+										/>
+									);
+								})}
+							</Box>
+							<Divider />
+						</>
+					)}
 
 					{/* Footer */}
 					<Box

@@ -5,7 +5,7 @@ import type { CartItem } from '../domain/models/cartItem.ts';
 interface CartStore {
 	items: CartItem[];
 	addToCart: (item: CartItem) => void;
-	removeFromCart: (item: CartItem) => void;
+	removeFromCart: (productId: string) => void;
 	clearCart: () => void;
 }
 
@@ -16,7 +16,7 @@ export const useCartStore = create<CartStore>()(
 
 			addToCart: item => set(state => handleAddToCart(state, item)),
 
-			removeFromCart: item => set(state => handleRemoveFromCart(state, item)),
+			removeFromCart: id => set(state => handleRemoveFromCart(state, id)),
 
 			clearCart: () =>
 				set({
@@ -49,8 +49,8 @@ function handleAddToCart(state: CartStore, item: CartItem): Partial<CartStore> {
 	return { items: [...state.items, item] };
 }
 
-function handleRemoveFromCart(state: CartStore, item: CartItem) {
+function handleRemoveFromCart(state: CartStore, productId: string) {
 	return {
-		items: state.items.filter(i => i.product.id !== item.product.id),
+		items: state.items.filter(i => i.product.id !== productId),
 	};
 }

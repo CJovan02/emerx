@@ -14,7 +14,7 @@ import { useStoreDrawerStore } from '../../stores/storeDrawerStore.tsx';
 import AvatarMenu from './avatarMenu.tsx';
 import { useLocation } from 'react-router';
 import { Routes } from '../../shared/common/constants/routeNames.ts';
-import CartMenu from './cartMenu.tsx';
+import CartMenu from './cart/cartMenu.tsx';
 
 const drawerWidth = Drawers.Store.Width;
 
