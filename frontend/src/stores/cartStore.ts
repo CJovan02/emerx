@@ -23,7 +23,13 @@ export const useCartStore = create<CartStore>()(
 					items: [],
 				}),
 		}),
-		{ name: 'cart-storage' }
+		{
+			name: 'anonymous-cart-storage',
+			// in order to generate local storage key like this: '{user-id}-cart-storage'
+			// we need to manually set the persistName and manually hydrate the store when auth state changes
+			// I hydrate this in /src/components/authFlow/authUserSync.tsx
+			// skipHydration: true,
+		}
 	)
 );
 

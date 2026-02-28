@@ -6,19 +6,37 @@ import { Backdrop } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useSnackbar } from 'notistack';
 import { mapResponseToUser } from '../../domain/models/appUser.ts';
+import { useCartStore } from '../../stores/cartStore.ts';
 
 // This component is used to sync firebase user state changes (sign in/sign out) with the user store
 // AppUser signs in -> call the server and fill in user store
 // AppUser signs out -> clear user store
+
+// Also I use it to manually hydrate the cartStore with local storage
 function AuthUserSync() {
 	const setUser = useUserStore(state => state.setUser);
 	const clearUser = useUserStore(state => state.clearUser);
 	const isLoading = useUserStore(state => state.isLoading);
 	const setLoading = useUserStore(state => state.setLoading);
+
 	const { enqueueSnackbar } = useSnackbar();
+
+	const clearCart = useCartStore(state => state.clearCart);
 
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async user => {
+			const prefix = user ? user.uid : 'anonymous';
+			useCartStore.persist.setOptions({
+				name: `${prefix}-cart-storage`,
+			});
+			await useCartStore.persist.rehydrate();
+			// This is important. We always need an 'anonymous-cart-storage' local storage item, even if it's empty.
+			// After hydrating and if user is null (it means we logged out we are using 'anonymous-cart-storage') it will automatically change the cartStore() to
+			// whatever was inside this anonymous one, and after changing account it will pick up the 'right' local storage item
+			// This just forces the creation of 'anonymous' storage key when the app starts. Without this the store will never clear out when
+			// we log out.
+			if (!user) clearCart();
+
 			if (!user) {
 				console.log('AppUser signed out');
 				clearUser();
@@ -54,7 +72,7 @@ function AuthUserSync() {
 		});
 
 		return () => unsubscribe();
-	}, []);
+	}, [clearUser, enqueueSnackbar, setLoading, setUser, clearCart]);
 
 	if (!isLoading) return null;
 
