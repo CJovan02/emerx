@@ -1,6 +1,7 @@
 import useCartLogic from '../../../hooks/pageLogic/useCartLogic.ts';
 import useMenuState from '../../../hooks/useMenuState.tsx';
 import {
+	Badge,
 	Box,
 	Button,
 	Divider,
@@ -38,8 +39,13 @@ export default function CartMenu() {
 				aria-controls={open ? 'cart-menu' : undefined}
 				aria-haspopup='true'
 				aria-expanded={open ? 'true' : undefined}
+				aria-label='cart'
 				onClick={openMenu}>
-				<ShoppingCart sx={{ height: 30, width: 30 }} />
+				<Badge
+					badgeContent={cartItems.length}
+					color='secondary'>
+					<ShoppingCart sx={{ height: 30, width: 30 }} />
+				</Badge>
 			</IconButton>
 			<Menu
 				id='cart-menu'
