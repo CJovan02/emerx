@@ -5,7 +5,6 @@ import { Alert, Box, Button, Container } from '@mui/material';
 import { ArrowBack, Refresh } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import ProductDetails from '../components/productDetails/productDetails.tsx';
-import { useEffect } from 'react';
 import { useSnackbar } from 'notistack';
 
 export function ProductDetailsPage() {
@@ -21,31 +20,36 @@ export function ProductDetailsPage() {
 		);
 
 	const {
-		errorMessage,
 		isError,
-		quantityNotAvailableMessage,
-		clearQuantityMessage,
 		refetch,
 		isRefetching,
-		productNotFound,
 		isPending,
-		data,
+		product,
 		addToCart,
-		itemAddedSignal
+		queryErrorStatus,
 	} = useProductDetailsLogic(id);
 	const { enqueueSnackbar } = useSnackbar();
 
-	useEffect(() => {
-		if (!quantityNotAvailableMessage) return;
+	function handleAddToCart(quantity: number) {
+		const result = addToCart(quantity);
+		if (result.success) {
+			enqueueSnackbar('Successfully added to cart.', { variant: 'success' });
+			return;
+		}
 
-		enqueueSnackbar(quantityNotAvailableMessage, { variant: 'warning', autoHideDuration: 8000 });
-		clearQuantityMessage();
-	}, [enqueueSnackbar, quantityNotAvailableMessage, clearQuantityMessage]);
+		if (result.errorType === 'general') {
+			enqueueSnackbar(result.errorMessage!, { variant: 'error' });
+			return;
+		}
 
-	useEffect(() => {
-		enqueueSnackbar("Successfully added item to cart", {variant: 'success'});
-	}, [itemAddedSignal]);
-
+		if (result.errorType === 'not-enough-stock') {
+			enqueueSnackbar(result.errorMessage!, {
+				variant: 'warning',
+				autoHideDuration: 7000,
+			});
+			return;
+		}
+	}
 
 	if (isPending) {
 		return (
@@ -61,7 +65,7 @@ export function ProductDetailsPage() {
 	if (isError) {
 		return (
 			<Container maxWidth='xs'>
-				<Alert severity='error'>{errorMessage}</Alert>
+				<Alert severity='error'>{queryErrorStatus!.message}</Alert>
 				<Box
 					mt={3}
 					display='flex'
@@ -79,7 +83,7 @@ export function ProductDetailsPage() {
 						Go to products
 					</Button>
 
-					{!productNotFound && (
+					{queryErrorStatus!.type !== 'product-not-found' && (
 						<Button
 							startIcon={<Refresh />}
 							onClick={_ => refetch()}
@@ -99,8 +103,8 @@ export function ProductDetailsPage() {
 
 	return (
 		<ProductDetails
-			product={data!}
-			onAddToCart={addToCart}
+			product={product!}
+			onAddToCart={handleAddToCart}
 		/>
 	);
 }

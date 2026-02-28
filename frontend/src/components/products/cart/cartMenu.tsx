@@ -26,8 +26,10 @@ export default function CartMenu() {
 		return formatCurrency(getCartTotalPrice(cartItems));
 	}, [cartItems]);
 
-	const navigateToProduct = (productId: string) =>
+	const navigateToProduct = (productId: string) => {
 		navigate(Routes.ProductDetails(productId));
+		closeMenu();
+	};
 
 	return (
 		<Box>
