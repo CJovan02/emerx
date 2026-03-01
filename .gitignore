@@ -1,2 +1,3 @@
 
 backend/src/firebase.json
+backend/src/.env.local
