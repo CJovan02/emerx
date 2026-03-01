@@ -1,66 +1,85 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { useForm } from "react-hook-form";
-import type {AddressRequiredDto} from "../../api/openApi/model";
+import { Box, Stack, Tooltip, Typography } from '@mui/material';
+import { FormProvider, type UseFormReturn } from 'react-hook-form';
+import TextInput from '../../shared/components/ui/textInput.tsx';
+import { Info } from '@mui/icons-material';
+import * as React from 'react';
 
 type Props = {
-    defaultValues?: AddressRequiredDto;
-    onContinue: (values: AddressRequiredDto) => void;
+	form: UseFormReturn<{
+		fullName: string;
+		email: string;
+		city: string;
+		street: string;
+		houseNumber: string;
+	}>;
+	onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
 };
 
-export default function AddressForm({
-                                        defaultValues,
-                                        onContinue,
-                                    }: Props) {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<AddressRequiredDto>({
-        defaultValues,
-    });
+export default function AddressForm({ form, onSubmit }: Props) {
+	return (
+		<Box>
+			<Box
+				display='flex'
+				alignItems='center'
+				gap={1}
+				mb={4}>
+				<Typography
+					variant='h5'
+					fontWeight={600}>
+					Shipping Information
+				</Typography>
+				<Tooltip
+					placement='top'
+					title='Some of the shipping information is picked up from your profile. You can change address if you need to.'>
+					<Info
+						color='info'
+						fontSize='small'
+					/>
+				</Tooltip>
+			</Box>
 
-    return (
-        <Box component="form" onSubmit={handleSubmit(onContinue)}>
-            <Typography variant="h6" mb={2}>
-                Shipping Address
-            </Typography>
+			<FormProvider {...form}>
+				<form
+					id='checkout-form'
+					onSubmit={onSubmit}>
+					<Stack spacing={2}>
+						<TextInput
+							id='fullName'
+							label='Full Name'
+							disabled
+							fullWidth
+						/>
 
+						<TextInput
+							id='email'
+							label='Email'
+							disabled
+							fullWidth
+						/>
 
-            <TextField
-                fullWidth
-                label="City"
-                margin="normal"
-                {...register("city", { required: "Required" })}
-                error={!!errors.city}
-                helperText={errors.city?.message}
-            />
+						<TextInput
+							id='city'
+							label='City'
+							required
+							fullWidth
+						/>
 
-            <TextField
-                fullWidth
-                label="Street"
-                margin="normal"
-                {...register("street", { required: "Required" })}
-                error={!!errors.street}
-                helperText={errors.street?.message}
-            />
+						<TextInput
+							id='street'
+							label='Street'
+							required
+							fullWidth
+						/>
 
-            <TextField
-                fullWidth
-                label="Country"
-                margin="normal"
-                {...register("houseNumber", { required: "Required" })}
-                error={!!errors.houseNumber}
-                helperText={errors.houseNumber?.message}
-            />
-
-            <Button
-                fullWidth
-                variant="contained"
-                type="submit"
-                sx={{ mt: 3 }}
-            >
-                Continue to Review
-            </Button>
-        </Box>
-    );
+						<TextInput
+							id='houseNumber'
+							label='House Number'
+							required
+							fullWidth
+						/>
+					</Stack>
+				</form>
+			</FormProvider>
+		</Box>
+	);
 }

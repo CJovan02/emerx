@@ -21,7 +21,7 @@ public class AddressRequiredDtoValidator : AbstractValidator<AddressRequiredDto>
         RuleFor(x => x.HouseNumber)
             .NotEmpty()
             .WithMessage("House Number is required")
-            .Length(3, 50)
-            .WithMessage("House Number must be between 3 and 50 characters");
+            .Length(1, 5)
+            .WithMessage("House Number must be between 1 and 5 characters");
     }
 }

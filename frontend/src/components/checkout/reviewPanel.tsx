@@ -4,6 +4,15 @@ import {
 	getCartTotalPrice,
 } from '../../domain/models/cartItem.ts';
 import type { AddressRequiredDto } from '../../api/openApi/model';
+import AddressFieldInfo from './addressFIeldInfo.tsx';
+import {
+	ArrowBackOutlined,
+	CheckCircleOutline,
+	HomeOutlined,
+	LocationCityOutlined,
+} from '@mui/icons-material';
+import CheckoutOrderItem from './checkoutOrderItem.tsx';
+import { formatCurrency } from '../../utils/utils.ts';
 
 type Props = {
 	items: CartItem[];
@@ -20,45 +29,42 @@ export default function ReviewPanel({
 	onConfirm,
 	loading,
 }: Props) {
-	const total = getCartTotalPrice(items);
+	const total = formatCurrency(getCartTotalPrice(items));
 
 	return (
 		<Box>
 			<Typography
-				variant='h6'
+				fontWeight={600}
+				variant='h5'
 				mb={2}>
-				Review Order
-			</Typography>
-
-			<Typography
-				fontWeight={500}
-				mb={1}>
 				Shipping Address
 			</Typography>
-			<Typography variant='body2'>{address.city}</Typography>
-			<Typography variant='body2'>{address.street}</Typography>
-			<Typography
-				variant='body2'
-				mb={2}>
-				{address.houseNumber}
-			</Typography>
+
+			<AddressFieldInfo
+				value={address.city}
+				icon={<LocationCityOutlined />}
+			/>
+			<AddressFieldInfo
+				value={address.street + ' - ' + address.houseNumber}
+				icon={<HomeOutlined />}
+			/>
 
 			<Divider sx={{ my: 2 }} />
 
 			{items.map(item => (
-				<Box
+				<CheckoutOrderItem
 					key={item.product.id}
-					mb={1}>
-					<Typography>
-						{item.product.name} ({item.quantity} × €{item.product.price})
-					</Typography>
-				</Box>
+					item={item}
+					disableClick
+					disableGutters
+				/>
 			))}
 
 			<Typography
-				mt={2}
+				mt={4}
+				variant='h6'
 				fontWeight={600}>
-				Total: €{total}
+				Total: {total}
 			</Typography>
 
 			<Box
@@ -66,17 +72,29 @@ export default function ReviewPanel({
 				gap={2}
 				mt={3}>
 				<Button
+					startIcon={<ArrowBackOutlined />}
 					fullWidth
 					variant='outlined'
-					onClick={onBack}>
+					onClick={onBack}
+					sx={{
+						height: 55,
+					}}
+				>
 					Back
 				</Button>
 
 				<Button
+					startIcon={<CheckCircleOutline />}
 					fullWidth
 					variant='contained'
 					onClick={onConfirm}
-					disabled={loading}>
+					disabled={loading}
+					sx={{
+						height: 55,
+						fontSize: 15,
+						fontWeight: 700,
+					}}
+				>
 					Confirm Order
 				</Button>
 			</Box>

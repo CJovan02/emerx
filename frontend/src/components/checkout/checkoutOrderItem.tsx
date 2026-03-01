@@ -8,10 +8,21 @@ import { formatCurrency } from '../../utils/utils.ts';
 import { useNavigate } from 'react-router';
 import { Routes } from '../../shared/common/constants/routeNames.ts';
 
-export default function CheckoutCartItemCard({ item }: { item: CartItem }) {
+export default function CheckoutOrderItem({
+	item,
+	disableClick,
+	disableGutters,
+}: {
+	item: CartItem;
+	disableClick?: boolean;
+	disableGutters?: boolean;
+}) {
 	const navigate = useNavigate();
-	const navigateToProductDetails = () =>
+	function navigateToProductDetails() {
+		if (disableClick) return;
+
 		navigate(Routes.ProductDetails(item.product.id));
+	}
 
 	return (
 		<Box
@@ -20,13 +31,17 @@ export default function CheckoutCartItemCard({ item }: { item: CartItem }) {
 			alignItems='center'
 			gap={2}
 			py={2}
-			px={3}
-			sx={{
-				cursor: 'pointer',
-				'&:hover': {
-					backgroundColor: 'action.hover',
-				},
-			}}>
+			px={!disableGutters ? 3 : 0}
+			sx={
+				!disableClick
+					? {
+							cursor: 'pointer',
+							'&:hover': {
+								backgroundColor: 'action.hover',
+							},
+						}
+					: {}
+			}>
 			{/* Thumbnail */}
 			{item.product.thumbnailUrl && (
 				<Box

@@ -4,7 +4,8 @@ import {
 	getCartTotalPrice,
 } from '../../domain/models/cartItem.ts';
 import { formatCurrency } from '../../utils/utils.ts';
-import CheckoutCartItemCard from './checkoutCartItemCard.tsx';
+import CheckoutOrderItem from './checkoutOrderItem.tsx';
+import { ArrowForwardOutlined } from '@mui/icons-material';
 
 type Props = {
 	items: CartItem[];
@@ -16,15 +17,16 @@ export default function CartSummary({ items }: Props) {
 	return (
 		<Box>
 			<Typography
-				variant='h6'
+				variant='h5'
+				fontWeight={600}
 				px={3}
 				pt={3}
 				mb={2}>
-				Cart Summary
+				Review your cart
 			</Typography>
 
 			{items.map(item => (
-				<CheckoutCartItemCard
+				<CheckoutOrderItem
 					key={item.product.id}
 					item={item}
 				/>
@@ -42,10 +44,13 @@ export default function CartSummary({ items }: Props) {
 				px={3}
 				pb={3}>
 				<Button
+					startIcon={<ArrowForwardOutlined />}
+					form='checkout-form'
+					type='submit'
 					sx={{
 						height: 55,
 						fontSize: 15,
-						fontWeight: 700
+						fontWeight: 700,
 					}}
 					fullWidth>
 					Continue to Review

@@ -1,82 +1,66 @@
 import { Box, Container, Paper, Typography } from '@mui/material';
-import { useState } from 'react';
-import { useCartStore } from '../stores/cartStore.ts';
-import type { AddressRequiredDto } from '../api/openApi/model';
 import CartSummary from '../components/checkout/cartSummary.tsx';
 import AddressForm from '../components/checkout/addressForm.tsx';
 import ReviewPanel from '../components/checkout/reviewPanel.tsx';
-
-type Stage = 'form' | 'review';
+import useCheckoutLogic from '../hooks/pageLogic/useCheckoutLogic.tsx';
+import type { AddressRequiredDto } from '../api/openApi/model';
 
 export default function CheckoutPage() {
-	const [stage, setStage] = useState<Stage>('form');
-	const [address, setAddress] = useState<AddressRequiredDto | null>(null);
-	const [loading, setLoading] = useState(false);
+	const {
+		cartItems,
+		handleFormContinueToReview,
+		form,
+		goBackToForm,
+		isFormStage,
+		isReviewStage,
+	} = useCheckoutLogic();
 
-	const cartItems = useCartStore(state => state.items);
-
-	const handleContinue = (values: AddressRequiredDto) => {
-		setAddress(values);
-		setStage('review');
-	};
-
-	const handleConfirm = async () => {
-		try {
-			setLoading(true);
-
-			// TODO: pozovi backend ovde
-			console.log('ORDER DATA:', {
-				items: cartItems,
-				address,
-			});
-
-			// simulacija
-			await new Promise(res => setTimeout(res, 1000));
-
-			alert('Order placed successfully!');
-		} finally {
-			setLoading(false);
-		}
+	const address: AddressRequiredDto = {
+		houseNumber: form.watch('houseNumber'),
+		city: form.watch('city'),
+		street: form.watch('street'),
 	};
 
 	return (
 		<Container
 			maxWidth='lg'
-			sx={{ py: 6 }}>
+			sx={{ pt: 6 }}>
 			<Typography
 				variant='h4'
+				fontWeight={600}
 				mb={4}>
-				Checkout
+				{isFormStage && 'Checkout'}
+				{isReviewStage && 'Review Your Order'}
 			</Typography>
 
-			<Box
-				display='flex'
-				gap={4}
-				alignItems='flex-start'
-			>
-				<Paper sx={{ flex: 1, p: 3 }}>
-					{stage === 'form' ? (
+			{isFormStage && (
+				<Box
+					display='flex'
+					gap={4}
+					alignItems='flex-start'>
+					<Paper sx={{ flex: 1, p: 3 }}>
 						<AddressForm
-							defaultValues={address ?? undefined}
-							onContinue={handleContinue}
+							onSubmit={handleFormContinueToReview}
+							form={form}
 						/>
-					) : (
-						address && (
-							<ReviewPanel
-								items={cartItems}
-								address={address}
-								onBack={() => setStage('form')}
-								onConfirm={handleConfirm}
-								loading={loading}
-							/>
-						)
-					)}
-				</Paper>
+					</Paper>
 
-				<Paper sx={{ flex: 1 }}>
-					<CartSummary items={cartItems} />
+					<Paper sx={{ flex: 1 }}>
+						<CartSummary items={cartItems} />
+					</Paper>
+				</Box>
+			)}
+			{isReviewStage && (
+				<Paper sx={{ p: 3 }}>
+					<ReviewPanel
+						items={cartItems}
+						address={address}
+						onBack={goBackToForm}
+						onConfirm={() => {}}
+						loading={false}
+					/>
 				</Paper>
-			</Box>
+			)}
 		</Container>
 	);
 }
