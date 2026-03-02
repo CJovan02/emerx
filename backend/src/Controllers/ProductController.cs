@@ -16,13 +16,23 @@ public class ProductController(IProductService productService) : ControllerBase
 {
     [Authorize]
     [ProducesResponseType(typeof(PageOfResponse<ProductResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType((StatusCodes.Status500InternalServerError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
-    public async Task<IActionResult> GetPaged([FromQuery] PageParams pageParams)
+    public async Task<IActionResult> GetPaged([FromQuery] PageParams pageParams,
+        [FromQuery] ProductFilterParams filterParams)
     {
-        var result = await productService.GetAllAsync(pageParams.Page, pageParams.PageSize);
+        var result = await productService.GetAllAsync(pageParams.Page, pageParams.PageSize, filterParams);
 
         return result.ToActionResult();
+    }
+
+    [Authorize]
+    [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories()
+    {
+        var categories = await productService.GetCategoriesAsync();
+        return Ok(categories);
     }
 
     [Authorize]
