@@ -4,7 +4,9 @@ using EMerx.DTOs.OrderItems.Request;
 using EMerx.DTOs.Orders;
 using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
+using EMerx.Entities;
 using EMerx.Infrastructure.MongoDb;
+using EMerx.Repositories.CloudinaryRepository;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.UserRepository;
@@ -18,6 +20,7 @@ public class OrderService(
     IOrderRepository orderRepository,
     IUserRepository userRepository,
     IProductRepository productRepository,
+    ICloudinaryRepository cloudinaryRepository,
     MongoContext mongoContext) : IOrderService
 {
     public async Task<Result<PageOfResponse<OrderResponse>>> GetAllAsync(int page, int pageSize)
@@ -50,6 +53,32 @@ public class OrderService(
         return Result<OrderResponse>.Success(order.ToResponse());
     }
 
+    // Very similar implementation to the CreateAsync below, but now instead of creating an order and writing to db
+    // we calculate the prices and return appropriate error responses.
+    public async Task<Result<OrderReviewResponse>> GetOrderReview(OrderReviewRequest request)
+    {
+        var normalizedItems = NormalizeOrderItems(request.Items);
+        var normalizedRequest = request with { Items = normalizedItems };
+
+        var productIds = normalizedItems.Select(x => ObjectId.Parse(x.ProductId)).ToList();
+        var products = (await productRepository.GetProductsByIds(productIds)).ToList();
+        var productsDict = products.ToDictionary(x => x.Id);
+
+        var missingProducts = GetMissingProducts(productIds, products).ToList();
+        if (missingProducts.Any())
+            return Result<OrderReviewResponse>.Failure(OrderErrors.NotFound(missingProducts));
+
+        var violation = CheckProductsAvailability(normalizedItems, productsDict);
+        if (violation is not null)
+            return Result<OrderReviewResponse>.Failure(
+                OrderErrors.QuantityNotAvailable(violation.Value.Item1, violation.Value.Item2, violation.Value.Item3));
+
+        var returnResponse =
+            normalizedRequest.ToResponse(productsDict, cloudinaryRepository.BuildProductThumbnailImageUrl);
+
+        return Result<OrderReviewResponse>.Success(returnResponse);
+    }
+
     public async Task<Result<OrderResponse>> CreateAsync(string userIdString, OrderRequest request)
     {
         using var session = await mongoContext.StartSessionAsync();
@@ -66,34 +95,30 @@ public class OrderService(
                 return Result<OrderResponse>.Failure(UserErrors.NotFound(userId));
             }
 
-            // We normalize ordered items, we sum up the quantities of items that have the same id
-            // if some bug on frontend happens and duplicate items get sent
-            var normalizedItems = request.Items
-                .GroupBy(x => x.ProductId)
-                .Select(g => new OrderItemRequest
-                    {
-                        ProductId = g.Key,
-                        Quantity = g.Sum(x => x.Quantity)
-                    }
-                ).ToList();
+            var normalizedItems = NormalizeOrderItems(request.Items);
             var normalizedRequest = request with { Items = normalizedItems };
-
-            // We need to fetch all the products ordered, to see if all the requested ids are correct and
-            // to check the price and the name of the products.
-            // We could send the price and the name from the frontend inside a request to save on the database reads but
-            // that is a security hole, price needs to be read from the database and not specified.
 
             var productIds = normalizedItems.Select(x => ObjectId.Parse(x.ProductId)).ToList();
             var products = (await productRepository.GetProductsByIds(productIds, session)).ToList();
+            var productsDict = products.ToDictionary(x => x.Id);
 
-            var missingProducts = productIds.Except(products.Select(x => x.Id)).ToList();
+            var missingProducts = GetMissingProducts(productIds, products).ToList();
             if (missingProducts.Any())
             {
                 await session.AbortTransactionAsync();
                 return Result<OrderResponse>.Failure(OrderErrors.NotFound(missingProducts));
             }
 
-            var order = normalizedRequest.ToDomain(products, userId);
+            var violation = CheckProductsAvailability(normalizedItems, productsDict);
+            if (violation is not null)
+            {
+                await session.AbortTransactionAsync();
+                return Result<OrderResponse>.Failure(
+                    OrderErrors.QuantityNotAvailable(violation.Value.Item1, violation.Value.Item2,
+                        violation.Value.Item3));
+            }
+
+            var order = normalizedRequest.ToDomain(productsDict, userId);
             await orderRepository.CreateOrder(order, session);
 
             await session.CommitTransactionAsync();
@@ -118,5 +143,42 @@ public class OrderService(
 
         await orderRepository.DeleteOrder(order.Id);
         return Result.Success();
+    }
+
+    // Utils
+
+    // We sum up the quantities of items that have the same id
+    // if some bug on frontend happens and duplicate items get sent
+    private static List<OrderItemRequest> NormalizeOrderItems(List<OrderItemRequest> orderItems)
+    {
+        return orderItems
+            .GroupBy(x => x.ProductId)
+            .Select(g => new OrderItemRequest
+                {
+                    ProductId = g.Key,
+                    Quantity = g.Sum(x => x.Quantity)
+                }
+            ).ToList();
+    }
+
+    private static IEnumerable<ObjectId> GetMissingProducts(IEnumerable<ObjectId> requestIds,
+        IEnumerable<Product> products)
+    {
+        return requestIds.Except(products.Select(x => x.Id));
+    }
+
+    private static (string, int, int)? CheckProductsAvailability(IEnumerable<OrderItemRequest> requestItems,
+        IDictionary<ObjectId, Product> productsDict)
+    {
+        foreach (var item in requestItems)
+        {
+            var stringId = item.ProductId;
+            var objectId = ObjectId.Parse(stringId);
+            var product = productsDict[objectId];
+            if (item.Quantity > product.Stock)
+                return (stringId, product.Stock, item.Quantity);
+        }
+
+        return null;
     }
 }

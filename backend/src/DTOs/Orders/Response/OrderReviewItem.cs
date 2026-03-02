@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EMerx.DTOs.Orders.Response;
 
-public record OrderReviewItemResponse
+public record OrderReviewItem
 {
     [Required] public required string ProductId { get; init; }
     [Required] public required string ProductName { get; init; }
