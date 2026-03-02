@@ -8,7 +8,8 @@ namespace EMerx.Repositories.ProductRepository;
 public interface IProductRepository
 {
     Task<bool> ProductExists(ObjectId id);
-    Task<PageOf<Product>> GetProducts(int page, int pageSize);
+    Task<PageOf<Product>> GetProducts(int page, int pageSize, ProductFilterParams filters);
+    Task<IEnumerable<string>> GetDistinctCategories();
     Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null);
     Task<IEnumerable<Product>> GetProductsByIds (IEnumerable<ObjectId> ids, IClientSessionHandle? session = null);
     Task CreateProduct(Product product);

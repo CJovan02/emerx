@@ -281,6 +281,152 @@ export const useProductCreate = <
 > => {
 	return useMutation(getProductCreateMutationOptions(options), queryClient);
 };
+export const productGetCategories = (
+	options?: SecondParameter<typeof axiosInstance>,
+	signal?: AbortSignal
+) => {
+	return axiosInstance<string[]>(
+		{ url: `/Product/categories`, method: 'GET', signal },
+		options
+	);
+};
+
+export const getProductGetCategoriesQueryKey = () => {
+	return [`/Product/categories`] as const;
+};
+
+export const getProductGetCategoriesQueryOptions = <
+	TData = Awaited<ReturnType<typeof productGetCategories>>,
+	TError = ErrorType<unknown>,
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof productGetCategories>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}) => {
+	const { query: queryOptions, request: requestOptions } = options ?? {};
+
+	const queryKey = queryOptions?.queryKey ?? getProductGetCategoriesQueryKey();
+
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof productGetCategories>>
+	> = ({ signal }) => productGetCategories(requestOptions, signal);
+
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof productGetCategories>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ProductGetCategoriesQueryResult = NonNullable<
+	Awaited<ReturnType<typeof productGetCategories>>
+>;
+export type ProductGetCategoriesQueryError = ErrorType<unknown>;
+
+export function useProductGetCategories<
+	TData = Awaited<ReturnType<typeof productGetCategories>>,
+	TError = ErrorType<unknown>,
+>(
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetCategories>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof productGetCategories>>,
+					TError,
+					Awaited<ReturnType<typeof productGetCategories>>
+				>,
+				'initialData'
+			>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useProductGetCategories<
+	TData = Awaited<ReturnType<typeof productGetCategories>>,
+	TError = ErrorType<unknown>,
+>(
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetCategories>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof productGetCategories>>,
+					TError,
+					Awaited<ReturnType<typeof productGetCategories>>
+				>,
+				'initialData'
+			>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useProductGetCategories<
+	TData = Awaited<ReturnType<typeof productGetCategories>>,
+	TError = ErrorType<unknown>,
+>(
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetCategories>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useProductGetCategories<
+	TData = Awaited<ReturnType<typeof productGetCategories>>,
+	TError = ErrorType<unknown>,
+>(
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof productGetCategories>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+} {
+	const queryOptions = getProductGetCategoriesQueryOptions(options);
+
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+	return { ...query, queryKey: queryOptions.queryKey };
+}
+
 export const productGetById = (
 	id: string,
 	options?: SecondParameter<typeof axiosInstance>,

@@ -8,4 +8,10 @@
 export type ProductGetPagedParams = {
 	PageSize?: number;
 	Page?: number;
+	Search?: string;
+	Category?: string;
+	MinPrice?: number;
+	MaxPrice?: number;
+	MinRating?: number;
+	InStockOnly?: boolean;
 };
