@@ -46,4 +46,20 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
     {
         return _client.StartSessionAsync();
     }
+
+    public async Task EnsureIndexesAsync()
+    {
+        await Products.Indexes.CreateManyAsync([
+            new CreateIndexModel<Product>(Builders<Product>.IndexKeys.Ascending(p => p.Category)),
+            new CreateIndexModel<Product>(Builders<Product>.IndexKeys.Ascending(p => p.Price)),
+            new CreateIndexModel<Product>(Builders<Product>.IndexKeys.Ascending(p => p.AverageRating)),
+            new CreateIndexModel<Product>(Builders<Product>.IndexKeys.Ascending(p => p.Stock)),
+        ]);
+
+        await Reviews.Indexes.CreateOneAsync(
+            new CreateIndexModel<Review>(Builders<Review>.IndexKeys.Ascending(r => r.ProductId)));
+
+        await Orders.Indexes.CreateOneAsync(
+            new CreateIndexModel<Order>(Builders<Order>.IndexKeys.Ascending(o => o.UserId)));
+    }
 }
