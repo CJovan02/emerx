@@ -15,6 +15,8 @@ public interface IReviewService
     Task<Result<IEnumerable<ReviewResponse>>> GetByProductIdAsync(IdRequest request);
     
     Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request);
-    
+
+    Task<Result<ReviewResponse>> PatchAsync(IdRequest idRequest, PatchReviewRequest request);
+
     Task<Result> DeleteAsync(IdRequest request);
 }

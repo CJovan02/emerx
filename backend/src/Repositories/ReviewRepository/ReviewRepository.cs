@@ -69,9 +69,17 @@ public class ReviewRepository(MongoContext context) : IReviewRepository
         await _reviews.InsertOneAsync(review);
     }
 
-    public async Task UpdateReview(Review review)
+    public async Task UpdateReview(Review review, IClientSessionHandle? session = null)
     {
-        await _reviews.ReplaceOneAsync(r => r.Id == review.Id, review);
+        var filter = Builders<Review>.Filter.Where(r => r.Id == review.Id);
+
+        if (session is not null)
+        {
+            await _reviews.ReplaceOneAsync(session, filter, review);
+            return;
+        }
+
+        await _reviews.ReplaceOneAsync(filter, review);
     }
 
     public async Task DeleteReview(ObjectId id, IClientSessionHandle? session = null)

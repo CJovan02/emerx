@@ -48,6 +48,16 @@ public class ReviewController(IReviewService reviewService) : ControllerBase
         return (await reviewService.CreateAsync(request)).ToActionResult();
     }
 
+    [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch([FromRoute] IdRequest idRequest, [FromBody] PatchReviewRequest request)
+    {
+        return (await reviewService.PatchAsync(idRequest, request)).ToActionResult();
+    }
+
     [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

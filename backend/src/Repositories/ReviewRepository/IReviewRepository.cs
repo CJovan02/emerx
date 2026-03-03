@@ -12,6 +12,6 @@ public interface IReviewRepository
     Task<bool> UserPostedReviewForProduct(ObjectId userId, ObjectId productId, IClientSessionHandle? session = null);
     Task<Review?> GetReviewById(ObjectId id, IClientSessionHandle? session = null);
     Task CreateReview(Review review, IClientSessionHandle? session = null);
-    Task UpdateReview(Review review);
+    Task UpdateReview(Review review, IClientSessionHandle? session = null);
     Task DeleteReview(ObjectId id, IClientSessionHandle? session = null);
 }

@@ -117,6 +117,52 @@ public class ReviewService(
         }
     }
 
+    public async Task<Result<ReviewResponse>> PatchAsync(IdRequest idRequest, PatchReviewRequest request)
+    {
+        if (request.Rating is null && request.Description is null)
+            return Result<ReviewResponse>.Failure(ReviewErrors.NoUpdates(ObjectId.Parse(idRequest.Id)));
+
+        using var session = await mongoContext.StartSessionAsync();
+        session.StartTransaction();
+
+        var objectId = ObjectId.Parse(idRequest.Id);
+        var review = await reviewRepository.GetReviewById(objectId, session);
+
+        if (review is null)
+        {
+            await session.AbortTransactionAsync();
+            return Result<ReviewResponse>.Failure(ReviewErrors.NotFound(objectId));
+        }
+
+        if (request.Rating.HasValue && request.Rating.Value != review.Rating)
+        {
+            var product = await productRepository.GetProductById(review.ProductId, session);
+            if (product is null)
+            {
+                await session.AbortTransactionAsync();
+                return Result<ReviewResponse>.Failure(ProductErrors.NotFound(review.ProductId));
+            }
+
+            var newSumRatings = product.SumRatings - review.Rating + request.Rating.Value;
+            var newAvgRating = newSumRatings / product.ReviewCount;
+            await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, product.ReviewCount, session);
+        }
+
+        var updatedReview = new Review
+        {
+            Id = review.Id,
+            UserId = review.UserId,
+            ProductId = review.ProductId,
+            Rating = request.Rating ?? review.Rating,
+            Description = request.Description ?? review.Description
+        };
+
+        await reviewRepository.UpdateReview(updatedReview, session);
+
+        await session.CommitTransactionAsync();
+        return Result<ReviewResponse>.Success(updatedReview.ToResponse());
+    }
+
     public async Task<Result> DeleteAsync(IdRequest request)
     {
         using var session = await mongoContext.StartSessionAsync();
