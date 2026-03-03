@@ -28,15 +28,13 @@ public class CloudinaryContext(IOptions<CloudinarySettings> options, ILogger<Clo
     public async Task PingAsync()
     {
         logger.LogInformation("Pinging Cloudinary connection...");
-        try
+        var result = await Client.PingAsync();
+        if (result.Error != null)
         {
-            await Client.PingAsync();
-            logger.LogInformation("✅ Successfully pinged Cloudinary connection.");
+            logger.LogError(result.Error.Message, "❌ Cloudinary ping failed.");
+            return;
         }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "❌ Cloudinary ping failed.");
-            throw ex;
-        }
+
+        logger.LogInformation("✅ Successfully pinged Cloudinary connection.");
     }
 }
