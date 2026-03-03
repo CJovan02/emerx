@@ -43,6 +43,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("/overview")]
     public async Task<IActionResult> Review([FromBody] OrderReviewRequest request)
     {
         return (await orderService.GetOrderReview(request)).ToActionResult();

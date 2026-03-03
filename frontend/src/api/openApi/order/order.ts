@@ -24,6 +24,8 @@ import type {
 	OrderGetAllParams,
 	OrderRequest,
 	OrderResponse,
+	OrderReviewRequest,
+	OrderReviewResponse,
 	ProblemDetails,
 } from '.././model';
 
@@ -465,3 +467,144 @@ export const useOrderDelete = <
 > => {
 	return useMutation(getOrderDeleteMutationOptions(options), queryClient);
 };
+export const orderReview = (
+	orderReviewRequest: BodyType<OrderReviewRequest>,
+	options?: SecondParameter<typeof axiosInstance>,
+	signal?: AbortSignal
+) => {
+	return axiosInstance<OrderReviewResponse>(
+		{
+			url: `/overview`,
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' },
+			signal,
+		},
+		options
+	);
+};
+
+export const getOrderReviewQueryKey = (
+	orderReviewRequest?: OrderReviewRequest
+) => {
+	return [`/overview`, orderReviewRequest] as const;
+};
+
+export const getOrderReviewQueryOptions = <
+	TData = Awaited<ReturnType<typeof orderReview>>,
+	TError = ErrorType<ProblemDetails | void>,
+>(
+	orderReviewRequest: OrderReviewRequest,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	}
+) => {
+	const { query: queryOptions, request: requestOptions } = options ?? {};
+
+	const queryKey =
+		queryOptions?.queryKey ?? getOrderReviewQueryKey(orderReviewRequest);
+
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof orderReview>>> = ({
+		signal,
+	}) => orderReview(orderReviewRequest, requestOptions, signal);
+
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof orderReview>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type OrderReviewQueryResult = NonNullable<
+	Awaited<ReturnType<typeof orderReview>>
+>;
+export type OrderReviewQueryError = ErrorType<ProblemDetails | void>;
+
+export function useOrderReview<
+	TData = Awaited<ReturnType<typeof orderReview>>,
+	TError = ErrorType<ProblemDetails | void>,
+>(
+	orderReviewRequest: OrderReviewRequest,
+	options: {
+		query: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof orderReview>>,
+					TError,
+					Awaited<ReturnType<typeof orderReview>>
+				>,
+				'initialData'
+			>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useOrderReview<
+	TData = Awaited<ReturnType<typeof orderReview>>,
+	TError = ErrorType<ProblemDetails | void>,
+>(
+	orderReviewRequest: OrderReviewRequest,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof orderReview>>,
+					TError,
+					Awaited<ReturnType<typeof orderReview>>
+				>,
+				'initialData'
+			>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useOrderReview<
+	TData = Awaited<ReturnType<typeof orderReview>>,
+	TError = ErrorType<ProblemDetails | void>,
+>(
+	orderReviewRequest: OrderReviewRequest,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useOrderReview<
+	TData = Awaited<ReturnType<typeof orderReview>>,
+	TError = ErrorType<ProblemDetails | void>,
+>(
+	orderReviewRequest: OrderReviewRequest,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+	queryKey: DataTag<QueryKey, TData, TError>;
+} {
+	const queryOptions = getOrderReviewQueryOptions(orderReviewRequest, options);
+
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+	return { ...query, queryKey: queryOptions.queryKey };
+}
