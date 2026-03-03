@@ -10,6 +10,6 @@ public static class OrderErrors
         new(StatusCodes.NotFound, $"These product ids do not exist: {string.Join(", ", missingIds)}");
 
     public static Error QuantityNotAvailable(string productId, int stock, int quantity) =>
-        new(StatusCodes.BadRequest,
+        new(StatusCodes.Conflict,
             $"Product with id {productId} has {stock} units in stock but the requested amount is {quantity}.");
 }

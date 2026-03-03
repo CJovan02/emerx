@@ -38,9 +38,22 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     [Authorize]
+    [ProducesResponseType(typeof(OrderReviewResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Review([FromBody] OrderReviewRequest request)
+    {
+        return (await orderService.GetOrderReview(request)).ToActionResult();
+    }
+
+
+    [Authorize]
     [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] OrderRequest request)
