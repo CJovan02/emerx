@@ -61,5 +61,10 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
 
         await Orders.Indexes.CreateOneAsync(
             new CreateIndexModel<Order>(Builders<Order>.IndexKeys.Ascending(o => o.UserId)));
+
+        await Users.Indexes.CreateManyAsync([
+            new CreateIndexModel<User>(Builders<User>.IndexKeys.Ascending(u => u.Email)),
+            new CreateIndexModel<User>(Builders<User>.IndexKeys.Ascending(u => u.FirebaseUid))
+        ]);
     }
 }
