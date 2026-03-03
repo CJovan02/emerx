@@ -6,6 +6,8 @@ public class Order : BaseEntity
 {
     public required ObjectId UserId { get; init; }
 
+    public required string UserFullNameAtOrder { get; init; }
+
     public required List<OrderItem> Items { get; init; }
 
     public required Address Address { get; init; }

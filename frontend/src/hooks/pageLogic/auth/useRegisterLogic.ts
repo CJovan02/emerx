@@ -9,21 +9,21 @@ import type {
 import type { ErrorType } from '../../../api/axiosInstance.ts';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
+import { RegExpressions } from '../../../shared/common/constants/regExps.ts';
 
 function useRegisterLogic() {
-	const lettersRegex = /^[a-zA-ZčČćĆđĐšŠžŽ]+$/;
 	const formSchema = z.object({
 		name: z
 			.string()
 			.min(3, 'Name must be at least 5 characters.')
 			.max(20, "Name can't exceed 20 characters")
-			.regex(lettersRegex, 'Name can only have letters'),
+			.regex(RegExpressions.OnlyLetters, 'Name can only have letters'),
 
 		surname: z
 			.string()
 			.min(3, 'Surname must be at least 5 characters.')
 			.max(20, "Surname can't exceed 20 characters")
-			.regex(lettersRegex, 'Surname can only have letters'),
+			.regex(RegExpressions.OnlyLetters, 'Surname can only have letters'),
 
 		email: z.email(),
 
@@ -31,8 +31,14 @@ function useRegisterLogic() {
 			.string()
 			.min(6, 'Password must be at least 6 characters.')
 			.max(30, "Password can't exceed 30 characters")
-			.regex(/[a-z]/, 'Password must contain at least one lowercase letter.')
-			.regex(/[A-Z]/, 'Password must contain at least one uppercase letter.'),
+			.regex(
+				RegExpressions.OneLowercase,
+				'Password must contain at least one lowercase letter.'
+			)
+			.regex(
+				RegExpressions.OneUppercase,
+				'Password must contain at least one uppercase letter.'
+			),
 	});
 	type FormValues = z.Infer<typeof formSchema>;
 	const form = useForm({

@@ -15,26 +15,58 @@ public static class OrdersExtensions
             Id = order.Id,
             UserId = order.UserId,
             Items = order.Items,
-            Address = order.Address.ToDto(),
+            Address = order.Address.ToDto()!,
             Price = order.Price,
             PlacedAt = order.PlacedAt
         };
     }
 
-    public static Order ToDomain(this OrderRequest order, IEnumerable<Product> products)
+    public static OrderReviewResponse ToResponse(this OrderReviewRequest request,
+        IDictionary<ObjectId, Product> productsDict, Func<string, string, string> buildImageUrl)
     {
-        // We create lookup (or dictionary) for easy access by the productId
-        var productsLookup = products.ToLookup(x => x.Id);
+        var domainItems = request.Items.Select(item =>
+        {
+            var id = item.ProductId;
+            var objectId = ObjectId.Parse(id);
+            var product = productsDict[objectId];
 
+            var imageUrl = product.ImageVersion is not null
+                ? buildImageUrl(id, product.ImageVersion)
+                : null;
+            var lineTotal = item.Quantity * product.Price;
+
+            return new OrderReviewItem
+            {
+                ProductId = id,
+                ProductName = product.Name,
+                ImageUrl = imageUrl,
+                UnitPrice = product.Price,
+                Quantity = item.Quantity,
+                Stock = product.Stock,
+                LineTotal = lineTotal,
+            };
+        }).ToList();
+        var totalPrice = domainItems.Sum(item => item.LineTotal);
+
+        return new OrderReviewResponse
+        {
+            Items = domainItems,
+            Total = totalPrice
+        };
+    }
+
+    public static Order ToDomain(this OrderRequest order, IDictionary<ObjectId, Product> productsDict, ObjectId userId,
+        string userFullName)
+    {
         var domainItems = order.Items.Select(item =>
         {
             var productId = ObjectId.Parse(item.ProductId);
-            var product = productsLookup[productId].First();
+            var product = productsDict[productId];
 
             return new OrderItem
             {
                 ProductId = ObjectId.Parse(item.ProductId),
-                Name = product.Name,
+                NameAtOrder = product.Name,
                 PriceAtOrder = product.Price,
                 Quantity = item.Quantity,
             };
@@ -43,7 +75,8 @@ public static class OrdersExtensions
         return new Order
         {
             Id = ObjectId.GenerateNewId(),
-            UserId = ObjectId.Parse(order.UserId),
+            UserId = userId,
+            UserFullNameAtOrder = userFullName,
             Items = domainItems,
             Address = order.Address.ToEntity(),
             Price = domainItems.Sum(x => x.PriceAtOrder * x.Quantity)

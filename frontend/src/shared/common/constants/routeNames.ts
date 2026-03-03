@@ -11,4 +11,5 @@ export const Routes = {
 		Products: '/admin/products',
 		AdminsManagement: '/admin/admins-management',
 	},
+	Checkout: '/checkout',
 } as const;

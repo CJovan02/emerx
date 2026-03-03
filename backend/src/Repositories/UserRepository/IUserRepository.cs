@@ -10,7 +10,7 @@ public interface IUserRepository
 
     Task<User?> GetUserByEmail(string email);
 
-    Task<User?> GetUserByFirebaseUid(string firebaseUid);
+    Task<User?> GetUserByFirebaseUid(string firebaseUid, IClientSessionHandle? session = null);
 
     Task<User?> GetUserById(ObjectId id, IClientSessionHandle? session = null);
 

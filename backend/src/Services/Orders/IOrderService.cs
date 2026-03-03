@@ -13,7 +13,11 @@ public interface IOrderService
 
     Task<Result<OrderResponse>> GetByIdAsync(IdRequest request);
 
-    Task<Result<OrderResponse>> CreateAsync(OrderRequest request);
+    // Client sends the id of the products that he wants to order and server checks their prices, stock and calculates
+    // the total price. Used in the final step of the checkout process to pull the latest prices and products
+    Task<Result<OrderReviewResponse>> GetOrderReview(OrderReviewRequest request);
+
+    Task<Result<OrderResponse>> CreateAsync(string userId, OrderRequest request);
 
     Task<Result> DeleteAsync(IdRequest request);
 }

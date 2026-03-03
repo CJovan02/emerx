@@ -6,12 +6,16 @@
  */
 
 export * from './addressDto';
+export * from './addressRequiredDto';
 export * from './objectId';
 export * from './orderGetAllParams';
 export * from './orderItem';
 export * from './orderItemRequest';
 export * from './orderRequest';
 export * from './orderResponse';
+export * from './orderReviewItem';
+export * from './orderReviewRequest';
+export * from './orderReviewResponse';
 export * from './problemDetails';
 export * from './productCreateBody';
 export * from './productGetPagedParams';

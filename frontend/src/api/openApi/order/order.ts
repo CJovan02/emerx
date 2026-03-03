@@ -24,6 +24,8 @@ import type {
 	OrderGetAllParams,
 	OrderRequest,
 	OrderResponse,
+	OrderReviewRequest,
+	OrderReviewResponse,
 	ProblemDetails,
 } from '.././model';
 
@@ -464,4 +466,87 @@ export const useOrderDelete = <
 	TContext
 > => {
 	return useMutation(getOrderDeleteMutationOptions(options), queryClient);
+};
+export const orderReview = (
+	orderReviewRequest: BodyType<OrderReviewRequest>,
+	options?: SecondParameter<typeof axiosInstance>,
+	signal?: AbortSignal
+) => {
+	return axiosInstance<OrderReviewResponse>(
+		{
+			url: `/Order/overview`,
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			data: orderReviewRequest,
+			signal,
+		},
+		options
+	);
+};
+
+export const getOrderReviewMutationOptions = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof orderReview>>,
+		TError,
+		{ data: BodyType<OrderReviewRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof orderReview>>,
+	TError,
+	{ data: BodyType<OrderReviewRequest> },
+	TContext
+> => {
+	const mutationKey = ['orderReview'];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			'mutationKey' in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof orderReview>>,
+		{ data: BodyType<OrderReviewRequest> }
+	> = props => {
+		const { data } = props ?? {};
+
+		return orderReview(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type OrderReviewMutationResult = NonNullable<
+	Awaited<ReturnType<typeof orderReview>>
+>;
+export type OrderReviewMutationBody = BodyType<OrderReviewRequest>;
+export type OrderReviewMutationError = ErrorType<ProblemDetails | void>;
+
+export const useOrderReview = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof orderReview>>,
+			TError,
+			{ data: BodyType<OrderReviewRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseMutationResult<
+	Awaited<ReturnType<typeof orderReview>>,
+	TError,
+	{ data: BodyType<OrderReviewRequest> },
+	TContext
+> => {
+	return useMutation(getOrderReviewMutationOptions(options), queryClient);
 };

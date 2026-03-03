@@ -5,6 +5,7 @@ using EMerx.DTOs.Orders.Request;
 using EMerx.DTOs.Orders.Response;
 using EMerx.ResultPattern;
 using EMerx.Services.Orders;
+using EMerx.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +25,8 @@ public class OrderController(IOrderService orderService) : ControllerBase
         return (await orderService.GetAllAsync(pageParams.Page, pageParams.PageSize)).ToActionResult();
     }
 
+    [Authorize]
+    [RequiresRole(Roles.Admin)]
     [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -34,16 +37,39 @@ public class OrderController(IOrderService orderService) : ControllerBase
         return (await orderService.GetByIdAsync(request)).ToActionResult();
     }
 
+    [Authorize]
+    [ProducesResponseType(typeof(OrderReviewResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // I used POST here cuz it's not just a simple get request, it validates product price, stock, calculates the prices.
+    // Also, it receives a list of objects that for me seems reasonable to be transferred through [Body] request
+    [HttpPost("overview")]
+    public async Task<IActionResult> Review([FromBody] OrderReviewRequest request)
+    {
+        return (await orderService.GetOrderReview(request)).ToActionResult();
+    }
+
+
+    [Authorize]
     [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] OrderRequest request)
     {
-        return (await orderService.CreateAsync(request)).ToActionResult();
+        var uid = JwtUtils.GetUidFromHttpContext(HttpContext);
+        if (uid is null)
+            return Unauthorized();
+
+        return (await orderService.CreateAsync(uid, request)).ToActionResult();
     }
 
+    [Authorize]
+    [RequiresRole(Roles.Admin)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
