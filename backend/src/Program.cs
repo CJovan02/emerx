@@ -34,6 +34,7 @@ var app = builder.Build();
 var mongoContext = app.Services.GetRequiredService<MongoContext>();
 mongoContext.Connect();
 await mongoContext.PingAsync();
+await mongoContext.EnsureIndexesAsync();
 
 // Ping Cloudinary
 var cloudinary = app.Services.GetRequiredService<CloudinaryContext>();
