@@ -18,9 +18,10 @@ public class ProductService(
     ICloudinaryRepository cloudinaryRepository)
     : IProductService
 {
-    public async Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize)
+    public async Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize,
+        ProductFilterParams filters)
     {
-        var pageOfProducts = await productRepository.GetProducts(page, pageSize);
+        var pageOfProducts = await productRepository.GetProducts(page, pageSize, filters);
         var productResponses = pageOfProducts
             .Items
             .Select(product =>
@@ -40,6 +41,11 @@ public class ProductService(
             pageOfProducts.TotalItems);
 
         return Result<PageOfResponse<ProductResponse>>.Success(response);
+    }
+
+    public Task<IEnumerable<string>> GetCategoriesAsync()
+    {
+        return productRepository.GetDistinctCategories();
     }
 
     public async Task<Result<ProductResponse>> GetByIdAsync(IdRequest request)

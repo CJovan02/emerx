@@ -15,18 +15,45 @@ public class ProductRepository(MongoContext context) : IProductRepository
         return _products.Find(product => product.Id == id).AnyAsync();
     }
 
-    public async Task<PageOf<Product>> GetProducts(int page, int pageSize)
+    public async Task<PageOf<Product>> GetProducts(int page, int pageSize, ProductFilterParams filters)
     {
-        var totalItems = await this._products.CountDocumentsAsync(Builders<Product>.Filter.Empty);
+        var filter = Builders<Product>.Filter.Empty;
+
+        if (!string.IsNullOrWhiteSpace(filters.Search))
+            filter &= Builders<Product>.Filter.Regex(p => p.Name, new BsonRegularExpression(filters.Search, "i"));
+
+        if (!string.IsNullOrWhiteSpace(filters.Category))
+            filter &= Builders<Product>.Filter.Eq(p => p.Category, filters.Category);
+
+        if (filters.MinPrice.HasValue)
+            filter &= Builders<Product>.Filter.Gte(p => p.Price, filters.MinPrice.Value);
+
+        if (filters.MaxPrice.HasValue)
+            filter &= Builders<Product>.Filter.Lte(p => p.Price, filters.MaxPrice.Value);
+
+        if (filters.MinRating.HasValue)
+            filter &= Builders<Product>.Filter.Gte(p => p.AverageRating, filters.MinRating.Value);
+
+        if (filters.InStockOnly)
+            filter &= Builders<Product>.Filter.Gt(p => p.Stock, 0);
+
+        var totalItems = await _products.CountDocumentsAsync(filter);
 
         var products = await _products
-            .Find(product => true)
+            .Find(filter)
             .SortBy(product => product.Id)
             .Skip((page - 1) * pageSize)
             .Limit(pageSize)
             .ToListAsync();
 
         return new PageOf<Product>(products, page, pageSize, (int)totalItems);
+    }
+
+    public async Task<IEnumerable<string>> GetDistinctCategories()
+    {
+        return await _products
+            .Distinct<string>(nameof(Product.Category), Builders<Product>.Filter.Empty)
+            .ToListAsync();
     }
 
     public async Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null)

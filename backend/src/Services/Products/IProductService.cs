@@ -9,7 +9,8 @@ namespace EMerx.Services.Products;
 
 public interface IProductService
 {
-    Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize);
+    Task<Result<PageOfResponse<ProductResponse>>> GetAllAsync(int page, int pageSize, ProductFilterParams filters);
+    Task<IEnumerable<string>> GetCategoriesAsync();
 
     Task<Result<ProductResponse>> GetByIdAsync(IdRequest request);
 
