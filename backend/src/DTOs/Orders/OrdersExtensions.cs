@@ -55,7 +55,8 @@ public static class OrdersExtensions
         };
     }
 
-    public static Order ToDomain(this OrderRequest order, IDictionary<ObjectId, Product> productsDict, ObjectId userId)
+    public static Order ToDomain(this OrderRequest order, IDictionary<ObjectId, Product> productsDict, ObjectId userId,
+        string userFullName)
     {
         var domainItems = order.Items.Select(item =>
         {
@@ -65,7 +66,7 @@ public static class OrdersExtensions
             return new OrderItem
             {
                 ProductId = ObjectId.Parse(item.ProductId),
-                Name = product.Name,
+                NameAtOrder = product.Name,
                 PriceAtOrder = product.Price,
                 Quantity = item.Quantity,
             };
@@ -75,6 +76,7 @@ public static class OrdersExtensions
         {
             Id = ObjectId.GenerateNewId(),
             UserId = userId,
+            UserFullNameAtOrder = userFullName,
             Items = domainItems,
             Address = order.Address.ToEntity(),
             Price = domainItems.Sum(x => x.PriceAtOrder * x.Quantity)

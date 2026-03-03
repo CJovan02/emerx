@@ -13,6 +13,7 @@ using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace EMerx.Services.Orders;
 
@@ -79,7 +80,7 @@ public class OrderService(
         return Result<OrderReviewResponse>.Success(returnResponse);
     }
 
-    public async Task<Result<OrderResponse>> CreateAsync(string userIdString, OrderRequest request)
+    public async Task<Result<OrderResponse>> CreateAsync(string userFirebaseId, OrderRequest request)
     {
         using var session = await mongoContext.StartSessionAsync();
 
@@ -87,13 +88,13 @@ public class OrderService(
         {
             session.StartTransaction();
 
-            var userId = ObjectId.Parse(userIdString);
-            var user = await userRepository.GetUserById(userId, session);
+            var user = await userRepository.GetUserByFirebaseUid(userFirebaseId, session);
             if (user is null)
             {
                 await session.AbortTransactionAsync();
-                return Result<OrderResponse>.Failure(UserErrors.NotFound(userId));
+                return Result<OrderResponse>.Failure(UserErrors.NotFound(userFirebaseId));
             }
+            var userId = user.Id;
 
             var normalizedItems = NormalizeOrderItems(request.Items);
             var normalizedRequest = request with { Items = normalizedItems };
@@ -109,17 +110,33 @@ public class OrderService(
                 return Result<OrderResponse>.Failure(OrderErrors.NotFound(missingProducts));
             }
 
-            var violation = CheckProductsAvailability(normalizedItems, productsDict);
-            if (violation is not null)
-            {
-                await session.AbortTransactionAsync();
-                return Result<OrderResponse>.Failure(
-                    OrderErrors.QuantityNotAvailable(violation.Value.Item1, violation.Value.Item2,
-                        violation.Value.Item3));
-            }
-
-            var order = normalizedRequest.ToDomain(productsDict, userId);
+            var order = normalizedRequest.ToDomain(productsDict, userId, $"{user.Name} {user.Surname}");
             await orderRepository.CreateOrder(order, session);
+
+            // after creating the order, we also need to decrease the stock of the ordered products
+            foreach (var item in normalizedItems)
+            {
+                var objectId = ObjectId.Parse(item.ProductId);
+
+                // we create a filter to find the specified product and also to check the available stock.
+                // With this method, if the UpdateProduct modifies 0 entities, it means that stock is not available for this quantity
+                // this also prevents race conditions
+                var filter = Builders<Product>.Filter.And(
+                    Builders<Product>.Filter.Eq(x => x.Id, objectId),
+                    Builders<Product>.Filter.Gte(x => x.Stock, item.Quantity)
+                );
+
+                var updateDef = Builders<Product>.Update.Inc(x => x.Stock, -item.Quantity);
+                var result = await productRepository.UpdateProduct(filter, updateDef, session);
+                if (result.ModifiedCount == 0)
+                {
+                    await session.AbortTransactionAsync();
+
+                    var product = productsDict[objectId];
+                    return Result<OrderResponse>.Failure(
+                        OrderErrors.QuantityNotAvailable(item.ProductId, product.Stock, item.Quantity));
+                }
+            }
 
             await session.CommitTransactionAsync();
             return Result<OrderResponse>.Success(order.ToResponse());

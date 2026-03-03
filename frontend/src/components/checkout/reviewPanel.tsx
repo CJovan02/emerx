@@ -19,7 +19,6 @@ type Props = {
 	address: AddressRequiredDto;
 	onBack: () => void;
 	onConfirm: () => void;
-	loading?: boolean;
 };
 
 export default function ReviewPanel({
@@ -27,7 +26,6 @@ export default function ReviewPanel({
 	address,
 	onBack,
 	onConfirm,
-	loading,
 }: Props) {
 	const total = formatCurrency(getCartTotalPrice(items));
 
@@ -87,7 +85,6 @@ export default function ReviewPanel({
 					fullWidth
 					variant='contained'
 					onClick={onConfirm}
-					disabled={loading}
 					sx={{
 						height: 55,
 						fontSize: 15,
