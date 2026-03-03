@@ -14,5 +14,6 @@ export interface OrderReviewItem {
 	imageUrl?: string | null;
 	unitPrice: number;
 	quantity: number;
+	stock: number;
 	lineTotal: number;
 }

@@ -43,7 +43,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpGet("/overview")]
+    // I used POST here cuz it's not just a simple get request, it validates product price, stock, calculates the prices.
+    // Also, it receives a list of objects that for me seems reasonable to be transferred through [Body] request
+    [HttpPost("overview")]
     public async Task<IActionResult> Review([FromBody] OrderReviewRequest request)
     {
         return (await orderService.GetOrderReview(request)).ToActionResult();

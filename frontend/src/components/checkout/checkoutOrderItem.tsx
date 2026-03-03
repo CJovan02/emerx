@@ -21,7 +21,7 @@ export default function CheckoutOrderItem({
 	function navigateToProductDetails() {
 		if (disableClick) return;
 
-		navigate(Routes.ProductDetails(item.product.id));
+		navigate(Routes.ProductDetails(item.productId));
 	}
 
 	return (
@@ -43,11 +43,11 @@ export default function CheckoutOrderItem({
 					: {}
 			}>
 			{/* Thumbnail */}
-			{item.product.thumbnailUrl && (
+			{item.thumbnailUrl && (
 				<Box
 					component='img'
-					src={item.product.thumbnailUrl}
-					alt={item.product.name}
+					src={item.thumbnailUrl}
+					alt={item.name}
 					sx={{
 						aspectRatio: '1/1',
 						width: 86,
@@ -58,7 +58,7 @@ export default function CheckoutOrderItem({
 					}}
 				/>
 			)}
-			{!item.product.thumbnailUrl && (
+			{!item.thumbnailUrl && (
 				<ImagePlaceholder
 					height={86}
 					width={86}
@@ -72,13 +72,13 @@ export default function CheckoutOrderItem({
 				<Typography
 					fontWeight={500}
 					noWrap>
-					{item.product.name}
+					{item.name}
 				</Typography>
 				<Typography
 					variant='body2'
 					color='text.secondary'
 					fontWeight={300}>
-					{formatCurrency(item.product.price)} × {item.quantity}
+					{formatCurrency(item.unitPrice)} × {item.quantity}
 				</Typography>
 				<Typography
 					mt={1}

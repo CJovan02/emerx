@@ -101,7 +101,7 @@ export default function CartMenu() {
 								{cartItems.map(item => {
 									return (
 										<CartItemRow
-											key={item.product.id}
+											key={item.productId}
 											item={item}
 											onRemove={removeFromCart}
 											onClick={navigateToProduct}

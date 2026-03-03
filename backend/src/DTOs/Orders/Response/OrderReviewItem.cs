@@ -9,5 +9,6 @@ public record OrderReviewItem
     public string? ImageUrl { get; init; }
     [Required] public required decimal UnitPrice { get; init; }
     [Required] public required int Quantity { get; init; }
+    [Required] public required int Stock { get; init; }
     [Required] public required decimal LineTotal { get; init; }
 }

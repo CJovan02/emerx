@@ -1,8 +1,8 @@
 import { Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { CartItem } from '../../../domain/models/cartItem.ts';
-import {formatCurrency} from "../../../utils/utils.ts";
-import ImagePlaceholder from "../../../shared/components/ui/imagePlaceholder.tsx";
+import { formatCurrency } from '../../../utils/utils.ts';
+import ImagePlaceholder from '../../../shared/components/ui/imagePlaceholder.tsx';
 
 interface CartItemRowProps {
 	item: CartItem;
@@ -15,9 +15,9 @@ export default function CartItemRow({
 	onRemove,
 	onClick,
 }: CartItemRowProps) {
-	const { product, quantity } = item;
+	const { quantity } = item;
 
-	const totalPrice = quantity * product.price;
+	const totalPrice = quantity * item.unitPrice;
 
 	return (
 		<Box
@@ -28,19 +28,18 @@ export default function CartItemRow({
 					backgroundColor: 'action.hover',
 				},
 			}}
-			onClick={() => onClick?.(product.id)}>
+			onClick={() => onClick?.(item.productId)}>
 			<Box
-                display='flex'
-                alignItems='center'
-                gap={2}
-                px={2}
-            >
+				display='flex'
+				alignItems='center'
+				gap={2}
+				px={2}>
 				{/* Thumbnail */}
-				{product.thumbnailUrl && (
+				{item.thumbnailUrl && (
 					<Box
 						component='img'
-						src={product.thumbnailUrl}
-						alt={product.name}
+						src={item.thumbnailUrl}
+						alt={item.name}
 						sx={{
 							width: 64,
 							height: 64,
@@ -51,7 +50,7 @@ export default function CartItemRow({
 						}}
 					/>
 				)}
-				{!product.thumbnailUrl && (
+				{!item.thumbnailUrl && (
 					<ImagePlaceholder
 						width={64}
 						height={64}
@@ -67,19 +66,18 @@ export default function CartItemRow({
 						variant='body2'
 						fontWeight={500}
 						noWrap>
-						{product.name}
+						{item.name}
 					</Typography>
 
 					<Typography
 						variant='body2'
 						color='text.secondary'
-                        fontWeight={300}
-                    >
-						{formatCurrency(product.price)} × {quantity}
+						fontWeight={300}>
+						{formatCurrency(item.unitPrice)} × {quantity}
 					</Typography>
 
 					<Typography
-                        mt={0.5}
+						mt={0.5}
 						variant='body2'
 						fontWeight={600}>
 						{formatCurrency(totalPrice)}
@@ -91,7 +89,7 @@ export default function CartItemRow({
 					size='small'
 					onClick={e => {
 						e.stopPropagation();
-						onRemove(product.id);
+						onRemove(item.productId);
 					}}>
 					<CloseIcon fontSize='small' />
 				</IconButton>

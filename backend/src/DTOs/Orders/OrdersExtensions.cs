@@ -42,6 +42,7 @@ public static class OrdersExtensions
                 ImageUrl = imageUrl,
                 UnitPrice = product.Price,
                 Quantity = item.Quantity,
+                Stock = product.Stock,
                 LineTotal = lineTotal,
             };
         }).ToList();

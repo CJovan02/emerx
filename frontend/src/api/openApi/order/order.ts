@@ -474,137 +474,79 @@ export const orderReview = (
 ) => {
 	return axiosInstance<OrderReviewResponse>(
 		{
-			url: `/overview`,
-			method: 'GET',
+			url: `/Order/overview`,
+			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
+			data: orderReviewRequest,
 			signal,
 		},
 		options
 	);
 };
 
-export const getOrderReviewQueryKey = (
-	orderReviewRequest?: OrderReviewRequest
-) => {
-	return [`/overview`, orderReviewRequest] as const;
-};
-
-export const getOrderReviewQueryOptions = <
-	TData = Awaited<ReturnType<typeof orderReview>>,
+export const getOrderReviewMutationOptions = <
 	TError = ErrorType<ProblemDetails | void>,
->(
-	orderReviewRequest: OrderReviewRequest,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
-		>;
-		request?: SecondParameter<typeof axiosInstance>;
-	}
-) => {
-	const { query: queryOptions, request: requestOptions } = options ?? {};
-
-	const queryKey =
-		queryOptions?.queryKey ?? getOrderReviewQueryKey(orderReviewRequest);
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof orderReview>>> = ({
-		signal,
-	}) => orderReview(orderReviewRequest, requestOptions, signal);
-
-	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
 		Awaited<ReturnType<typeof orderReview>>,
 		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData, TError> };
+		{ data: BodyType<OrderReviewRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof orderReview>>,
+	TError,
+	{ data: BodyType<OrderReviewRequest> },
+	TContext
+> => {
+	const mutationKey = ['orderReview'];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			'mutationKey' in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof orderReview>>,
+		{ data: BodyType<OrderReviewRequest> }
+	> = props => {
+		const { data } = props ?? {};
+
+		return orderReview(data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
 };
 
-export type OrderReviewQueryResult = NonNullable<
+export type OrderReviewMutationResult = NonNullable<
 	Awaited<ReturnType<typeof orderReview>>
 >;
-export type OrderReviewQueryError = ErrorType<ProblemDetails | void>;
+export type OrderReviewMutationBody = BodyType<OrderReviewRequest>;
+export type OrderReviewMutationError = ErrorType<ProblemDetails | void>;
 
-export function useOrderReview<
-	TData = Awaited<ReturnType<typeof orderReview>>,
+export const useOrderReview = <
 	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
 >(
-	orderReviewRequest: OrderReviewRequest,
-	options: {
-		query: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof orderReview>>,
-					TError,
-					Awaited<ReturnType<typeof orderReview>>
-				>,
-				'initialData'
-			>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useOrderReview<
-	TData = Awaited<ReturnType<typeof orderReview>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	orderReviewRequest: OrderReviewRequest,
 	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof orderReview>>,
-					TError,
-					Awaited<ReturnType<typeof orderReview>>
-				>,
-				'initialData'
-			>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useOrderReview<
-	TData = Awaited<ReturnType<typeof orderReview>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	orderReviewRequest: OrderReviewRequest,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof orderReview>>,
+			TError,
+			{ data: BodyType<OrderReviewRequest> },
+			TContext
 		>;
 		request?: SecondParameter<typeof axiosInstance>;
 	},
 	queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
+): UseMutationResult<
+	Awaited<ReturnType<typeof orderReview>>,
+	TError,
+	{ data: BodyType<OrderReviewRequest> },
+	TContext
+> => {
+	return useMutation(getOrderReviewMutationOptions(options), queryClient);
 };
-
-export function useOrderReview<
-	TData = Awaited<ReturnType<typeof orderReview>>,
-	TError = ErrorType<ProblemDetails | void>,
->(
-	orderReviewRequest: OrderReviewRequest,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof orderReview>>, TError, TData>
-		>;
-		request?: SecondParameter<typeof axiosInstance>;
-	},
-	queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-	queryKey: DataTag<QueryKey, TData, TError>;
-} {
-	const queryOptions = getOrderReviewQueryOptions(orderReviewRequest, options);
-
-	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-		TData,
-		TError
-	> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-	return { ...query, queryKey: queryOptions.queryKey };
-}

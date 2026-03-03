@@ -53,7 +53,7 @@ export default function ReviewPanel({
 
 			{items.map(item => (
 				<CheckoutOrderItem
-					key={item.product.id}
+					key={item.productId}
 					item={item}
 					disableClick
 					disableGutters
@@ -78,8 +78,7 @@ export default function ReviewPanel({
 					onClick={onBack}
 					sx={{
 						height: 55,
-					}}
-				>
+					}}>
 					Back
 				</Button>
 
@@ -93,8 +92,7 @@ export default function ReviewPanel({
 						height: 55,
 						fontSize: 15,
 						fontWeight: 700,
-					}}
-				>
+					}}>
 					Confirm Order
 				</Button>
 			</Box>

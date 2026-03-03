@@ -83,7 +83,11 @@ function useProductDetailsLogic(productId: string) {
 			}
 
 			const item: CartItem = {
-				product: data,
+				productId: data.id,
+				name: data.name,
+				unitPrice: data.price,
+				stock: data.stock,
+				thumbnailUrl: data.thumbnailUrl,
 				quantity,
 			};
 

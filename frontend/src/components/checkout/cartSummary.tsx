@@ -27,7 +27,7 @@ export default function CartSummary({ items }: Props) {
 
 			{items.map(item => (
 				<CheckoutOrderItem
-					key={item.product.id}
+					key={item.productId}
 					item={item}
 				/>
 			))}

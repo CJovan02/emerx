@@ -1,9 +1,19 @@
-import { Box, Container, Paper, Typography } from '@mui/material';
+import {
+	Alert,
+	Box,
+	Button,
+	Container,
+	Paper,
+	Typography,
+} from '@mui/material';
 import CartSummary from '../components/checkout/cartSummary.tsx';
 import AddressForm from '../components/checkout/addressForm.tsx';
 import ReviewPanel from '../components/checkout/reviewPanel.tsx';
-import useCheckoutLogic from '../hooks/pageLogic/useCheckoutLogic.tsx';
+import useCheckoutLogic from '../hooks/pageLogic/useCheckoutLogic.ts';
 import type { AddressRequiredDto } from '../api/openApi/model';
+import CircularProgress from '@mui/material/CircularProgress';
+import { mapOrderReviewResponseToDomain } from '../domain/models/cartItem.ts';
+import { Refresh } from '@mui/icons-material';
 
 export default function CheckoutPage() {
 	const {
@@ -13,6 +23,10 @@ export default function CheckoutPage() {
 		goBackToForm,
 		isFormStage,
 		isReviewStage,
+		reviewData,
+		reviewIsError,
+		reviewErrorMessage,
+		reviewIsPending,
 	} = useCheckoutLogic();
 
 	const address: AddressRequiredDto = {
@@ -50,10 +64,35 @@ export default function CheckoutPage() {
 					</Paper>
 				</Box>
 			)}
-			{isReviewStage && (
+
+			{isReviewStage && reviewIsError && (
+				<Container maxWidth='xs'>
+					<Alert severity='error'>{reviewErrorMessage}</Alert>
+					<Button
+						startIcon={<Refresh />}
+						onClick={handleFormContinueToReview}
+						sx={{
+							mt: 3,
+							width: '100%',
+						}}>
+						Refresh
+					</Button>
+				</Container>
+			)}
+
+			{isReviewStage && !reviewIsError && reviewIsPending && (
+				<Box
+					mt={5}
+					display='flex'
+					justifyContent='center'>
+					<CircularProgress size={50} />
+				</Box>
+			)}
+
+			{isReviewStage && !reviewIsPending && !reviewIsError && (
 				<Paper sx={{ p: 3 }}>
 					<ReviewPanel
-						items={cartItems}
+						items={mapOrderReviewResponseToDomain(reviewData!)}
 						address={address}
 						onBack={goBackToForm}
 						onConfirm={() => {}}
