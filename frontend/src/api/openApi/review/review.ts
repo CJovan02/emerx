@@ -21,6 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+	PatchReviewRequest,
 	ProblemDetails,
 	ReviewGetAllParams,
 	ReviewRequest,
@@ -388,6 +389,90 @@ export function useReviewGetById<
 	return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export const reviewPatch = (
+	id: string,
+	patchReviewRequest: BodyType<PatchReviewRequest>,
+	options?: SecondParameter<typeof axiosInstance>,
+	signal?: AbortSignal
+) => {
+	return axiosInstance<ReviewResponse>(
+		{
+			url: `/Review/${id}`,
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			data: patchReviewRequest,
+			signal,
+		},
+		options
+	);
+};
+
+export const getReviewPatchMutationOptions = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof reviewPatch>>,
+		TError,
+		{ id: string; data: BodyType<PatchReviewRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof axiosInstance>;
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof reviewPatch>>,
+	TError,
+	{ id: string; data: BodyType<PatchReviewRequest> },
+	TContext
+> => {
+	const mutationKey = ['reviewPatch'];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			'mutationKey' in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof reviewPatch>>,
+		{ id: string; data: BodyType<PatchReviewRequest> }
+	> = props => {
+		const { id, data } = props ?? {};
+
+		return reviewPatch(id, data, requestOptions);
+	};
+
+	return { mutationFn, ...mutationOptions };
+};
+
+export type ReviewPatchMutationResult = NonNullable<
+	Awaited<ReturnType<typeof reviewPatch>>
+>;
+export type ReviewPatchMutationBody = BodyType<PatchReviewRequest>;
+export type ReviewPatchMutationError = ErrorType<ProblemDetails | void>;
+
+export const useReviewPatch = <
+	TError = ErrorType<ProblemDetails | void>,
+	TContext = unknown,
+>(
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof reviewPatch>>,
+			TError,
+			{ id: string; data: BodyType<PatchReviewRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof axiosInstance>;
+	},
+	queryClient?: QueryClient
+): UseMutationResult<
+	Awaited<ReturnType<typeof reviewPatch>>,
+	TError,
+	{ id: string; data: BodyType<PatchReviewRequest> },
+	TContext
+> => {
+	return useMutation(getReviewPatchMutationOptions(options), queryClient);
+};
 export const reviewDelete = (
 	id: string,
 	options?: SecondParameter<typeof axiosInstance>,

@@ -12,6 +12,7 @@ export * from './orderItem';
 export * from './orderItemRequest';
 export * from './orderRequest';
 export * from './orderResponse';
+export * from './patchReviewRequest';
 export * from './problemDetails';
 export * from './productCreateBody';
 export * from './productGetPagedParams';
