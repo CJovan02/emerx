@@ -105,6 +105,7 @@ export function ProductDetailsPage() {
 		<ProductDetails
 			product={product!}
 			onAddToCart={handleAddToCart}
+			productId={id}
 		/>
 	);
 }

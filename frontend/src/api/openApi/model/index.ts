@@ -13,6 +13,7 @@ export * from './orderItem';
 export * from './orderItemRequest';
 export * from './orderRequest';
 export * from './orderResponse';
+export * from './patchReviewRequest';
 export * from './orderReviewItem';
 export * from './orderReviewRequest';
 export * from './orderReviewResponse';

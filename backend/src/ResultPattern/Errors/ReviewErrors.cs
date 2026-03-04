@@ -11,4 +11,7 @@ public static class ReviewErrors
     
     public static Error UserPostedReviewForProduct(ObjectId userId, ObjectId productId) =>
         new(StatusCodes.BadRequest, $"User {userId} can only post one review on product {productId}");
+
+    public static Error NoUpdates(ObjectId id) =>
+        new(StatusCodes.BadRequest, $"You provided no updates for review with id {id}.");
 }

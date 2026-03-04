@@ -4,13 +4,15 @@ import { formatCurrency } from '../../utils/utils.ts';
 import ProductStock from './productStock.tsx';
 import ProductDetailImage from './productDetailsImage.tsx';
 import ProductDetailsCta from './productDetailsCta.tsx';
+import ProductReviewsSection from './ProductReviewsSection.tsx';
 
 type Props = {
 	product: ProductResponse;
 	onAddToCart: (quantity: number) => void;
+	productId: string;
 };
 
-export default function ProductDetails({ product, onAddToCart }: Props) {
+export default function ProductDetails({ product, onAddToCart, productId }: Props) {
 	const {
 		thumbnailUrl,
 		name,
@@ -105,6 +107,9 @@ export default function ProductDetails({ product, onAddToCart }: Props) {
 					/>
 				</Grid>
 			</Grid>
+
+			<Divider sx={{ my: 4 }} />
+			<ProductReviewsSection productId={productId} />
 		</Box>
 	);
 }
