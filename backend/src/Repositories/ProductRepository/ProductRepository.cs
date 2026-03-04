@@ -109,9 +109,27 @@ public class ProductRepository(MongoContext context) : IProductRepository
         await _products.UpdateOneAsync(filter, update);
     }
 
-    public Task UpdateProduct(ObjectId id, UpdateDefinition<Product> updateDef)
+    public Task<UpdateResult> UpdateProduct(FilterDefinition<Product> filter, UpdateDefinition<Product> updateDef,
+        IClientSessionHandle? session = null)
     {
-        return _products.UpdateOneAsync(item => item.Id == id, updateDef);
+        if (session is not null)
+        {
+            return _products.UpdateOneAsync(session, filter, updateDef);
+        }
+
+        return _products.UpdateOneAsync(filter, updateDef);
+    }
+
+    public Task UpdateProduct(ObjectId id, UpdateDefinition<Product> updateDef, IClientSessionHandle? session = null)
+    {
+        var filter = Builders<Product>.Filter.Eq(p => p.Id, id);
+
+        if (session is not null)
+        {
+            return _products.UpdateOneAsync(session, filter, updateDef);
+        }
+
+        return _products.UpdateOneAsync(filter, updateDef);
     }
 
     public async Task DeleteProduct(ObjectId id)

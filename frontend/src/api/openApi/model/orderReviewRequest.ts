@@ -4,10 +4,8 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { AddressRequiredDto } from './addressRequiredDto';
 import type { OrderItemRequest } from './orderItemRequest';
 
-export interface OrderRequest {
+export interface OrderReviewRequest {
 	items: OrderItemRequest[];
-	address: AddressRequiredDto;
 }

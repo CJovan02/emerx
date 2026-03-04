@@ -11,12 +11,16 @@ public interface IProductRepository
     Task<PageOf<Product>> GetProducts(int page, int pageSize, ProductFilterParams filters);
     Task<IEnumerable<string>> GetDistinctCategories();
     Task<Product?> GetProductById(ObjectId id, IClientSessionHandle? session = null);
-    Task<IEnumerable<Product>> GetProductsByIds (IEnumerable<ObjectId> ids, IClientSessionHandle? session = null);
+    Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<ObjectId> ids, IClientSessionHandle? session = null);
     Task CreateProduct(Product product);
     Task UpdateProduct(Product product);
+
     Task UpdateProductReviewAsync(ObjectId productId, double averageRating, double sumRatings, int reviewsCount,
         IClientSessionHandle? session = null);
 
-    Task UpdateProduct(ObjectId id, UpdateDefinition<Product> updateDef);
+    Task<UpdateResult> UpdateProduct(FilterDefinition<Product> filter, UpdateDefinition<Product> updateDef,
+        IClientSessionHandle? session = null);
+
+    Task UpdateProduct(ObjectId id, UpdateDefinition<Product> updateDef, IClientSessionHandle? session = null);
     Task DeleteProduct(ObjectId id);
 }

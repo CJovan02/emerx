@@ -39,7 +39,7 @@ function handleAddToCart(state: CartStore, item: CartItem): Partial<CartStore> {
 	// if (state.items.length >= 10) return state;
 	if (item.quantity < 1) return state;
 
-	const existing = state.items.find(i => i.product.id === item.product.id);
+	const existing = state.items.find(i => i.productId === item.productId);
 
 	// if this product exists in store, we sum the quantity of both
 	if (existing) {
@@ -47,7 +47,7 @@ function handleAddToCart(state: CartStore, item: CartItem): Partial<CartStore> {
 		const newProduct = { ...existing, quantity: newQuantity };
 		return {
 			items: state.items.map(i =>
-				i.product.id === item.product.id ? newProduct : i
+				i.productId === item.productId ? newProduct : i
 			),
 		};
 	}
@@ -57,7 +57,7 @@ function handleAddToCart(state: CartStore, item: CartItem): Partial<CartStore> {
 
 function handleRemoveFromCart(state: CartStore, productId: string) {
 	return {
-		items: state.items.filter(i => i.product.id !== productId),
+		items: state.items.filter(i => i.productId !== productId),
 	};
 }
 
@@ -66,5 +66,5 @@ export function getQuantityForProduct(
 	items: CartItem[],
 	productId: string
 ): number | undefined {
-	return items.find(i => i.product.id === productId)?.quantity;
+	return items.find(i => i.productId === productId)?.quantity;
 }

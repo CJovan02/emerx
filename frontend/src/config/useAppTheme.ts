@@ -13,7 +13,7 @@ function useAppTheme() {
 			},
 			background: {
 				default: lighten(Colors.Primary.Main, 0.97),
-				paper: lighten(Colors.Primary.Main, 0.95),
+				paper: lighten(Colors.Primary.Main, 0.94),
 			},
 
 			surface: {
@@ -41,7 +41,7 @@ function useAppTheme() {
 		},
 
 		shape: {
-			borderRadius: 12,
+			borderRadius: 8,
 		},
 		typography: {
 			fontFamily: `'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif`,
