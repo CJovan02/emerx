@@ -195,19 +195,25 @@ export default function StoreDrawer() {
 					gutterBottom>
 					Minimum rating
 				</Typography>
-				<Rating
-					value={minRating}
-					onChange={(_, value) => setMinRating(value)}
-				/>
-				{minRating !== null && (
-					<Button
-						size='small'
-						variant='text'
-						sx={{ mt: 0.5, p: 0 }}
-						onClick={() => setMinRating(null)}>
-						Any rating
-					</Button>
-				)}
+				<Box
+					display='flex'
+					alignItems='center'
+					gap={1}
+				>
+					<Rating
+						value={minRating}
+						onChange={(_, value) => setMinRating(value)}
+					/>
+					{minRating !== null && (
+						<Button
+							size='small'
+							variant='text'
+							sx={{ mt: 0.5, p: 0 }}
+							onClick={() => setMinRating(null)}>
+							Any rating
+						</Button>
+					)}
+				</Box>
 
 				<Divider sx={{ my: 2 }} />
 
