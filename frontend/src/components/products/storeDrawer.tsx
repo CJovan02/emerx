@@ -7,7 +7,6 @@ import {
 	FormControlLabel,
 	InputAdornment,
 	List,
-	ListSubheader,
 	Rating,
 	Skeleton,
 	Switch,
@@ -23,6 +22,7 @@ import {
 	useProductFiltersStore,
 } from '../../stores/productFiltersStore.ts';
 import { useProductGetCategories } from '../../api/openApi/product/product.ts';
+import { FilterAlt } from '@mui/icons-material';
 
 const drawerWidth = Drawers.Store.Width;
 
@@ -64,7 +64,24 @@ export default function StoreDrawer() {
 				},
 			}}
 			anchor='left'>
-			<Toolbar />
+			<Toolbar
+				disableGutters
+				sx={{
+					px: 2,
+					gap: 3,
+					alignItems: 'center',
+				}}>
+				<FilterAlt
+					fontSize='large'
+					color='primary'
+				/>
+				<Typography
+					color='primary'
+					variant='h6'
+					fontWeight={700}>
+					Filters
+				</Typography>
+			</Toolbar>
 			<Divider />
 
 			<Box sx={{ overflow: 'auto', px: 2, py: 1 }}>
@@ -75,9 +92,6 @@ export default function StoreDrawer() {
 						justifyContent: 'space-between',
 						mb: 1,
 					}}>
-					<Typography variant='subtitle1' fontWeight={700}>
-						Filters
-					</Typography>
 					{filtersActive && (
 						<Button
 							size='small'
@@ -89,19 +103,26 @@ export default function StoreDrawer() {
 					)}
 				</Box>
 
-				<Divider sx={{ mb: 2 }} />
-
 				<List
 					dense
 					disablePadding
 					subheader={
-						<ListSubheader disableGutters sx={{ lineHeight: '32px' }}>
+						<Typography
+							variant='body2'
+							fontWeight={600}
+							mb={1}
+							gutterBottom>
 							Category
-						</ListSubheader>
+						</Typography>
 					}>
 					{categoriesLoading
 						? [1, 2, 3].map(i => (
-								<Skeleton key={i} variant='text' height={32} sx={{ mb: 0.5 }} />
+								<Skeleton
+									key={i}
+									variant='text'
+									height={32}
+									sx={{ mb: 0.5 }}
+								/>
 							))
 						: (categories ?? []).map(cat => (
 								<FormControlLabel
@@ -123,7 +144,11 @@ export default function StoreDrawer() {
 
 				<Divider sx={{ my: 2 }} />
 
-				<Typography variant='body2' fontWeight={600} gutterBottom>
+				<Typography
+					variant='body2'
+					fontWeight={600}
+					mb={2.5}
+					gutterBottom>
 					Price range
 				</Typography>
 				<Box sx={{ display: 'flex', gap: 1 }}>
@@ -163,7 +188,11 @@ export default function StoreDrawer() {
 
 				<Divider sx={{ my: 2 }} />
 
-				<Typography variant='body2' fontWeight={600} gutterBottom>
+				<Typography
+					variant='body2'
+					fontWeight={600}
+					mb={2}
+					gutterBottom>
 					Minimum rating
 				</Typography>
 				<Rating

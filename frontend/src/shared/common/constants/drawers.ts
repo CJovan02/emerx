@@ -3,6 +3,6 @@ export const Drawers = {
 		Width: 250,
 	},
 	Admin: {
-		Width: 260,
+		Width: 250,
 	},
 };

@@ -51,7 +51,7 @@ export default function AdminNavigationDrawer() {
 				<DrawerNavLinkButton
 					to={Routes.Admin.AdminsManagement}
 					icon={<SupervisorAccount />}
-					text='Admins Management'
+					text='Manage Admins'
 				/>
 			</List>
 		</Drawer>
