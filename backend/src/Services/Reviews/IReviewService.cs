@@ -9,14 +9,14 @@ namespace EMerx.Services.Reviews;
 public interface IReviewService
 {
     Task<Result<PageOfResponse<ReviewResponse>>> GetAllAsync(int page, int pageSize);
-    
+
     Task<Result<ReviewResponse>> GetByIdAsync(IdRequest request);
 
     Task<Result<IEnumerable<ReviewResponse>>> GetByProductIdAsync(IdRequest request);
-    
-    Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request);
 
-    Task<Result<ReviewResponse>> PatchAsync(IdRequest idRequest, PatchReviewRequest request);
+    Task<Result<ReviewResponse>> CreateAsync(string userFirebaseUid, ReviewRequest request);
+
+    Task<Result<ReviewResponse>> PatchAsync(IdRequest idRequest, PatchReviewRequest request, string userFirebaseUid);
 
     Task<Result> DeleteAsync(IdRequest request);
 }

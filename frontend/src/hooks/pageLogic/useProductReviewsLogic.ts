@@ -12,9 +12,7 @@ import {
 } from '../../api/openApi/review/review.ts';
 import { getProductGetByIdQueryKey } from '../../api/openApi/product/product.ts';
 import { useUserStore } from '../../stores/userStore.ts';
-import type { ProblemDetails, ReviewResponse } from '../../api/openApi/model';
-import type { ErrorType } from '../../api/axiosInstance.ts';
-
+import type { ReviewResponse } from '../../api/openApi/model';
 const reviewFormSchema = z.object({
 	rating: z.number().min(1, 'Please select a rating').max(5),
 	description: z.string().min(1, 'Description is required'),
@@ -31,9 +29,8 @@ function useProductReviewsLogic(productId: string) {
 
 	const userHasReviewed = useMemo(() => {
 		if (!reviews || !user) return false;
-		return reviews.some(
-			review => (review.userId as unknown as string) === user.id
-		);
+
+		return reviews.some(review => review.userId === user.id);
 	}, [reviews, user]);
 
 	// --- Create form ---
@@ -42,31 +39,44 @@ function useProductReviewsLogic(productId: string) {
 		defaultValues: { rating: 0, description: '' },
 	});
 
-	const [submitError, setSubmitError] = useState<string | null>(null);
-
-	const { mutateAsync: createAsync, isPending: isSubmitting } = useReviewCreate(
-		{
-			mutation: {
-				onSuccess: () => {
-					queryClient.invalidateQueries({
-						queryKey: getReviewGetByProductIdQueryKey(productId),
-					});
-					queryClient.invalidateQueries({
-						queryKey: getProductGetByIdQueryKey(productId),
-					});
-					form.reset();
-					setSubmitError(null);
-				},
-				onError: err => handleMutationError(err, setSubmitError),
+	const {
+		mutateAsync: createAsync,
+		isPending: isSubmitting,
+		isError: createIsError,
+		error: createError,
+	} = useReviewCreate({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getReviewGetByProductIdQueryKey(productId),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getProductGetByIdQueryKey(productId),
+				});
+				form.reset();
 			},
+		},
+	});
+	const createErrorMessage: string | null = useMemo(() => {
+		if (!createIsError) return null;
+
+		if (isAxiosError(createError)) {
+			switch (createError.response?.status) {
+				case 403:
+					return 'You need to order this product before leaving a review.';
+				case 409:
+					return 'You already posted a review for this product.';
+			}
 		}
-	);
+
+		return 'Unexpected error occurred while trying to post your review, please try again.';
+	}, [createIsError, createError]);
 
 	const submitReview = form.handleSubmit(
 		async ({ rating, description }: FormValues) => {
 			if (!user) return;
 			await createAsync({
-				data: { userId: user.id, productId, rating, description },
+				data: { productId, rating, description },
 			});
 		}
 	);
@@ -80,22 +90,29 @@ function useProductReviewsLogic(productId: string) {
 		defaultValues: { rating: 0, description: '' },
 	});
 
-	const { mutateAsync: patchAsync, isPending: isEditSubmitting } =
-		useReviewPatch({
-			mutation: {
-				onSuccess: () => {
-					queryClient.invalidateQueries({
-						queryKey: getReviewGetByProductIdQueryKey(productId),
-					});
-					queryClient.invalidateQueries({
-						queryKey: getProductGetByIdQueryKey(productId),
-					});
-					setEditingReviewId(null);
-					setEditError(null);
-				},
-				onError: err => handleMutationError(err, setEditError),
+	const {
+		mutateAsync: patchAsync,
+		isPending: isEditSubmitting,
+		isError: patchIsError,
+		error: patchError,
+	} = useReviewPatch({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getReviewGetByProductIdQueryKey(productId),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getProductGetByIdQueryKey(productId),
+				});
+				setEditingReviewId(null);
+				setEditError(null);
 			},
-		});
+		},
+	});
+	const patchErrorMessage: string | null = useMemo(() => {
+		if (!patchIsError) return null;
+		return 'Unexpected error happened while trying to edit your review, please try again.';
+	}, [patchIsError, patchError]);
 
 	function startEditing(review: ReviewResponse) {
 		setEditingReviewId(review.id as unknown as string);
@@ -126,7 +143,8 @@ function useProductReviewsLogic(productId: string) {
 		isSubmitting,
 		userHasReviewed,
 		user,
-		submitError,
+		createErrorMessage,
+		patchErrorMessage,
 		editingReviewId,
 		editForm,
 		isEditSubmitting,
@@ -135,23 +153,6 @@ function useProductReviewsLogic(productId: string) {
 		cancelEditing,
 		submitEdit,
 	};
-}
-
-function handleMutationError(
-	error: ErrorType<void | ProblemDetails>,
-	setError: (msg: string | null) => void
-) {
-	if (!error) {
-		setError(null);
-		return;
-	}
-
-	if (isAxiosError(error) && error.response?.status === 400) {
-		setError('You must have purchased this product before you can review it.');
-		return;
-	}
-
-	setError('Unexpected error occurred, please try again.');
 }
 
 export default useProductReviewsLogic;

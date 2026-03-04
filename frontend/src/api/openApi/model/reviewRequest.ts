@@ -7,8 +7,6 @@
 
 export interface ReviewRequest {
 	/** @minLength 1 */
-	userId: string;
-	/** @minLength 1 */
 	productId: string;
 	rating: number;
 	/** @minLength 1 */

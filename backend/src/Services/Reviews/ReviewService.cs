@@ -8,6 +8,7 @@ using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.OrderRepository;
 using EMerx.Repositories.ProductRepository;
 using EMerx.Repositories.ReviewRepository;
+using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern;
 using EMerx.ResultPattern.Errors;
 using MongoDB.Bson;
@@ -16,6 +17,7 @@ using MongoDB.Driver;
 namespace EMerx.Services.Reviews;
 
 public class ReviewService(
+    IUserRepository userRepository,
     IReviewRepository reviewRepository,
     IProductRepository productRepository,
     IOrderRepository orderRepository,
@@ -34,8 +36,8 @@ public class ReviewService(
             pageOfReviews.Page,
             pageOfReviews.PageSize,
             pageOfReviews.TotalItems);
-        
-        return Result<PageOfResponse<ReviewResponse>>.Success(response);    
+
+        return Result<PageOfResponse<ReviewResponse>>.Success(response);
     }
 
     public async Task<Result<ReviewResponse>> GetByIdAsync(IdRequest request)
@@ -61,22 +63,22 @@ public class ReviewService(
         return Result<IEnumerable<ReviewResponse>>.Success(productsResponse);
     }
 
-    public async Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request)
+    public async Task<Result<ReviewResponse>> CreateAsync(string userFirebaseUid, ReviewRequest request)
     {
         using var session = await mongoContext.StartSessionAsync();
 
         try
         {
             session.StartTransaction();
-            var userId = new ObjectId(request.UserId);
 
-            // Discuss user check it's required
-            // var user = await userRepository.GetUserById(userId, session);
-            // if (user is null)
-            // {
-            //     await session.AbortTransactionAsync();
-            //     return Result<ReviewResponse>.Failure(UserErrors.NotFound(userId));
-            // }
+            var user = await userRepository.GetUserByFirebaseUid(userFirebaseUid, session);
+            if (user is null)
+            {
+                await session.AbortTransactionAsync();
+                return Result<ReviewResponse>.Failure(UserErrors.NotFound(userFirebaseUid));
+            }
+
+            var userId = user.Id;
 
             var productId = new ObjectId(request.ProductId);
             var product = await productRepository.GetProductById(productId, session);
@@ -100,13 +102,13 @@ public class ReviewService(
                 return Result<ReviewResponse>.Failure(ReviewErrors.UserPostedReviewForProduct(userId, productId));
             }
 
-            var review = request.ToDomain();
+            var review = request.ToDomain(userId, $"{user.Name} {user.Surname}");
 
             // We also calculate the avg rating and increase the review count of the product
             await CalculateAndIncreaseProductRating(product, review.Rating, session);
 
             await reviewRepository.CreateReview(review, session);
-            
+
             await session.CommitTransactionAsync();
             return Result<ReviewResponse>.Success(review.ToResponse());
         }
@@ -117,13 +119,21 @@ public class ReviewService(
         }
     }
 
-    public async Task<Result<ReviewResponse>> PatchAsync(IdRequest idRequest, PatchReviewRequest request)
+    public async Task<Result<ReviewResponse>> PatchAsync(IdRequest idRequest, PatchReviewRequest request,
+        string firebaseUid)
     {
         if (request.Rating is null && request.Description is null)
             return Result<ReviewResponse>.Failure(ReviewErrors.NoUpdates(ObjectId.Parse(idRequest.Id)));
 
         using var session = await mongoContext.StartSessionAsync();
         session.StartTransaction();
+
+        var user = await userRepository.GetUserByFirebaseUid(firebaseUid, session);
+        if (user is null)
+        {
+            await session.AbortTransactionAsync();
+            return Result<ReviewResponse>.Failure(UserErrors.NotFound(firebaseUid));
+        }
 
         var objectId = ObjectId.Parse(idRequest.Id);
         var review = await reviewRepository.GetReviewById(objectId, session);
@@ -132,6 +142,12 @@ public class ReviewService(
         {
             await session.AbortTransactionAsync();
             return Result<ReviewResponse>.Failure(ReviewErrors.NotFound(objectId));
+        }
+
+        if (user.Id != review.UserId)
+        {
+            await session.AbortTransactionAsync();
+            return Result<ReviewResponse>.Failure(ReviewErrors.NotYourReview());
         }
 
         if (request.Rating.HasValue && request.Rating.Value != review.Rating)
@@ -145,13 +161,15 @@ public class ReviewService(
 
             var newSumRatings = product.SumRatings - review.Rating + request.Rating.Value;
             var newAvgRating = newSumRatings / product.ReviewCount;
-            await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, product.ReviewCount, session);
+            await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings,
+                product.ReviewCount, session);
         }
 
         var updatedReview = new Review
         {
             Id = review.Id,
             UserId = review.UserId,
+            UserFullName = review.UserFullName,
             ProductId = review.ProductId,
             Rating = request.Rating ?? review.Rating,
             Description = request.Description ?? review.Description
@@ -170,7 +188,7 @@ public class ReviewService(
         try
         {
             session.StartTransaction();
-            
+
             var objectId = ObjectId.Parse(request.Id);
             var review = await reviewRepository.GetReviewById(objectId, session);
 
@@ -207,7 +225,8 @@ public class ReviewService(
         var newReviewsCount = product.ReviewCount + 1;
         var newSumRatings = product.SumRatings + rating;
         var newAvgRating = newSumRatings / newReviewsCount;
-        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount, session);
+        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount,
+            session);
     }
 
     private async Task CalculateAndDecreaseProductRating(Product product, double rating, IClientSessionHandle session)
@@ -225,6 +244,7 @@ public class ReviewService(
             newAvgRating = 0;
         }
 
-        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount, session);
+        await productRepository.UpdateProductReviewAsync(product.Id, newAvgRating, newSumRatings, newReviewsCount,
+            session);
     }
 }

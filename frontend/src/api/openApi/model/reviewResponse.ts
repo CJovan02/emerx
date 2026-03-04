@@ -4,12 +4,16 @@
  * Demo API
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from './objectId';
 
 export interface ReviewResponse {
-	id: ObjectId;
-	userId: ObjectId;
-	productId: ObjectId;
+	/** @minLength 1 */
+	id: string;
+	/** @minLength 1 */
+	userId: string;
+	/** @minLength 1 */
+	userFullName: string;
+	/** @minLength 1 */
+	productId: string;
 	rating: number;
 	/** @minLength 1 */
 	description: string;

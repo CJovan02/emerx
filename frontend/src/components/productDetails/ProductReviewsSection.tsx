@@ -13,6 +13,8 @@ import {
 import { Controller } from 'react-hook-form';
 import useProductReviewsLogic from '../../hooks/pageLogic/useProductReviewsLogic.ts';
 import ProductReviewCard from './ProductReviewCard.tsx';
+import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 
 type Props = {
 	productId: string;
@@ -27,7 +29,8 @@ export default function ProductReviewsSection({ productId }: Props) {
 		isSubmitting,
 		userHasReviewed,
 		user,
-		submitError,
+		createErrorMessage,
+		patchErrorMessage,
 		editingReviewId,
 		editForm,
 		isEditSubmitting,
@@ -36,13 +39,26 @@ export default function ProductReviewsSection({ productId }: Props) {
 		cancelEditing,
 		submitEdit,
 	} = useProductReviewsLogic(productId);
+	const { enqueueSnackbar } = useSnackbar();
 
-	const { register, control, formState: { errors } } = form;
+	const {
+		register,
+		control,
+		formState: { errors },
+	} = form;
 	const {
 		register: editRegister,
 		control: editControl,
 		formState: { errors: editErrors },
 	} = editForm;
+	useEffect(() => {
+		if (!createErrorMessage) return;
+		enqueueSnackbar(createErrorMessage, { variant: 'error' });
+	}, [createErrorMessage, enqueueSnackbar]);
+	useEffect(() => {
+		if (!patchErrorMessage) return;
+		enqueueSnackbar(patchErrorMessage, { variant: 'error' });
+	}, [patchErrorMessage, enqueueSnackbar]);
 
 	return (
 		<Box>
@@ -96,14 +112,6 @@ export default function ProductReviewsSection({ productId }: Props) {
 						helperText={errors.description?.message}
 						sx={{ mb: 2 }}
 					/>
-
-					{submitError && (
-						<Alert
-							severity='error'
-							sx={{ mb: 2 }}>
-							{submitError}
-						</Alert>
-					)}
 
 					<Button
 						type='submit'
@@ -218,9 +226,7 @@ export default function ProductReviewsSection({ productId }: Props) {
 							<ProductReviewCard
 								key={reviewId}
 								review={review}
-								isOwnReview={
-									(review.userId as unknown as string) === user?.id
-								}
+								isOwnReview={review.userId === user?.id}
 								onEditClick={() => startEditing(review)}
 							/>
 						);

@@ -11,20 +11,21 @@ public static class ReviewsExtensions
     {
         return new ReviewResponse
         {
-            Id = review.Id,
-            UserId = review.UserId,
-            ProductId = review.ProductId,
+            Id = review.Id.ToString(),
+            UserId = review.UserId.ToString(),
+            ProductId = review.ProductId.ToString(),
+            UserFullName = review.UserFullName,
             Rating = review.Rating,
             Description = review.Description
         };
     }
 
-    public static Review ToDomain(this ReviewRequest request)
+    public static Review ToDomain(this ReviewRequest request, ObjectId userId, string userFullName)
     {
         return new Review
         {
-            Id = new ObjectId(),
-            UserId = new ObjectId(request.UserId),
+            UserId = userId,
+            UserFullName = userFullName,
             ProductId = new ObjectId(request.ProductId),
             Rating = request.Rating,
             Description = request.Description,

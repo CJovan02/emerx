@@ -13,6 +13,7 @@ import type { ProductResponse } from '../../api/openApi/model';
 import { useNavigate } from 'react-router';
 import { Routes } from '../../shared/common/constants/routeNames.ts';
 import ProductStock from '../productDetails/productStock.tsx';
+import { formatCurrency } from '../../utils/utils.ts';
 
 type Props = {
 	product: ProductResponse;
@@ -99,6 +100,7 @@ export default function ProductCard({ product }: Props) {
 						/>
 						<Typography
 							variant='caption'
+							fontWeight={300}
 							color='text.secondary'>
 							({product.reviewCount})
 						</Typography>
@@ -115,15 +117,12 @@ export default function ProductCard({ product }: Props) {
 							variant='h6'
 							fontWeight={700}
 							color='primary'>
-							${product.price.toFixed(2)}
+							{formatCurrency(product.price)}
 						</Typography>
-						<ProductStock stock={product.stock} size='small' />
-						{/*<Typography*/}
-						{/*	variant='caption'*/}
-						{/*	color={product.stock > 0 ? 'success.main' : 'error.main'}*/}
-						{/*	fontWeight={600}>*/}
-						{/*	{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}*/}
-						{/*</Typography>*/}
+						<ProductStock
+							stock={product.stock}
+							size='small'
+						/>
 					</Box>
 				</CardContent>
 			</CardActionArea>
