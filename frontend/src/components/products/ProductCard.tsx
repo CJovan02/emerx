@@ -12,6 +12,7 @@ import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupported
 import type { ProductResponse } from '../../api/openApi/model';
 import { useNavigate } from 'react-router';
 import { Routes } from '../../shared/common/constants/routeNames.ts';
+import ProductStock from '../productDetails/productStock.tsx';
 
 type Props = {
 	product: ProductResponse;
@@ -28,7 +29,12 @@ export default function ProductCard({ product }: Props) {
 		<Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 			<CardActionArea
 				onClick={handleClick}
-				sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+				sx={{
+					flexGrow: 1,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'stretch',
+				}}>
 				{product.thumbnailUrl ? (
 					<CardMedia
 						component='img'
@@ -51,7 +57,13 @@ export default function ProductCard({ product }: Props) {
 					</Box>
 				)}
 
-				<CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+				<CardContent
+					sx={{
+						flexGrow: 1,
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 0.5,
+					}}>
 					<Chip
 						label={product.category}
 						size='small'
@@ -72,28 +84,46 @@ export default function ProductCard({ product }: Props) {
 						{product.name}
 					</Typography>
 
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 'auto' }}>
+					<Box
+						sx={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: 0.5,
+							mt: 'auto',
+						}}>
 						<Rating
 							value={product.averageRating}
 							precision={0.5}
 							size='small'
 							readOnly
 						/>
-						<Typography variant='caption' color='text.secondary'>
+						<Typography
+							variant='caption'
+							color='text.secondary'>
 							({product.reviewCount})
 						</Typography>
 					</Box>
 
-					<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-						<Typography variant='h6' fontWeight={700} color='primary'>
+					<Box
+						sx={{
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'space-between',
+							mt: 1,
+						}}>
+						<Typography
+							variant='h6'
+							fontWeight={700}
+							color='primary'>
 							${product.price.toFixed(2)}
 						</Typography>
-						<Typography
-							variant='caption'
-							color={product.stock > 0 ? 'success.main' : 'error.main'}
-							fontWeight={600}>
-							{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-						</Typography>
+						<ProductStock stock={product.stock} size='small' />
+						{/*<Typography*/}
+						{/*	variant='caption'*/}
+						{/*	color={product.stock > 0 ? 'success.main' : 'error.main'}*/}
+						{/*	fontWeight={600}>*/}
+						{/*	{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}*/}
+						{/*</Typography>*/}
 					</Box>
 				</CardContent>
 			</CardActionArea>

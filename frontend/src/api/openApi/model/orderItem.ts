@@ -9,7 +9,7 @@ import type { ObjectId } from './objectId';
 export interface OrderItem {
 	productId: ObjectId;
 	/** @nullable */
-	name: string | null;
+	nameAtOrder: string | null;
 	priceAtOrder: number;
 	quantity: number;
 }

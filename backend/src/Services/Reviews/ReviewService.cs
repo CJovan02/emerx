@@ -87,7 +87,7 @@ public class ReviewService(
             }
 
             // We check if user ordered this item, if not then he can't leave review
-            if (!(await orderRepository.HasUserOrderedProduct(userId, productId, session)))
+            if (!await orderRepository.HasUserOrderedProduct(userId, productId, session))
             {
                 await session.AbortTransactionAsync();
                 return Result<ReviewResponse>.Failure(ReviewErrors.NotOrdered(userId, productId));

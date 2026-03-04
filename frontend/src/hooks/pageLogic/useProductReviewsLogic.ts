@@ -44,28 +44,32 @@ function useProductReviewsLogic(productId: string) {
 
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
-	const { mutateAsync: createAsync, isPending: isSubmitting } = useReviewCreate({
-		mutation: {
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: getReviewGetByProductIdQueryKey(productId),
-				});
-				queryClient.invalidateQueries({
-					queryKey: getProductGetByIdQueryKey(productId),
-				});
-				form.reset();
-				setSubmitError(null);
+	const { mutateAsync: createAsync, isPending: isSubmitting } = useReviewCreate(
+		{
+			mutation: {
+				onSuccess: () => {
+					queryClient.invalidateQueries({
+						queryKey: getReviewGetByProductIdQueryKey(productId),
+					});
+					queryClient.invalidateQueries({
+						queryKey: getProductGetByIdQueryKey(productId),
+					});
+					form.reset();
+					setSubmitError(null);
+				},
+				onError: err => handleMutationError(err, setSubmitError),
 			},
-			onError: (err) => handleMutationError(err, setSubmitError),
-		},
-	});
+		}
+	);
 
-	const submitReview = form.handleSubmit(async ({ rating, description }: FormValues) => {
-		if (!user) return;
-		await createAsync({
-			data: { userId: user.id, productId, rating, description },
-		});
-	});
+	const submitReview = form.handleSubmit(
+		async ({ rating, description }: FormValues) => {
+			if (!user) return;
+			await createAsync({
+				data: { userId: user.id, productId, rating, description },
+			});
+		}
+	);
 
 	// --- Edit form ---
 	const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
@@ -76,21 +80,22 @@ function useProductReviewsLogic(productId: string) {
 		defaultValues: { rating: 0, description: '' },
 	});
 
-	const { mutateAsync: patchAsync, isPending: isEditSubmitting } = useReviewPatch({
-		mutation: {
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: getReviewGetByProductIdQueryKey(productId),
-				});
-				queryClient.invalidateQueries({
-					queryKey: getProductGetByIdQueryKey(productId),
-				});
-				setEditingReviewId(null);
-				setEditError(null);
+	const { mutateAsync: patchAsync, isPending: isEditSubmitting } =
+		useReviewPatch({
+			mutation: {
+				onSuccess: () => {
+					queryClient.invalidateQueries({
+						queryKey: getReviewGetByProductIdQueryKey(productId),
+					});
+					queryClient.invalidateQueries({
+						queryKey: getProductGetByIdQueryKey(productId),
+					});
+					setEditingReviewId(null);
+					setEditError(null);
+				},
+				onError: err => handleMutationError(err, setEditError),
 			},
-			onError: (err) => handleMutationError(err, setEditError),
-		},
-	});
+		});
 
 	function startEditing(review: ReviewResponse) {
 		setEditingReviewId(review.id as unknown as string);
@@ -103,13 +108,15 @@ function useProductReviewsLogic(productId: string) {
 		setEditError(null);
 	}
 
-	const submitEdit = editForm.handleSubmit(async ({ rating, description }: FormValues) => {
-		if (!editingReviewId) return;
-		await patchAsync({
-			id: editingReviewId,
-			data: { rating, description },
-		});
-	});
+	const submitEdit = editForm.handleSubmit(
+		async ({ rating, description }: FormValues) => {
+			if (!editingReviewId) return;
+			await patchAsync({
+				id: editingReviewId,
+				data: { rating, description },
+			});
+		}
+	);
 
 	return {
 		reviews,
