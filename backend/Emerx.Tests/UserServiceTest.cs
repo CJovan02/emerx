@@ -311,4 +311,72 @@ public class UserServiceTest
                 It.Is<string>(uid => uid == userUid)),
             Times.Once);
     }
+
+    [Test]
+    public async Task DeleteAsync_NonExistingIdPassed_ReturnsNotFoundError()
+    {
+        // Arrange
+        var nonExistingId = ObjectId.GenerateNewId();
+        var request = new IdRequest
+        {
+            Id = nonExistingId.ToString()
+        };
+
+        _userRepository
+            .Setup(r => r.GetUserById(nonExistingId, null))
+            .ReturnsAsync(null as User);
+
+        // Act
+        var result = await _userService.DeleteAsync(request);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(UserErrors.NotFound(nonExistingId)));
+        });
+
+        _authRepository.Verify(
+            r => r.DeleteUserAsync(
+                It.IsAny<string>()),
+            Times.Never);
+
+        _userRepository.Verify(
+            r => r.DeleteUser(
+                It.IsAny<ObjectId>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteAsync_ExistingIdPassed_UserDeleted()
+    {
+        // Arrange
+        var existingId = ObjectId.GenerateNewId();
+        var firebaseUid = "SomeFirebaseUid";
+        var request = new IdRequest
+        {
+            Id = existingId.ToString()
+        };
+        var user = CreateUser(existingId, null, firebaseUid);
+
+        _userRepository
+            .Setup(r => r.GetUserById(existingId, null))
+            .ReturnsAsync(user);
+
+        // Act
+        var result = await _userService.DeleteAsync(request);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(
+            r => r.DeleteUserAsync(
+                It.Is<string>(id => id == firebaseUid)),
+            Times.Once);
+
+        _userRepository.Verify(
+            r => r.DeleteUser(
+                It.Is<ObjectId>(id => id == existingId)),
+            Times.Once);
+    }
 }
