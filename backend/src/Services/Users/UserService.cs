@@ -146,7 +146,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         {
             await authRepository.DeleteUserAsync(firebaseUid);
         }
-        catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+        catch (UserNotFoundById)
         {
             // ignore
         }
@@ -167,6 +167,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         if (user is null)
             return Result<UserResponse>.Failure(UserErrors.NotFound(request.Id));
 
+        // error, updating on old object instead of this one, consult with Peric
         var updatedUser = new User
         {
             Id = ObjectId.Parse(request.Id),

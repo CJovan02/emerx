@@ -17,14 +17,9 @@ public class AuthRepository : IAuthRepository
         {
             return await _firebaseAuth.GetUserAsync(uid);
         }
-        catch (FirebaseAuthException e)
+        catch (FirebaseAuthException e) when (e.ErrorCode == ErrorCode.NotFound)
         {
-            if (e.ErrorCode == ErrorCode.NotFound)
-            {
-                throw new UserNotFoundById(uid);
-            }
-
-            throw e;
+            throw new UserNotFoundById(uid);
         }
     }
 
@@ -36,14 +31,9 @@ public class AuthRepository : IAuthRepository
         {
             return await _firebaseAuth.GetUserByEmailAsync(email);
         }
-        catch (FirebaseAuthException e)
+        catch (FirebaseAuthException e) when (e.ErrorCode == ErrorCode.NotFound)
         {
-            if (e.ErrorCode == ErrorCode.NotFound)
-            {
-                throw new UserNotFoundByEmail(email);
-            }
-
-            throw e;
+            throw new UserNotFoundByEmail(email);
         }
     }
 
@@ -55,14 +45,9 @@ public class AuthRepository : IAuthRepository
         {
             return (await _firebaseAuth.GetUserByEmailAsync(email)).Uid;
         }
-        catch (FirebaseAuthException e)
+        catch (FirebaseAuthException e) when (e.ErrorCode == ErrorCode.NotFound)
         {
-            if (e.ErrorCode == ErrorCode.NotFound)
-            {
-                throw new UserNotFoundByEmail(email);
-            }
-
-            throw e;
+            throw new UserNotFoundByEmail(email);
         }
     }
 
@@ -80,7 +65,14 @@ public class AuthRepository : IAuthRepository
 
     public async Task DeleteUserAsync(string uid)
     {
-        await _firebaseAuth.DeleteUserAsync(uid);
+        try
+        {
+            await _firebaseAuth.DeleteUserAsync(uid);
+        }
+        catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+        {
+            throw new UserNotFoundById(uid);
+        }
     }
 
     /// <summary>

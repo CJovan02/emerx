@@ -379,4 +379,71 @@ public class UserServiceTest
                 It.Is<ObjectId>(id => id == existingId)),
             Times.Once);
     }
+
+    [Test]
+    public async Task DeleteByFirebaseIdAsync_UserExists_DeletesFirebaseAndDbUser()
+    {
+        // Arrange
+        const string firebaseUid = "SomeFirebaseUid";
+
+        var user = CreateUser(null, null, firebaseUid);
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
+            .ReturnsAsync(user);
+
+        // Act
+        var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(r => r.DeleteUserAsync(firebaseUid), Times.Once);
+        _userRepository.Verify(r => r.DeleteUser(user.Id), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteByFirebaseIdAsync_FirebaseUserNotFound_IgnoresExceptionAndDeletesDbUser()
+    {
+        // Arrange
+        var firebaseUid = "uid123";
+
+        _authRepository
+            .Setup(r => r.DeleteUserAsync(firebaseUid))
+            .ThrowsAsync(new UserNotFoundById(firebaseUid));
+
+        var dbUser = CreateUser(null, null, firebaseUid);
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
+            .ReturnsAsync(dbUser);
+
+        // Act
+        var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _userRepository.Verify(r => r.DeleteUser(dbUser.Id), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteByFirebaseIdAsync_DbUserNotFound_OnlyDeletesFirebase()
+    {
+        // Arrange
+        var firebaseUid = "uid123";
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
+            .ReturnsAsync((User)null);
+
+        // Act
+        var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(r => r.DeleteUserAsync(firebaseUid), Times.Once);
+        _userRepository.Verify(r => r.DeleteUser(It.IsAny<ObjectId>()), Times.Never);
+    }
 }
