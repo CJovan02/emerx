@@ -1,10 +1,14 @@
-﻿using EMerx.DTOs.Id;
+﻿using EMerx.Common.Exceptions;
+using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.Entities;
+using EMerx.ExceptionHandlers;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern.Errors;
 using EMerx.Services.Users;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
 using MongoDB.Bson;
 using Moq;
 
@@ -217,6 +221,94 @@ public class UserServiceTest
 
         _userRepository.Verify(
             r => r.UpdateUser(It.Is<User>(u => u.FirebaseUid == validFirebaseUid)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GrantAdminRoleAsync_NonExistingEmailPassed_ReturnsNotFoundError()
+    {
+        // Arrange
+        const string email = "nonexisting@email.com";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ThrowsAsync(new UserNotFoundByEmail(email));
+
+        // Act
+        var result = await _userService.GrantAdminRoleAsync(email);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(AuthErrors.NotFoundByEmail(email)));
+        });
+    }
+
+    [Test]
+    public async Task GrantAdminRoleAsync_ExistingEmailPassed_GrantRole()
+    {
+        // Arrange
+        const string email = "existing@email.com";
+        const string userUid = "SomeUserUid";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ReturnsAsync(userUid);
+
+        // Act
+        var result = await _userService.GrantAdminRoleAsync(email);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(
+            r => r.GrantAdminRoleAsync(
+                It.Is<string>(uid => uid == userUid)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task RemoveAdminRoleAsync_NonExistingEmailPassed_ReturnsNotFoundError()
+    {
+        // Arrange
+        const string email = "nonexisting@email.com";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ThrowsAsync(new UserNotFoundByEmail(email));
+
+        // Act
+        var result = await _userService.RemoveAdminRoleAsync(email);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(AuthErrors.NotFoundByEmail(email)));
+        });
+    }
+
+    [Test]
+    public async Task RemoveAdminRoleAsync_ExistingEmailPassed_GrantRole()
+    {
+        // Arrange
+        const string email = "existing@email.com";
+        const string userUid = "SomeUserUid";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ReturnsAsync(userUid);
+
+        // Act
+        var result = await _userService.RemoveAdminRoleAsync(email);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(
+            r => r.RemoveAdminRoleAsync(
+                It.Is<string>(uid => uid == userUid)),
             Times.Once);
     }
 }

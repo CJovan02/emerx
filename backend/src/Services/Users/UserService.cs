@@ -1,3 +1,4 @@
+using EMerx.Common.Exceptions;
 using EMerx.DTOs.Address;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users;
@@ -87,13 +88,12 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
     {
         try
         {
-            var user = await authRepository.GetUserByEmailAsync(email);
-            await authRepository.GrantAdminRoleAsync(user.Uid);
+            var uid = await authRepository.GetUserUidByEmailAsync(email);
+            await authRepository.GrantAdminRoleAsync(uid);
 
             return Result.Success();
         }
-        // Thrown if auth user with the provided email can't be found
-        catch (FirebaseAuthException e)
+        catch (UserNotFoundByEmail)
         {
             return Result.Failure(AuthErrors.NotFoundByEmail(email));
         }
@@ -103,13 +103,12 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
     {
         try
         {
-            var user = await authRepository.GetUserByEmailAsync(email);
-            await authRepository.RemoveAdminRoleAsync(user.Uid);
+            var uid = await authRepository.GetUserUidByEmailAsync(email);
+            await authRepository.RemoveAdminRoleAsync(uid);
 
             return Result.Success();
         }
-        // Thrown if auth user with the provided email can't be found
-        catch (FirebaseAuthException e)
+        catch (UserNotFoundByEmail)
         {
             return Result.Failure(AuthErrors.NotFoundByEmail(email));
         }

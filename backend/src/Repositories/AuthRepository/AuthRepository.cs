@@ -1,4 +1,6 @@
 using EMerx.Auth;
+using EMerx.Common.Exceptions;
+using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 
 namespace EMerx.Repositories.AuthRepository;
@@ -9,12 +11,59 @@ public class AuthRepository : IAuthRepository
 
     public async Task<UserRecord> GetUserByUidAsync(string uid)
     {
-        return await _firebaseAuth.GetUserAsync(uid);
+        // In order to properly mock this error in unit tests, I need to replace FirebaseException with my own
+        // Because FirebaseAuthException is internal class and I can't create its instance
+        try
+        {
+            return await _firebaseAuth.GetUserAsync(uid);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.ErrorCode == ErrorCode.NotFound)
+            {
+                throw new UserNotFoundById(uid);
+            }
+
+            throw e;
+        }
     }
 
     public async Task<UserRecord> GetUserByEmailAsync(string email)
     {
-        return await _firebaseAuth.GetUserByEmailAsync(email);
+        // In order to properly mock this error in unit tests, I need to replace FirebaseException with my own
+        // Because FirebaseAuthException is internal class and I can't create its instance
+        try
+        {
+            return await _firebaseAuth.GetUserByEmailAsync(email);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.ErrorCode == ErrorCode.NotFound)
+            {
+                throw new UserNotFoundByEmail(email);
+            }
+
+            throw e;
+        }
+    }
+
+    public async Task<string> GetUserUidByEmailAsync(string email)
+    {
+        // I order to properly mock this error in unit tests, I need to replace FirebaseException with my own
+        // Because FirebaseAuthException is internal class and I can't create its instance
+        try
+        {
+            return (await _firebaseAuth.GetUserByEmailAsync(email)).Uid;
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.ErrorCode == ErrorCode.NotFound)
+            {
+                throw new UserNotFoundByEmail(email);
+            }
+
+            throw e;
+        }
     }
 
     public async Task<string> RegisterAsync(string email, string password)

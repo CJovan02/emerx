@@ -7,6 +7,8 @@ public interface IAuthRepository
     Task<UserRecord> GetUserByUidAsync(string uid);
 
     Task<UserRecord> GetUserByEmailAsync(string email);
+
+    Task<string> GetUserUidByEmailAsync(string email);
     
     Task<string> RegisterAsync(string email, string password);
 
