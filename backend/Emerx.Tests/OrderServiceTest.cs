@@ -324,7 +324,7 @@ public class OrderServiceTest
     }
 
     [Test]
-    public async Task CreateAsync_TooLargeQuantity_ReturnsQuantityError()
+    public async Task CreateAsync_QuantityNotAvailable_ReturnsError()
     {
         // Arrange
 
@@ -404,6 +404,124 @@ public class OrderServiceTest
             Times.Never);
     }
 
+    [Test]
+    public async Task GetOrderReview_ValidRequest_ReturnsReviewResponse()
+    {
+        // Arrange
+        var product = CreateProduct();
+
+        var request = CreateOrderReviewRequest(product.Id.ToString());
+
+
+        _productRepository
+            .Setup(r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(), null))
+            .ReturnsAsync([product]);
+
+        _cloudinaryRepository
+            .Setup(r => r.BuildProductThumbnailImageUrl(
+                It.IsAny<string>(), null))
+            .Returns("thumbnail-url");
+
+        // Act
+
+        var result = await _orderService.GetOrderReview(request);
+
+        // Assert
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.True);
+
+            Assert.That(result.Value.Items.Count, Is.EqualTo(1));
+
+            Assert.That(result.Value.Items[0].Quantity, Is.EqualTo(2));
+        });
+
+        _productRepository.Verify(
+            r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(), null),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetOrderReview_ProductDoesNotExist_ReturnsNotFoundError()
+    {
+        // Arrange
+        var missingProductId = ObjectId.GenerateNewId();
+        var request = CreateOrderReviewRequest(missingProductId.ToString());
+
+        _productRepository
+            .Setup(r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(), null))
+            .ReturnsAsync([]);
+
+        // Act
+
+        var result = await _orderService.GetOrderReview(request);
+
+        // Assert
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+
+            Assert.That(
+                result.Error,
+                Is.EqualTo(OrderErrors.NotFound([missingProductId])));
+        });
+    }
+
+    [Test]
+    public async Task GetOrderReview_QuantityNotAvailable_ReturnsError()
+    {
+        // Arrange
+        const int stock = 5;
+        const int quantity = 20;
+        var product = CreateProduct(stock);
+        var request = CreateOrderReviewRequest(product.Id.ToString(), quantity);
+
+
+        _productRepository
+            .Setup(r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(), null))
+            .ReturnsAsync([product]);
+
+        // Act
+
+        var result = await _orderService.GetOrderReview(request);
+
+        // Assert
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+
+            Assert.That(
+                result.Error,
+                Is.EqualTo(
+                    OrderErrors.QuantityNotAvailable(
+                        product.Id.ToString(),
+                        stock,
+                        quantity)));
+        });
+    }
+
+    private OrderReviewRequest CreateOrderReviewRequest(string? productId = null, int quantity = 2)
+    {
+        return new OrderReviewRequest
+        {
+            Items =
+            [
+                new OrderItemRequest
+                {
+                    ProductId = productId ?? "id123",
+                    Quantity = quantity
+                }
+            ]
+        };
+    }
+
     private OrderRequest CreateOrderRequest(string? productId = null)
     {
         return new OrderRequest
@@ -425,7 +543,7 @@ public class OrderServiceTest
         };
     }
 
-    private Product CreateProduct()
+    private Product CreateProduct(int stock = 10)
     {
         return new Product
         {
@@ -437,9 +555,76 @@ public class OrderServiceTest
             AverageRating = 4,
             ReviewCount = 5,
             SumRatings = 20,
-            Stock = 10,
+            Stock = stock,
             ImageVersion = null
         };
+    }
+
+    [Test]
+    public async Task DeleteAsync_ExistingOrder_DeletesOrder()
+    {
+        // Arrange
+
+        var orderId = ObjectId.GenerateNewId();
+
+        var request = new IdRequest
+        {
+            Id = orderId.ToString()
+        };
+
+        var order = CreateOrder(orderId);
+
+        _orderRepository
+            .Setup(r => r.GetOrderById(orderId))
+            .ReturnsAsync(order);
+
+        // Act
+
+        var result = await _orderService.DeleteAsync(request);
+
+        // Assert
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        _orderRepository.Verify(
+            r => r.DeleteOrder(orderId),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteAsync_OrderDoesNotExist_ReturnsNotFoundError()
+    {
+        // Arrange
+
+        var orderId = ObjectId.GenerateNewId();
+
+        var request = new IdRequest
+        {
+            Id = orderId.ToString()
+        };
+
+        _orderRepository
+            .Setup(r => r.GetOrderById(orderId))
+            .ReturnsAsync(null as Order);
+
+        // Act
+
+        var result = await _orderService.DeleteAsync(request);
+
+        // Assert
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+
+            Assert.That(
+                result.Error,
+                Is.EqualTo(OrderErrors.NotFound(orderId)));
+        });
+
+        _orderRepository.Verify(
+            r => r.DeleteOrder(It.IsAny<ObjectId>()),
+            Times.Never);
     }
 
     private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
