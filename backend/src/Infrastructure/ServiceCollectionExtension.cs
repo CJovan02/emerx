@@ -51,7 +51,7 @@ public static class ServiceCollectionExtension
                                         throw new EnvVariableNotFoundException(Constants.EnvVariables.Database);
         });
 
-        services.AddSingleton<MongoContext>();
+        services.AddSingleton<IMongoContext, MongoContext>();
         return services;
     }
 
