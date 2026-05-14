@@ -48,7 +48,6 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         if (user?.FirebaseUid != null)
             return Result<UserResponse>.Failure(UserErrors.EmailOccupied(user.Email));
 
-
         // If user doesn't exist -> create db user
         if (user is null)
         {
@@ -168,7 +167,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         var user = await userRepository.GetUserById(ObjectId.Parse(request.Id));
         if (user is null)
             return Result<UserResponse>.Failure(UserErrors.NotFound(request.Id));
-        
+
         var updatedUser = new User
         {
             Id = ObjectId.Parse(request.Id),
@@ -178,7 +177,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
             FirebaseUid = user.FirebaseUid,
             Address = updateUserRequest.Address.ToEntity()
         };
-        
+
         await userRepository.UpdateUser(user);
         return Result<UserResponse>.Success(user.ToResponse());
     }
