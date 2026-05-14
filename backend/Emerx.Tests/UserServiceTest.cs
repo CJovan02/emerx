@@ -2,13 +2,10 @@
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.Entities;
-using EMerx.ExceptionHandlers;
 using EMerx.Repositories.AuthRepository;
 using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern.Errors;
 using EMerx.Services.Users;
-using FirebaseAdmin;
-using FirebaseAdmin.Auth;
 using MongoDB.Bson;
 using Moq;
 
@@ -20,18 +17,6 @@ public class UserServiceTest
     private Mock<IUserRepository> _userRepository;
     private Mock<IAuthRepository> _authRepository;
     private const string _userEmail = "johnPeacock@email.com";
-
-    private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
-    {
-        return new User
-        {
-            Email = email ?? _userEmail,
-            Id = id ?? ObjectId.GenerateNewId(),
-            Name = "John",
-            Surname = "Peacock",
-            FirebaseUid = firebaseUid,
-        };
-    }
 
     [SetUp]
     public void Setup()
@@ -81,7 +66,7 @@ public class UserServiceTest
 
         _userRepository
             .Setup(r => r.GetUserById(objectId, null))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync(null as User);
 
         // Act
         var result = await _userService.GetByIdAsync(request);
@@ -187,7 +172,7 @@ public class UserServiceTest
 
         _userRepository
             .Setup(r => r.GetUserByEmail(newEmail))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync(null as User);
 
         _userRepository
             .Setup(r => r.CreateUser(It.IsAny<User>()))
@@ -435,7 +420,7 @@ public class UserServiceTest
 
         _userRepository
             .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync(null as User);
 
         // Act
         var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
@@ -445,5 +430,17 @@ public class UserServiceTest
 
         _authRepository.Verify(r => r.DeleteUserAsync(firebaseUid), Times.Once);
         _userRepository.Verify(r => r.DeleteUser(It.IsAny<ObjectId>()), Times.Never);
+    }
+
+    private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
+    {
+        return new User
+        {
+            Email = email ?? _userEmail,
+            Id = id ?? ObjectId.GenerateNewId(),
+            Name = "John",
+            Surname = "Peacock",
+            FirebaseUid = firebaseUid,
+        };
     }
 }
