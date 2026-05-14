@@ -1,5 +1,8 @@
 using EMerx.Common.Filters;
+using EMerx.DTOs.Address;
 using EMerx.DTOs.Id;
+using EMerx.DTOs.OrderItems.Request;
+using EMerx.DTOs.Orders.Request;
 using EMerx.Entities;
 using EMerx.Infrastructure.MongoDb;
 using EMerx.Repositories.CloudinaryRepository;
@@ -9,6 +12,7 @@ using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern.Errors;
 using EMerx.Services.Orders;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using Moq;
 
 namespace Emerx.Tests;
@@ -20,6 +24,8 @@ public class OrderServiceTest
     private Mock<IUserRepository> _userRepository;
     private Mock<IProductRepository> _productRepository;
     private Mock<ICloudinaryRepository> _cloudinaryRepository;
+
+    private Mock<IClientSessionHandle> _session;
     private Mock<IMongoContext> _mongoContext;
 
     private List<Order> _orders;
@@ -31,7 +37,12 @@ public class OrderServiceTest
         _userRepository = new Mock<IUserRepository>();
         _productRepository = new Mock<IProductRepository>();
         _cloudinaryRepository = new Mock<ICloudinaryRepository>();
+
         _mongoContext = new Mock<IMongoContext>();
+        _session = new Mock<IClientSessionHandle>();
+        _mongoContext
+            .Setup(c => c.StartSessionAsync())
+            .ReturnsAsync(_session.Object);
 
         _orderService = new OrderService(
             _orderRepository.Object,
@@ -148,36 +159,6 @@ public class OrderServiceTest
             Times.Once);
     }
 
-    private List<Order> CreateOrders(int count = 1)
-    {
-        var result = new List<Order>();
-        for (int i = 0; i < count; i++)
-        {
-            result.Add(CreateOrder());
-        }
-
-        return result;
-    }
-
-    private static Order CreateOrder(ObjectId? id = null)
-    {
-        return new Order
-        {
-            Id = id ?? ObjectId.GenerateNewId(),
-            UserId = ObjectId.GenerateNewId(),
-            Address = new Address
-            {
-                City = "City",
-                Street = "Street",
-                HouseNumber = "HouseNumber",
-            },
-            Items = [],
-            Price = 100,
-            UserFullNameAtOrder = "UserFullNameAtOrder",
-            PlacedAt = DateTime.Now,
-        };
-    }
-
     [Test]
     public async Task GetByIdAsync_OrderDoesNotExist_ReturnsNotFoundError()
     {
@@ -208,5 +189,298 @@ public class OrderServiceTest
         _orderRepository.Verify(
             r => r.GetOrderById(orderId),
             Times.Once);
+    }
+
+    [Test]
+    public async Task CreateAsync_ValidRequest_CreatesOrder()
+    {
+        // Arrange
+
+        var firebaseUid = "uid123";
+
+        var user = CreateUser();
+
+        var product = CreateProduct();
+
+        var request = CreateOrderRequest(product.Id.ToString());
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, _session.Object))
+            .ReturnsAsync(user);
+
+        _productRepository
+            .Setup(r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(),
+                _session.Object))
+            .ReturnsAsync([product]);
+
+        var updateResultMock = new Mock<UpdateResult>();
+
+        updateResultMock
+            .Setup(x => x.ModifiedCount)
+            .Returns(1);
+
+        _productRepository
+            .Setup(r => r.UpdateProduct(
+                It.IsAny<FilterDefinition<Product>>(),
+                It.IsAny<UpdateDefinition<Product>>(),
+                _session.Object))
+            .ReturnsAsync(updateResultMock.Object);
+
+        // Act
+
+        var result = await _orderService.CreateAsync(firebaseUid, request);
+
+        // Assert
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        _mongoContext.Verify(
+            c => c.StartSessionAsync(),
+            Times.Once);
+
+        _userRepository.Verify(
+            r => r.GetUserByFirebaseUid(firebaseUid, _session.Object),
+            Times.Once);
+        _productRepository.Verify(
+            r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(),
+                _session.Object),
+            Times.Once);
+
+        _orderRepository.Verify(
+            r => r.CreateOrder(
+                It.IsAny<Order>(),
+                _session.Object),
+            Times.Once);
+
+        _session.Verify(
+            s => s.AbortTransactionAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+        _session.Verify(
+            s => s.CommitTransactionAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task CreateAsync_UserDoesNotExist_ReturnsNotFoundError()
+    {
+        // Arrange
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(
+                It.IsAny<string>(),
+                _session.Object))
+            .ReturnsAsync(null as User);
+
+        // Act
+
+        var result = await _orderService.CreateAsync(
+            "uid",
+            CreateOrderRequest());
+
+        // Assert
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(UserErrors.NotFound("uid")));
+        });
+
+        _mongoContext.Verify(
+            c => c.StartSessionAsync(),
+            Times.Once);
+
+        _session.Verify(
+            s => s.AbortTransactionAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        _session.Verify(
+            s => s.CommitTransactionAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+
+
+        _productRepository.Verify(
+            r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(), _session.Object),
+            Times.Never);
+
+        _productRepository.Verify(
+            r => r.UpdateProduct(
+                It.IsAny<FilterDefinition<Product>>(),
+                It.IsAny<UpdateDefinition<Product>>(),
+                _session.Object),
+            Times.Never);
+
+        _orderRepository.Verify(
+            r => r.CreateOrder(
+                It.IsAny<Order>(),
+                It.IsAny<IClientSessionHandle>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task CreateAsync_TooLargeQuantity_ReturnsQuantityError()
+    {
+        // Arrange
+
+        var firebaseUid = "uid123";
+
+        var user = CreateUser();
+
+        var product = CreateProduct();
+
+        var request = CreateOrderRequest(product.Id.ToString());
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, _session.Object))
+            .ReturnsAsync(user);
+
+        _productRepository
+            .Setup(r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(),
+                _session.Object))
+            .ReturnsAsync([product]);
+
+        var updateResultMock = new Mock<UpdateResult>();
+
+        updateResultMock
+            .Setup(x => x.ModifiedCount)
+            .Returns(0);
+
+        _productRepository
+            .Setup(r => r.UpdateProduct(
+                It.IsAny<FilterDefinition<Product>>(),
+                It.IsAny<UpdateDefinition<Product>>(),
+                _session.Object))
+            .ReturnsAsync(updateResultMock.Object);
+
+        // Act
+
+        var result = await _orderService.CreateAsync(firebaseUid, request);
+
+        // Assert
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Error, Is.EqualTo(
+                OrderErrors.QuantityNotAvailable(
+                    request.Items.First().ProductId,
+                    product.Stock,
+                    request.Items.First().Quantity)));
+        });
+
+        _mongoContext.Verify(
+            c => c.StartSessionAsync(),
+            Times.Once);
+
+        _userRepository.Verify(
+            r => r.GetUserByFirebaseUid(firebaseUid, _session.Object),
+            Times.Once);
+        _productRepository.Verify(
+            r => r.GetProductsByIds(
+                It.IsAny<List<ObjectId>>(),
+                _session.Object),
+            Times.Once);
+
+        _orderRepository.Verify(
+            r => r.CreateOrder(
+                It.IsAny<Order>(),
+                _session.Object),
+            Times.Once);
+
+        _session.Verify(
+            s => s.AbortTransactionAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+        _session.Verify(
+            s => s.CommitTransactionAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    private OrderRequest CreateOrderRequest(string? productId = null)
+    {
+        return new OrderRequest
+        {
+            Address = new AddressRequiredDto
+            {
+                City = "City",
+                HouseNumber = "HouseNum",
+                Street = "Street"
+            },
+            Items =
+            [
+                new OrderItemRequest
+                {
+                    ProductId = productId ?? "id123",
+                    Quantity = 2
+                }
+            ]
+        };
+    }
+
+    private Product CreateProduct()
+    {
+        return new Product
+        {
+            Id = ObjectId.GenerateNewId(),
+            Name = "Product",
+            Price = 10,
+            Category = "Category",
+            Description = "Description",
+            AverageRating = 4,
+            ReviewCount = 5,
+            SumRatings = 20,
+            Stock = 10,
+            ImageVersion = null
+        };
+    }
+
+    private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
+    {
+        return new User
+        {
+            Email = email ?? "johnpeacock@email.com",
+            Id = id ?? ObjectId.GenerateNewId(),
+            Name = "John",
+            Surname = "Peacock",
+            FirebaseUid = firebaseUid,
+        };
+    }
+
+    private List<Order> CreateOrders(int count = 1)
+    {
+        var result = new List<Order>();
+        for (int i = 0; i < count; i++)
+        {
+            result.Add(CreateOrder());
+        }
+
+        return result;
+    }
+
+    private static Order CreateOrder(ObjectId? id = null)
+    {
+        return new Order
+        {
+            Id = id ?? ObjectId.GenerateNewId(),
+            UserId = ObjectId.GenerateNewId(),
+            Address = new Address
+            {
+                City = "City",
+                Street = "Street",
+                HouseNumber = "HouseNumber",
+            },
+            Items = [],
+            Price = 100,
+            UserFullNameAtOrder = "UserFullNameAtOrder",
+            PlacedAt = DateTime.Now,
+        };
     }
 }
