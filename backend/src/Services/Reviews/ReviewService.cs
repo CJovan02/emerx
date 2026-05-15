@@ -21,7 +21,7 @@ public class ReviewService(
     IReviewRepository reviewRepository,
     IProductRepository productRepository,
     IOrderRepository orderRepository,
-    MongoContext mongoContext) : IReviewService
+    IMongoContext mongoContext) : IReviewService
 {
     public async Task<Result<PageOfResponse<ReviewResponse>>> GetAllAsync(int page, int pageSize)
     {

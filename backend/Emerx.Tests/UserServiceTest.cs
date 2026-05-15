@@ -1,4 +1,5 @@
-﻿using EMerx.DTOs.Id;
+﻿using EMerx.Common.Exceptions;
+using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.Entities;
 using EMerx.Repositories.AuthRepository;
@@ -16,18 +17,6 @@ public class UserServiceTest
     private Mock<IUserRepository> _userRepository;
     private Mock<IAuthRepository> _authRepository;
     private const string _userEmail = "johnPeacock@email.com";
-
-    private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
-    {
-        return new User
-        {
-            Email = email ?? _userEmail,
-            Id = id ?? ObjectId.GenerateNewId(),
-            Name = "John",
-            Surname = "Peacock",
-            FirebaseUid = firebaseUid,
-        };
-    }
 
     [SetUp]
     public void Setup()
@@ -77,7 +66,7 @@ public class UserServiceTest
 
         _userRepository
             .Setup(r => r.GetUserById(objectId, null))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync(null as User);
 
         // Act
         var result = await _userService.GetByIdAsync(request);
@@ -183,7 +172,7 @@ public class UserServiceTest
 
         _userRepository
             .Setup(r => r.GetUserByEmail(newEmail))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync(null as User);
 
         _userRepository
             .Setup(r => r.CreateUser(It.IsAny<User>()))
@@ -218,5 +207,240 @@ public class UserServiceTest
         _userRepository.Verify(
             r => r.UpdateUser(It.Is<User>(u => u.FirebaseUid == validFirebaseUid)),
             Times.Once);
+    }
+
+    [Test]
+    public async Task GrantAdminRoleAsync_NonExistingEmailPassed_ReturnsNotFoundError()
+    {
+        // Arrange
+        const string email = "nonexisting@email.com";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ThrowsAsync(new UserNotFoundByEmail(email));
+
+        // Act
+        var result = await _userService.GrantAdminRoleAsync(email);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(AuthErrors.NotFoundByEmail(email)));
+        });
+    }
+
+    [Test]
+    public async Task GrantAdminRoleAsync_ExistingEmailPassed_GrantRole()
+    {
+        // Arrange
+        const string email = "existing@email.com";
+        const string userUid = "SomeUserUid";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ReturnsAsync(userUid);
+
+        // Act
+        var result = await _userService.GrantAdminRoleAsync(email);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(
+            r => r.GrantAdminRoleAsync(
+                It.Is<string>(uid => uid == userUid)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task RemoveAdminRoleAsync_NonExistingEmailPassed_ReturnsNotFoundError()
+    {
+        // Arrange
+        const string email = "nonexisting@email.com";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ThrowsAsync(new UserNotFoundByEmail(email));
+
+        // Act
+        var result = await _userService.RemoveAdminRoleAsync(email);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(AuthErrors.NotFoundByEmail(email)));
+        });
+    }
+
+    [Test]
+    public async Task RemoveAdminRoleAsync_ExistingEmailPassed_GrantRole()
+    {
+        // Arrange
+        const string email = "existing@email.com";
+        const string userUid = "SomeUserUid";
+
+        _authRepository
+            .Setup(r => r.GetUserUidByEmailAsync(email))
+            .ReturnsAsync(userUid);
+
+        // Act
+        var result = await _userService.RemoveAdminRoleAsync(email);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(
+            r => r.RemoveAdminRoleAsync(
+                It.Is<string>(uid => uid == userUid)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteAsync_NonExistingIdPassed_ReturnsNotFoundError()
+    {
+        // Arrange
+        var nonExistingId = ObjectId.GenerateNewId();
+        var request = new IdRequest
+        {
+            Id = nonExistingId.ToString()
+        };
+
+        _userRepository
+            .Setup(r => r.GetUserById(nonExistingId, null))
+            .ReturnsAsync(null as User);
+
+        // Act
+        var result = await _userService.DeleteAsync(request);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailiure, Is.True);
+            Assert.That(result.Error, Is.EqualTo(UserErrors.NotFound(nonExistingId)));
+        });
+
+        _authRepository.Verify(
+            r => r.DeleteUserAsync(
+                It.IsAny<string>()),
+            Times.Never);
+
+        _userRepository.Verify(
+            r => r.DeleteUser(
+                It.IsAny<ObjectId>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteAsync_ExistingIdPassed_UserDeleted()
+    {
+        // Arrange
+        var existingId = ObjectId.GenerateNewId();
+        var firebaseUid = "SomeFirebaseUid";
+        var request = new IdRequest
+        {
+            Id = existingId.ToString()
+        };
+        var user = CreateUser(existingId, null, firebaseUid);
+
+        _userRepository
+            .Setup(r => r.GetUserById(existingId, null))
+            .ReturnsAsync(user);
+
+        // Act
+        var result = await _userService.DeleteAsync(request);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(
+            r => r.DeleteUserAsync(
+                It.Is<string>(id => id == firebaseUid)),
+            Times.Once);
+
+        _userRepository.Verify(
+            r => r.DeleteUser(
+                It.Is<ObjectId>(id => id == existingId)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteByFirebaseIdAsync_UserExists_DeletesFirebaseAndDbUser()
+    {
+        // Arrange
+        const string firebaseUid = "SomeFirebaseUid";
+
+        var user = CreateUser(null, null, firebaseUid);
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
+            .ReturnsAsync(user);
+
+        // Act
+        var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(r => r.DeleteUserAsync(firebaseUid), Times.Once);
+        _userRepository.Verify(r => r.DeleteUser(user.Id), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteByFirebaseIdAsync_FirebaseUserNotFound_IgnoresExceptionAndDeletesDbUser()
+    {
+        // Arrange
+        var firebaseUid = "uid123";
+
+        _authRepository
+            .Setup(r => r.DeleteUserAsync(firebaseUid))
+            .ThrowsAsync(new UserNotFoundById(firebaseUid));
+
+        var dbUser = CreateUser(null, null, firebaseUid);
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
+            .ReturnsAsync(dbUser);
+
+        // Act
+        var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _userRepository.Verify(r => r.DeleteUser(dbUser.Id), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteByFirebaseIdAsync_DbUserNotFound_OnlyDeletesFirebase()
+    {
+        // Arrange
+        var firebaseUid = "uid123";
+
+        _userRepository
+            .Setup(r => r.GetUserByFirebaseUid(firebaseUid, null))
+            .ReturnsAsync(null as User);
+
+        // Act
+        var result = await _userService.DeleteByFirebaseIdAsync(firebaseUid);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+
+        _authRepository.Verify(r => r.DeleteUserAsync(firebaseUid), Times.Once);
+        _userRepository.Verify(r => r.DeleteUser(It.IsAny<ObjectId>()), Times.Never);
+    }
+
+    private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
+    {
+        return new User
+        {
+            Email = email ?? _userEmail,
+            Id = id ?? ObjectId.GenerateNewId(),
+            Name = "John",
+            Surname = "Peacock",
+            FirebaseUid = firebaseUid,
+        };
     }
 }

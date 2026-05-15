@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace EMerx.Infrastructure.MongoDb;
 
-public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContext> logger)
+public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContext> logger) : IMongoContext
 {
     private IMongoDatabase _database;
     private MongoClient _client;
