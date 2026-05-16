@@ -23,5 +23,5 @@
     <ItemGroup>
       <ProjectReference Include="..\src\EMerx.csproj" />
     </ItemGroup>
-
+    
 </Project>

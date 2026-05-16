@@ -507,59 +507,6 @@ public class OrderServiceTest
         });
     }
 
-    private OrderReviewRequest CreateOrderReviewRequest(string? productId = null, int quantity = 2)
-    {
-        return new OrderReviewRequest
-        {
-            Items =
-            [
-                new OrderItemRequest
-                {
-                    ProductId = productId ?? "id123",
-                    Quantity = quantity
-                }
-            ]
-        };
-    }
-
-    private OrderRequest CreateOrderRequest(string? productId = null)
-    {
-        return new OrderRequest
-        {
-            Address = new AddressRequiredDto
-            {
-                City = "City",
-                HouseNumber = "HouseNum",
-                Street = "Street"
-            },
-            Items =
-            [
-                new OrderItemRequest
-                {
-                    ProductId = productId ?? "id123",
-                    Quantity = 2
-                }
-            ]
-        };
-    }
-
-    private Product CreateProduct(int stock = 10)
-    {
-        return new Product
-        {
-            Id = ObjectId.GenerateNewId(),
-            Name = "Product",
-            Price = 10,
-            Category = "Category",
-            Description = "Description",
-            AverageRating = 4,
-            ReviewCount = 5,
-            SumRatings = 20,
-            Stock = stock,
-            ImageVersion = null
-        };
-    }
-
     [Test]
     public async Task DeleteAsync_ExistingOrder_DeletesOrder()
     {
@@ -625,6 +572,59 @@ public class OrderServiceTest
         _orderRepository.Verify(
             r => r.DeleteOrder(It.IsAny<ObjectId>()),
             Times.Never);
+    }
+
+    private OrderReviewRequest CreateOrderReviewRequest(string? productId = null, int quantity = 2)
+    {
+        return new OrderReviewRequest
+        {
+            Items =
+            [
+                new OrderItemRequest
+                {
+                    ProductId = productId ?? "id123",
+                    Quantity = quantity
+                }
+            ]
+        };
+    }
+
+    private OrderRequest CreateOrderRequest(string? productId = null)
+    {
+        return new OrderRequest
+        {
+            Address = new AddressRequiredDto
+            {
+                City = "City",
+                HouseNumber = "HouseNum",
+                Street = "Street"
+            },
+            Items =
+            [
+                new OrderItemRequest
+                {
+                    ProductId = productId ?? "id123",
+                    Quantity = 2
+                }
+            ]
+        };
+    }
+
+    private Product CreateProduct(int stock = 10)
+    {
+        return new Product
+        {
+            Id = ObjectId.GenerateNewId(),
+            Name = "Product",
+            Price = 10,
+            Category = "Category",
+            Description = "Description",
+            AverageRating = 4,
+            ReviewCount = 5,
+            SumRatings = 20,
+            Stock = stock,
+            ImageVersion = null
+        };
     }
 
     private User CreateUser(ObjectId? id = null, string? email = null, string? firebaseUid = null)
