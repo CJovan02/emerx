@@ -447,6 +447,147 @@ public class ProductServiceTests
             .Verify(r => r.DeleteProduct(_id), Times.Once);
     }
 
+    [Test]
+    public async Task GetAllAsync_ReturnsSuccess_WithEmptyPage()
+    {
+        // Arrange
+        var page = 1;
+        var pageSize = 10;
+        var pagedResult = new PageOf<Product>([], page, pageSize, 0);
+        _productRepository
+            .Setup(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()))
+            .ReturnsAsync(pagedResult);
+
+        // Act
+        var result = await _sut.GetAllAsync(page, pageSize, new ProductFilterParams());
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Value!.Items, Is.Empty);
+            Assert.That(result.Value.TotalItems, Is.EqualTo(0));
+        });
+
+        _productRepository
+            .Verify(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()), Times.Once);
+    }
+
+    [Test]
+    public async Task GetAllAsync_DoesNotBuildImageUrl_WhenProductHasNoImageVersion()
+    {
+        // Arrange
+        var page = 1;
+        var pageSize = 10;
+        var pagedResult = new PageOf<Product>([_product], page, pageSize, 1);
+        _productRepository
+            .Setup(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()))
+            .ReturnsAsync(pagedResult);
+
+        // Act
+        var result = await _sut.GetAllAsync(page, pageSize, new ProductFilterParams());
+
+        // Assert
+        Assert.That(result.Value!.Items.First().ThumbnailUrl, Is.Null);
+
+        _productRepository
+            .Verify(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()), Times.Once);
+        _cloudinaryRepository
+            .Verify(c => c.BuildProductThumbnailImageUrl(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetAllAsync_BuildsImageUrl_WhenProductHasImageVersion()
+    {
+        // Arrange
+        var page = 1;
+        var pageSize = 10;
+        _product.ImageVersion = "v123";
+        var expectedUrl = "https://cloudinary.com/image.jpg";
+        var pagedResult = new PageOf<Product>([_product], page, pageSize, 1);
+
+        _productRepository
+            .Setup(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()))
+            .ReturnsAsync(pagedResult);
+        _cloudinaryRepository
+            .Setup(c => c.BuildProductThumbnailImageUrl(_id.ToString(), "v123"))
+            .Returns(expectedUrl);
+
+        // Act
+        var result = await _sut.GetAllAsync(page, pageSize, new ProductFilterParams());
+
+        // Assert
+        Assert.That(result.Value!.Items.First().ThumbnailUrl, Is.EqualTo(expectedUrl));
+
+        _productRepository
+            .Verify(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()), Times.Once);
+        _cloudinaryRepository
+            .Verify(c => c.BuildProductThumbnailImageUrl(_id.ToString(), "v123"), Times.Once);
+    }
+
+    [Test]
+    public async Task GetAllAsync_BuildsImageUrlOnlyForProductsWithImageVersion()
+    {
+        // Arrange
+        var page = 1;
+        var pageSize = 10;
+        var withImage = CreateProduct(ObjectId.GenerateNewId());
+        withImage.ImageVersion = "v1";
+        var withoutImage = CreateProduct(ObjectId.GenerateNewId());
+
+        var pagedResult = new PageOf<Product>([withImage, withoutImage], page, pageSize, 2);
+        _productRepository
+            .Setup(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()))
+            .ReturnsAsync(pagedResult);
+        _cloudinaryRepository
+            .Setup(c => c.BuildProductThumbnailImageUrl(withImage.Id.ToString(), "v1"))
+            .Returns("https://cloudinary.com/img.jpg");
+
+        // Act
+        var result = await _sut.GetAllAsync(page, pageSize, new ProductFilterParams());
+
+        // Assert
+        var items = result.Value!.Items.ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(items[0].ThumbnailUrl, Is.Not.Null);
+            Assert.That(items[1].ThumbnailUrl, Is.Null);
+        });
+
+        _productRepository
+            .Verify(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()), Times.Once);
+        _cloudinaryRepository
+            .Verify(c => c.BuildProductThumbnailImageUrl(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+
+    [Test]
+    public async Task GetAllAsync_PreservesPaginationMetadata()
+    {
+        // Arrange
+        var page = 2;
+        var pageSize = 5;
+        var pagedResult = new PageOf<Product>([], page, pageSize, 20);
+        _productRepository
+            .Setup(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()))
+            .ReturnsAsync(pagedResult);
+
+        // Act
+        var result = await _sut.GetAllAsync(page, pageSize, new ProductFilterParams());
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Value!.Page, Is.EqualTo(page));
+            Assert.That(result.Value.PageSize, Is.EqualTo(pageSize));
+            Assert.That(result.Value.TotalItems, Is.EqualTo(20));
+        });
+
+        _productRepository
+            .Verify(r => r.GetProducts(page, pageSize, It.IsAny<ProductFilterParams>()), Times.Once);
+    }
+
     private static CreateProductRequest CreateProductRequest(IFormFile? image = null) =>
         new()
         {
