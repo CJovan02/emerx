@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace EMerx.Infrastructure.MongoDb;
 
-public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContext> logger) : IMongoContext
+public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContext> logger)
 {
     private IMongoDatabase _database;
     private MongoClient _client;
@@ -42,7 +42,7 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
     public IMongoCollection<Review> Reviews => _database.GetCollection<Review>("reviews");
     public IMongoCollection<Order> Orders => _database.GetCollection<Order>("orders");
 
-    public Task<IClientSessionHandle> StartSessionAsync()
+    public virtual Task<IClientSessionHandle> StartSessionAsync()
     {
         return _client.StartSessionAsync();
     }
