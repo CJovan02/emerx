@@ -24,7 +24,6 @@ public class LoginPage : PageTest
     [Test]
     public async Task Login_ValidCredentials_RedirectsToProductsPage()
     {
-        // TODO: replace with real test account credentials
         await EmailInput.FillAsync("atest@test.com");
         await PasswordInput.FillAsync("Test123!");
         await SignInButton.ClickAsync();
