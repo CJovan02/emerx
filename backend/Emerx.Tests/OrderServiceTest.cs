@@ -13,6 +13,8 @@ using EMerx.ResultPattern.Errors;
 using EMerx.Services.Orders;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Emerx.Tests;
@@ -26,7 +28,7 @@ public class OrderServiceTest
     private Mock<ICloudinaryRepository> _cloudinaryRepository;
 
     private Mock<IClientSessionHandle> _session;
-    private Mock<IMongoContext> _mongoContext;
+    private Mock<MongoContext> _mongoContext;
 
     private List<Order> _orders;
 
@@ -38,7 +40,10 @@ public class OrderServiceTest
         _productRepository = new Mock<IProductRepository>();
         _cloudinaryRepository = new Mock<ICloudinaryRepository>();
 
-        _mongoContext = new Mock<IMongoContext>();
+        _mongoContext = new Mock<MongoContext>(
+            Mock.Of<IOptions<MongoDbSettings>>(),
+            Mock.Of<ILogger<MongoContext>>()
+        );
         _session = new Mock<IClientSessionHandle>();
         _mongoContext
             .Setup(c => c.StartSessionAsync())

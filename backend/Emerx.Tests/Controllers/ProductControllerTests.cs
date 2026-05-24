@@ -242,7 +242,7 @@ public class ProductControllerTests
 
         // Assert
 
-        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        Assert.That(result, Is.InstanceOf<OkResult>());
 
         _productService.Verify(
             s => s.PatchAsync(idRequest, request),
@@ -307,7 +307,7 @@ public class ProductControllerTests
 
         // Assert
 
-        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        Assert.That(result, Is.InstanceOf<OkResult>());
 
         _productService.Verify(
             s => s.DeleteAsync(request),
