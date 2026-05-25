@@ -22,7 +22,7 @@ public class OrderService(
     IUserRepository userRepository,
     IProductRepository productRepository,
     ICloudinaryRepository cloudinaryRepository,
-    IMongoContext mongoContext) : IOrderService
+    MongoContext mongoContext) : IOrderService
 {
     public async Task<Result<PageOfResponse<OrderResponse>>> GetAllAsync(int page, int pageSize)
     {
