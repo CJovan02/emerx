@@ -356,6 +356,56 @@ public class UserControllerTest
 
 
 
+    [Test]
+    public async Task DeleteUser_ValidRequest_ReturnsOk()
+    {
+        // Arrange
+
+        var userId = ObjectId.GenerateNewId().ToString();
+        var request = new IdRequest { Id = userId };
+
+        _userService
+            .Setup(s => s.DeleteAsync(request))
+            .ReturnsAsync(Result.Success());
+
+        // Act
+
+        var result = await _userController.DeleteUser(request);
+
+        // Assert
+
+        Assert.That(result, Is.InstanceOf<OkResult>());
+
+        _userService.Verify(
+            s => s.DeleteAsync(request),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteUser_UserDoesNotExist_ReturnsNotFound()
+    {
+        // Arrange
+
+        var userId = ObjectId.GenerateNewId();
+        var request = new IdRequest { Id = userId.ToString() };
+
+        _userService
+            .Setup(s => s.DeleteAsync(request))
+            .ReturnsAsync(Result.Failure(UserErrors.NotFound(userId)));
+
+        // Act
+
+        var result = await _userController.DeleteUser(request);
+
+        // Assert
+
+        Assert.That(result, Is.InstanceOf<NotFoundObjectResult>());
+
+        _userService.Verify(
+            s => s.DeleteAsync(request),
+            Times.Once);
+    }
+
     private UserResponse CreateUserResponse()
     {
         return new UserResponse
