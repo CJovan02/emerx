@@ -9,6 +9,8 @@ using EMerx.Repositories.ReviewRepository;
 using EMerx.Repositories.UserRepository;
 using EMerx.ResultPattern.Errors;
 using EMerx.Services.Reviews;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
@@ -22,7 +24,7 @@ public class ReviewServiceTests
     private Mock<IReviewRepository> _reviewRepository;
     private Mock<IProductRepository> _productRepository;
     private Mock<IOrderRepository> _orderRepository;
-    private Mock<IMongoContext> _mongoContext;
+    private Mock<MongoContext> _mongoContext;
     private Mock<IClientSessionHandle> _session;
 
     private ObjectId _id;
@@ -35,9 +37,11 @@ public class ReviewServiceTests
         _reviewRepository = new Mock<IReviewRepository>();
         _productRepository = new Mock<IProductRepository>();
         _orderRepository = new Mock<IOrderRepository>();
-        _mongoContext = new Mock<IMongoContext>();
         _session = new Mock<IClientSessionHandle>();
-
+        
+        _mongoContext = new Mock<MongoContext>(
+            new Mock<IOptions<MongoDbSettings>>().Object,
+            new Mock<ILogger<MongoContext>>().Object);
         _mongoContext
             .Setup(c => c.StartSessionAsync())
             .ReturnsAsync(_session.Object);
