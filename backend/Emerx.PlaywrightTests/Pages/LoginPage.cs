@@ -24,8 +24,8 @@ public class LoginPage : PageTest
     [Test]
     public async Task Login_ValidCredentials_RedirectsToProductsPage()
     {
-        await EmailInput.FillAsync("atest@test.com");
-        await PasswordInput.FillAsync("Test123!");
+        await EmailInput.FillAsync("admin@admin.com");
+        await PasswordInput.FillAsync("Sifra123");
         await SignInButton.ClickAsync();
 
         await Expect(Page).ToHaveURLAsync($"{BaseUrl}/products");
@@ -45,7 +45,6 @@ public class LoginPage : PageTest
     public async Task Login_EmptyFields_DoesNotSubmit()
     {
         await SignInButton.ClickAsync();
-
         await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
     }
 
@@ -53,7 +52,6 @@ public class LoginPage : PageTest
     public async Task Login_SignUpLink_NavigatesToRegisterPage()
     {
         await SignUpLink.ClickAsync();
-
         await Expect(Page).ToHaveURLAsync($"{BaseUrl}/register");
     }
 }
