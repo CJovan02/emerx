@@ -30,6 +30,9 @@ public class ProductsPage : PageTest
     private async Task WaitForLoadingToFinish() =>
         await Expect(Skeletons.First).Not.ToBeVisibleAsync(new() { Timeout = 10000 });
 
+    private async Task WaitForProductsOrEmpty() =>
+        await Expect(ProductCards.First.Or(EmptyMessage)).ToBeVisibleAsync(new() { Timeout = 10000 });
+
     [Test]
     public async Task Products_PageLoads_ShowsProductsOrEmptyState()
     {
@@ -56,7 +59,7 @@ public class ProductsPage : PageTest
     [Test]
     public async Task Products_ClickCard_NavigatesToProductDetails()
     {
-        await WaitForLoadingToFinish();
+        await WaitForProductsOrEmpty();
 
         var firstCard = ProductCards.First;
         Assume.That(await firstCard.IsVisibleAsync(), "No products available to click");
