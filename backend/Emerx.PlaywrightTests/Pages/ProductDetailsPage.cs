@@ -13,12 +13,12 @@ public class ProductDetailsPage : PageTest
     private const string BaseUrl = "http://localhost:5173";
     private const string BackendUrl = "http://localhost:5016";
     private const string ProductId = "69a18f932a241fbd4433dd3b";
-    private const string FirebaseApiKey = "AIzaSyDxAIVCgS8yuHnqHbUaWgB2AM1_0gaikqo";
     private const string MockUserPassword = "MockTest123!";
 
     private static readonly HttpClient Http = new();
 
     private string _mockUserEmail = "";
+    private string _idToken = "";
 
     [SetUp]
     public async Task SetUpAuthenticated()
@@ -36,6 +36,18 @@ public class ProductDetailsPage : PageTest
             $"{BackendUrl}/User/register",
             new StringContent(registerPayload, Encoding.UTF8, "application/json"));
 
+        await Page.RouteAsync("**/api/**", async route =>
+        {
+            if (string.IsNullOrEmpty(_idToken))
+            {
+                var authHeader = route.Request.Headers
+                    .FirstOrDefault(h => h.Key.Equals("authorization", StringComparison.OrdinalIgnoreCase)).Value ?? "";
+                if (authHeader.StartsWith("Bearer "))
+                    _idToken = authHeader["Bearer ".Length..];
+            }
+            await route.ContinueAsync();
+        });
+
         await Page.GotoAsync($"{BaseUrl}/login");
         await Page.Locator("#email").FillAsync(_mockUserEmail);
         await Page.Locator("#password").FillAsync(MockUserPassword);
@@ -48,26 +60,12 @@ public class ProductDetailsPage : PageTest
     [TearDown]
     public async Task DeleteMockUser()
     {
-        var loginPayload = JsonSerializer.Serialize(new
-        {
-            email = _mockUserEmail,
-            password = MockUserPassword,
-            returnSecureToken = true
-        });
-
-        var loginResp = await Http.PostAsync(
-            $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FirebaseApiKey}",
-            new StringContent(loginPayload, Encoding.UTF8, "application/json"));
-
-        if (!loginResp.IsSuccessStatusCode) return;
-
-        var loginJson = JsonDocument.Parse(await loginResp.Content.ReadAsStringAsync());
-        var idToken = loginJson.RootElement.GetProperty("idToken").GetString();
+        if (string.IsNullOrEmpty(_idToken)) return;
 
         // userId in ReviewResponse is the MongoDB ObjectId, not the Firebase UID —
         // resolve it via GET /User (returns the logged-in user's MongoDB profile)
         var userReq = new HttpRequestMessage(HttpMethod.Get, $"{BackendUrl}/User");
-        userReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", idToken);
+        userReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
         var userResp = await Http.SendAsync(userReq);
 
         if (userResp.IsSuccessStatusCode)
@@ -77,7 +75,7 @@ public class ProductDetailsPage : PageTest
 
             var reviewsReq = new HttpRequestMessage(HttpMethod.Get,
                 $"{BackendUrl}/Review/getProductReviews/{ProductId}");
-            reviewsReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", idToken);
+            reviewsReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
             var reviewsResp = await Http.SendAsync(reviewsReq);
 
             if (reviewsResp.IsSuccessStatusCode)
@@ -90,7 +88,7 @@ public class ProductDetailsPage : PageTest
                     var reviewId = review.GetProperty("id").GetString();
                     var deleteReviewReq = new HttpRequestMessage(HttpMethod.Delete,
                         $"{BackendUrl}/Review/{reviewId}");
-                    deleteReviewReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", idToken);
+                    deleteReviewReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
                     await Http.SendAsync(deleteReviewReq);
                     break;
                 }
@@ -98,7 +96,7 @@ public class ProductDetailsPage : PageTest
         }
 
         var deleteUserReq = new HttpRequestMessage(HttpMethod.Delete, $"{BackendUrl}/User");
-        deleteUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", idToken);
+        deleteUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
         await Http.SendAsync(deleteUserReq);
     }
 
@@ -118,8 +116,14 @@ public class ProductDetailsPage : PageTest
     private ILocator RatingValidationError => WriteReviewForm.GetByText("Please select a rating");
     private ILocator DescriptionValidationError => WriteReviewForm.GetByText("Description is required");
 
-    private async Task WaitForReviewsToLoad() =>
+    private async Task WaitForReviewsToLoad()
+    {
+        // "Customer Reviews" heading only renders after auth completes and the product page mounts.
+        // This covers the race where Firebase fires onAuthStateChanged from IndexedDB after
+        // NetworkIdle has already been satisfied (no network during IndexedDB reads).
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Customer Reviews" })).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = 10000 });
+    }
 
     [Test]
     public async Task ProductDetails_PageLoads_ShowsProductName()
@@ -202,7 +206,7 @@ public class ProductDetailsPage : PageTest
 
         await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync();
         await ReviewDescription.FillAsync("Some text I changed my mind about");
-        await ReviewDescription.FillAsync(""); // clear it
+        await ReviewDescription.FillAsync("");
 
         await SubmitReviewButton.ClickAsync();
 

@@ -34,17 +34,6 @@ public class ProductsPage : PageTest
         await Expect(ProductCards.First.Or(EmptyMessage)).ToBeVisibleAsync(new() { Timeout = 10000 });
 
     [Test]
-    public async Task Products_PageLoads_ShowsProductsOrEmptyState()
-    {
-        await WaitForLoadingToFinish();
-
-        var hasProducts = await ProductCards.CountAsync() > 0;
-        var hasEmptyMessage = await EmptyMessage.IsVisibleAsync();
-
-        Assert.That(hasProducts || hasEmptyMessage, Is.True);
-    }
-
-    [Test]
     public async Task Products_Search_ReloadsResults()
     {
         await WaitForLoadingToFinish();
