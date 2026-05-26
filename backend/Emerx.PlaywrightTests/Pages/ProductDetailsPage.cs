@@ -192,7 +192,7 @@ public class ProductDetailsPage : PageTest
         await WaitForReviewsToLoad();
         Assume.That(await WriteReviewForm.IsVisibleAsync(), "User has already reviewed this product");
 
-        await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync(); // 3 stars
+        await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync(new() { Force = true }); // 3 stars
         await SubmitReviewButton.ClickAsync();
 
         await Expect(DescriptionValidationError).ToBeVisibleAsync();
@@ -204,7 +204,7 @@ public class ProductDetailsPage : PageTest
         await WaitForReviewsToLoad();
         Assume.That(await WriteReviewForm.IsVisibleAsync(), "User has already reviewed this product");
 
-        await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync();
+        await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync(new() { Force = true });
         await ReviewDescription.FillAsync("Some text I changed my mind about");
         await ReviewDescription.FillAsync("");
 
@@ -219,7 +219,7 @@ public class ProductDetailsPage : PageTest
         await WaitForReviewsToLoad();
         Assume.That(await WriteReviewForm.IsVisibleAsync(), "User has already reviewed this product");
 
-        await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync(); // 3 stars
+        await WriteReviewForm.GetByRole(AriaRole.Radio).Nth(2).ClickAsync(new() { Force = true }); // 3 stars
         await ReviewDescription.FillAsync("This is a great product, highly recommend!");
 
         await SubmitReviewButton.ClickAsync();
