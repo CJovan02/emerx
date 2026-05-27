@@ -16,6 +16,6 @@ public static class AuthHelper
             .FillAsync("Sifra123");
         await page.GetByTestId("login-button").ClickAsync();
 
-        await page.WaitForURLAsync($"**/{PageUrls.ProductsPageRaw}");
+        await page.WaitForURLAsync(PageUrls.ProductsPage);
     }
 }
