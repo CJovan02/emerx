@@ -48,9 +48,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-app.UseHttpsRedirection();
+
+if (!app.Environment.IsEnvironment("Api-Testing"))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+if (app.Environment.IsEnvironment("Api-Testing"))
+{
+    Console.WriteLine("Api-Testing environment is running.\n" +
+                      "Injecting fake auth claims into context...");
+}
 
 app.Run();
