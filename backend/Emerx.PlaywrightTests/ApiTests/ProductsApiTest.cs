@@ -20,7 +20,7 @@ public class ProductsApiTest : PlaywrightTest
 
         HttpClient = await Playwright.APIRequest.NewContextAsync(new()
         {
-            BaseURL = PageUrls.BaseUrl,
+            BaseURL = PageUrls.ServerUrl,
             ExtraHTTPHeaders = headers,
             IgnoreHTTPSErrors = true
         });
