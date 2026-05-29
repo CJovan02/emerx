@@ -46,7 +46,7 @@ var cloudinary = app.Services.GetRequiredService<CloudinaryContext>();
 cloudinary.Connect();
 await cloudinary.PingAsync();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Api-Testing"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
