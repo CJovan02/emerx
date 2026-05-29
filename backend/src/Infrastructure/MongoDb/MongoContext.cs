@@ -33,7 +33,7 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
         catch (Exception ex)
         {
             _logger.LogError(ex, "❌ MongoDb ping failed.");
-            throw ex;
+            // throw ex;
         }
     }
 

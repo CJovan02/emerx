@@ -15,7 +15,6 @@ public class ProductsApiTest : PlaywrightTest
         var headers = new Dictionary<string, string>
         {
             { "Accept", "application/json" },
-            { "Test-Auth", "true" },
         };
 
         HttpClient = await Playwright.APIRequest.NewContextAsync(new()
@@ -29,7 +28,7 @@ public class ProductsApiTest : PlaywrightTest
     [Test]
     public async Task GetCategories()
     {
-        await using var response = await HttpClient.GetAsync("/Products/categories");
+        await using var response = await HttpClient.GetAsync("/Product/categories");
         Console.WriteLine($"Status: {response.Status}");
         Console.WriteLine($"Status text: {response.StatusText}");
 
