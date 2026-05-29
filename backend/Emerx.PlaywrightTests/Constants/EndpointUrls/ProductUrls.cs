@@ -2,6 +2,6 @@
 
 public static class ProductUrls
 {
-    public static string GetCategories => "/Product/categories";
-    public static string GetPaged => "/Product";
+    public static string Base => "/Product";
+    public static string GetCategories => $"{Base}/categories";
 }
