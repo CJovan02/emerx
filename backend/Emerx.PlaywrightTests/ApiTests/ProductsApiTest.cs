@@ -29,7 +29,7 @@ public class ProductsApiTest : PlaywrightTest
 
         _request = await Playwright.APIRequest.NewContextAsync(new()
         {
-            BaseURL = ApiTestUrls.Products,
+            BaseURL = ServerUrls.BackendTest,
             ExtraHTTPHeaders = headers,
             IgnoreHTTPSErrors = true,
         });
@@ -44,7 +44,7 @@ public class ProductsApiTest : PlaywrightTest
 
         // Act
         await using var response =
-            await _request.GetAsync($"?PageSize={pageSize}&Page={page}");
+            await _request.GetAsync($"{ProductUrls.Base}?PageSize={pageSize}&Page={page}");
 
         // Assert
         Assert.That(response.Status, Is.EqualTo(200));
@@ -70,7 +70,7 @@ public class ProductsApiTest : PlaywrightTest
 
         // Act
         await using var response =
-            await _request.GetAsync($"?PageSize={pageSize}&Page={page}");
+            await _request.GetAsync($"{ProductUrls.Base}?PageSize={pageSize}&Page={page}");
 
         // Assert
         Assert.That(response.Status, Is.EqualTo(400));
@@ -80,7 +80,7 @@ public class ProductsApiTest : PlaywrightTest
     public async Task GetCategories()
     {
         // Arrange, Act
-        await using var response = await _request.GetAsync(ApiTestUrls.ProductCategoriesRaw);
+        await using var response = await _request.GetAsync(ProductUrls.GetCategories);
 
         // Assert
         Assert.That(response.Status, Is.EqualTo(200));
@@ -100,7 +100,7 @@ public class ProductsApiTest : PlaywrightTest
         try
         {
             await using var response =
-                await _request.GetAsync(productId);
+                await _request.GetAsync($"{ProductUrls.Base}/{productId}");
 
             // Assert
             Assert.That(response.Status, Is.EqualTo(200));
@@ -127,7 +127,7 @@ public class ProductsApiTest : PlaywrightTest
 
         // Act
         await using var response =
-            await _request.GetAsync(nonExistingId);
+            await _request.GetAsync($"{ProductUrls.Base}/{nonExistingId}");
 
         // Assert
         Assert.That(response.Status, Is.EqualTo(404));
@@ -146,7 +146,7 @@ public class ProductsApiTest : PlaywrightTest
         try
         {
             // Act
-            await using var response = await _request.PostAsync("", new APIRequestContextOptions
+            await using var response = await _request.PostAsync(ProductUrls.Base, new APIRequestContextOptions
             {
                 Multipart = form
             });
@@ -181,7 +181,7 @@ public class ProductsApiTest : PlaywrightTest
 
         ProductResponse productResponse = null;
         // Act
-        await using var response = await _request.PostAsync("", new APIRequestContextOptions
+        await using var response = await _request.PostAsync(ProductUrls.Base, new APIRequestContextOptions
         {
             Multipart = form
         });
@@ -204,7 +204,7 @@ public class ProductsApiTest : PlaywrightTest
         {
             // Act
             await using var response =
-                await _request.PatchAsync(createdProduct.Id, new APIRequestContextOptions
+                await _request.PatchAsync($"{ProductUrls.Base}/{createdProduct.Id}", new APIRequestContextOptions
                 {
                     Multipart = form
                 });
@@ -231,21 +231,14 @@ public class ProductsApiTest : PlaywrightTest
         var form = ProductApiHelpers.CreatePatchProductFormData(_request, newName, newPrice);
 
         // Act
-        try
-        {
-            await using var response =
-                await _request.PatchAsync(createdProduct.Id, new APIRequestContextOptions
-                {
-                    Multipart = form
-                });
+        await using var response =
+            await _request.PatchAsync($"{ProductUrls.Base}/{createdProduct.Id}", new APIRequestContextOptions
+            {
+                Multipart = form
+            });
 
-            // Assert
-            Assert.That(response.Status, Is.EqualTo(400));
-        }
-        finally
-        {
-            await ProductApiHelpers.DeleteProduct(_request, createdProduct.Id);
-        }
+        // Assert
+        Assert.That(response.Status, Is.EqualTo(400));
     }
 
     [Test]
@@ -255,13 +248,13 @@ public class ProductsApiTest : PlaywrightTest
         var productResponse = await ProductApiHelpers.PostProduct(_request);
 
         // Act
-        await using var response = await _request.DeleteAsync(productResponse.Id);
+        await using var response = await _request.DeleteAsync($"{ProductUrls.Base}/{productResponse.Id}");
 
         // Assert
         Assert.That(response.Status, Is.EqualTo(200));
 
         await using var getResponse =
-            await _request.GetAsync(productResponse.Id);
+            await _request.GetAsync($"{ProductUrls.Base}/{productResponse.Id}");
 
         Assert.That(getResponse.Status, Is.EqualTo(404));
     }
@@ -273,7 +266,7 @@ public class ProductsApiTest : PlaywrightTest
         var nonExistingId = ObjectId.GenerateNewId().ToString();
 
         // Act
-        await using var response = await _request.DeleteAsync(nonExistingId);
+        await using var response = await _request.DeleteAsync($"{ProductUrls.Base}/{nonExistingId}");
 
         // Assert
         Assert.That(response.Status, Is.EqualTo(404));
