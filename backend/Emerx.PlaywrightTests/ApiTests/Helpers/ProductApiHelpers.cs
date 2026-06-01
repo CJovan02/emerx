@@ -1,6 +1,5 @@
 using System.Text.Json;
 using EMerx.DTOs.Products.Response;
-using Emerx.PlaywrightTests.Constants;
 using Microsoft.Playwright;
 
 namespace Emerx.PlaywrightTests.ApiTests.Helpers;
@@ -36,7 +35,7 @@ public static class ProductApiHelpers
     {
         var form = CreateProductFormData(request);
 
-        await using var response = await request.PostAsync(ProductUrls.Base, new APIRequestContextOptions
+        await using var response = await request.PostAsync("", new APIRequestContextOptions
         {
             Multipart = form
         });
@@ -51,6 +50,6 @@ public static class ProductApiHelpers
 
     public static async Task DeleteProduct(IAPIRequestContext request, string productId)
     {
-        await request.DeleteAsync($"{ProductUrls.Base}/{productId}");
+        await request.DeleteAsync(productId);
     }
 }
