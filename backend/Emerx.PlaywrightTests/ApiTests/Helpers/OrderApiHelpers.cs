@@ -12,7 +12,7 @@ public static class OrderApiHelpers
 {
     public static string TestProductId = "6a1d7853560f5e66666adb13";
 
-    public static OrderRequest CreateOrderRequest(IAPIRequestContext request)
+    public static OrderRequest CreateOrderRequest()
     {
         return new OrderRequest
         {
@@ -33,9 +33,24 @@ public static class OrderApiHelpers
         };
     }
 
+    public static OrderReviewRequest CreateReviewRequest()
+    {
+        return new OrderReviewRequest()
+        {
+            Items =
+            [
+                new()
+                {
+                    Quantity = 1,
+                    ProductId = TestProductId,
+                }
+            ],
+        };
+    }
+
     public static async Task<OrderResponse> PostOrder(IAPIRequestContext request)
     {
-        var data = CreateOrderRequest(request);
+        var data = CreateOrderRequest();
 
         await using var response = await request.PostAsync(OrderUrls.Base, new APIRequestContextOptions
         {
@@ -50,8 +65,8 @@ public static class OrderApiHelpers
         return await response.JsonAsync<OrderResponse>(options);
     }
 
-    public static async Task DeleteOrderAndProducts(IAPIRequestContext request, string orderId)
+    public static async Task DeleteOrder(IAPIRequestContext request, string orderId)
     {
-        await request.DeleteAsync(orderId);
+        await request.DeleteAsync($"{OrderUrls.Base}/{orderId}");
     }
 }
