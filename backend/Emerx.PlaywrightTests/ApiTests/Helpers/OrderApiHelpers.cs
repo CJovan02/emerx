@@ -33,6 +33,21 @@ public static class OrderApiHelpers
         };
     }
 
+    public static OrderRequest CreateEmptyOrderRequest()
+    {
+        return new OrderRequest
+        {
+            Address = new AddressRequiredDto
+            {
+                City = "City",
+                HouseNumber = "1234",
+                Street = "Street",
+            },
+            Items =
+                [],
+        };
+    }
+
     public static OrderReviewRequest CreateReviewRequest()
     {
         return new OrderReviewRequest()

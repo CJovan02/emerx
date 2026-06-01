@@ -230,14 +230,21 @@ public class ProductsApiTest : PlaywrightTest
         var form = ProductApiHelpers.CreatePatchProductFormData(_request, newName, newPrice);
 
         // Act
-        await using var response =
-            await _request.PatchAsync($"{ProductUrls.Base}/{createdProduct.Id}", new APIRequestContextOptions
-            {
-                Multipart = form
-            });
+        try
+        {
+            await using var response =
+                await _request.PatchAsync($"{ProductUrls.Base}/{createdProduct.Id}", new APIRequestContextOptions
+                {
+                    Multipart = form
+                });
 
-        // Assert
-        Assert.That(response.Status, Is.EqualTo(400));
+            // Assert
+            Assert.That(response.Status, Is.EqualTo(400));
+        }
+        finally
+        {
+            await ProductApiHelpers.DeleteProduct(_request, createdProduct.Id);
+        }
     }
 
     [Test]

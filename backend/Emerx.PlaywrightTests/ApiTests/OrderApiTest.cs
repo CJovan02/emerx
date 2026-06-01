@@ -215,6 +215,26 @@ public class OrderApiTest : PlaywrightTest
     }
 
     [Test]
+    public async Task Create_EmptyCart_ReturnsBadRequest()
+    {
+        // Arrange
+        var request =
+            OrderApiHelpers.CreateEmptyOrderRequest();
+
+        // Act
+        await using var response =
+            await _request.PostAsync(
+                OrderUrls.Base,
+                new()
+                {
+                    DataObject = request
+                });
+
+        // Assert
+        Assert.That(response.Status, Is.EqualTo(400));
+    }
+
+    [Test]
     public async Task Delete_ExistingOrder_ReturnsSuccess()
     {
         // Arrange
