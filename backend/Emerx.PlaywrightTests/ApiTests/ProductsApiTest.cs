@@ -54,7 +54,6 @@ public class ProductsApiTest : PlaywrightTest
         Assert.Multiple(() =>
         {
             Assert.That(pageResponse, Is.Not.Null);
-            Assert.That(pageResponse.Items, Is.Not.Null);
             Assert.That(pageResponse.Page, Is.EqualTo(page));
             Assert.That(pageResponse.PageSize, Is.EqualTo(pageSize));
             Assert.That(pageResponse.Items.Count, Is.LessThanOrEqualTo(pageSize));

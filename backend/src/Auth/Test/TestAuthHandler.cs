@@ -17,17 +17,20 @@ public class TestAuthHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        var adminUser = TestUsers.Admin;
+
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Role, ((int)Roles.Admin).ToString()),
-            new Claim(ClaimTypes.NameIdentifier, "test-user"),
-            new Claim(ClaimTypes.Email, "testuser@test.com")
+            new Claim(ClaimTypes.Role, ((int)adminUser.Role).ToString()),
+            new Claim(ClaimTypes.NameIdentifier, adminUser.Name),
+            new Claim(ClaimTypes.Email, adminUser.Email),
+            new Claim("user_id", adminUser.Uid)
         };
 
         var identity = new ClaimsIdentity(claims, "Test");
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, "Test");
 
-        return Task.FromResult( AuthenticateResult.Success(ticket));
+        return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }

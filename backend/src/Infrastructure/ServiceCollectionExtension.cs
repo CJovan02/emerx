@@ -32,7 +32,6 @@ public static class ServiceCollectionExtension
             .AddScoped<IProductRepository, ProductRepository>()
             .AddScoped<IReviewRepository, ReviewRepository>()
             .AddScoped<IOrderRepository, OrderRepository>()
-            .AddScoped<IAuthRepository, AuthRepository>()
             .AddScoped<ICloudinaryRepository, CloudinaryRepository>();
     }
 

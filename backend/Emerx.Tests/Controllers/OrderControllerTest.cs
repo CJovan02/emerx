@@ -346,8 +346,8 @@ public class OrderControllerTest
     {
         return new OrderResponse
         {
-            Id = ObjectId.GenerateNewId(),
-            UserId = ObjectId.GenerateNewId(),
+            Id = ObjectId.GenerateNewId().ToString(),
+            UserId = ObjectId.GenerateNewId().ToString(),
             Address = new AddressDto
             {
                 City = "city",

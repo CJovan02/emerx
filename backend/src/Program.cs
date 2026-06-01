@@ -1,6 +1,7 @@
 using EMerx.DTOs.Id;
 using EMerx.Infrastructure.CloudinaryContext;
 using EMerx.Infrastructure.MongoDb;
+using EMerx.Repositories.AuthRepository;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -20,9 +21,15 @@ builder.Services.AddFluentValidationAutoValidation();
 // We use fake auth for api-testing
 // dotnet run --launch-profile Api-Testing
 if (builder.Environment.IsEnvironment("Api-Testing"))
+{
     builder.Services.AddFakeAuthentication();
+    builder.Services.AddScoped<IAuthRepository, TestAuthRepository>();
+}
 else
+{
     builder.Services.AddFirebaseAuthentication(builder.Configuration);
+    builder.Services.AddScoped<IAuthRepository, FirebaseAuthRepository>();
+}
 
 builder.Services.AddCloudinaryContext();
 builder.Services

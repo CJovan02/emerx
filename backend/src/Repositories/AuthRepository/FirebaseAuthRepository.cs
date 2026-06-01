@@ -5,37 +5,9 @@ using FirebaseAdmin.Auth;
 
 namespace EMerx.Repositories.AuthRepository;
 
-public class AuthRepository : IAuthRepository
+public class FirebaseAuthRepository : IAuthRepository
 {
     private readonly FirebaseAuth _firebaseAuth = FirebaseAuth.DefaultInstance;
-
-    public async Task<UserRecord> GetUserByUidAsync(string uid)
-    {
-        // In order to properly mock this error in unit tests, I need to replace FirebaseException with my own
-        // Because FirebaseAuthException is internal class and I can't create its instance
-        try
-        {
-            return await _firebaseAuth.GetUserAsync(uid);
-        }
-        catch (FirebaseAuthException e) when (e.ErrorCode == ErrorCode.NotFound)
-        {
-            throw new UserNotFoundById(uid);
-        }
-    }
-
-    public async Task<UserRecord> GetUserByEmailAsync(string email)
-    {
-        // In order to properly mock this error in unit tests, I need to replace FirebaseException with my own
-        // Because FirebaseAuthException is internal class and I can't create its instance
-        try
-        {
-            return await _firebaseAuth.GetUserByEmailAsync(email);
-        }
-        catch (FirebaseAuthException e) when (e.ErrorCode == ErrorCode.NotFound)
-        {
-            throw new UserNotFoundByEmail(email);
-        }
-    }
 
     public async Task<string> GetUserUidByEmailAsync(string email)
     {
