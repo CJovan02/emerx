@@ -1,4 +1,5 @@
 using System.Text.Json;
+using EMerx.DTOs.Address;
 using EMerx.DTOs.Users.Request;
 using EMerx.DTOs.Users.Response;
 using Emerx.PlaywrightTests.Constants;
@@ -16,6 +17,21 @@ public static class UserApiHelpers
             Name = "Playwright",
             Password = "Playwright123",
             Surname = "Playwright",
+        };
+    }
+
+    public static UpdateUserRequest CreateUpdateUserRequest(string name = "new-name")
+    {
+        return new UpdateUserRequest
+        {
+            Name = name,
+            Surname = "new-surname",
+            Address = new AddressDto
+            {
+                City = "new-city",
+                HouseNumber = "999",
+                Street = "new-street"
+            }
         };
     }
 

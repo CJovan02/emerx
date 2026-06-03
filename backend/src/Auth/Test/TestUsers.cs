@@ -9,7 +9,7 @@ public static class TestUsers
         Roles.Admin);
 
     public static AuthUser User => new (
-        "user-valid-uid",
+        "deec9588-4258-4830-9e92-d091e2a691e3",
         "test-user",
         "test-user@test.com",
         Roles.User);
