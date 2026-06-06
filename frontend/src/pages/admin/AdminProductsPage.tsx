@@ -76,6 +76,7 @@ export default function AdminProductsPage() {
                 <Box display='flex' mb={2}>
                     <Spacer/>
                     <Button
+												data-testid='open-create-drawer-button'
                         startIcon={<Add/>}
                         onClick={openAddDrawer}
                         disabled={isFetching}

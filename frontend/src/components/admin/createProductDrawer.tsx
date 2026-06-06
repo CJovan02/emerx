@@ -55,6 +55,7 @@ export default function CreateProductDrawer({
 
 	return (
 		<Drawer
+			data-testid="create-product-drawer"
 			open={open}
 			onClose={handleClose}
 			anchor='right'
@@ -133,6 +134,7 @@ export default function CreateProductDrawer({
 
 								<Button
 									startIcon={<ArrowUpward />}
+									data-testid="submit-create-product"
 									form='create-product-form'
 									type='submit'
 									loading={isLoading}
