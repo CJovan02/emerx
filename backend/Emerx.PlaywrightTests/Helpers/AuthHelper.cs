@@ -15,7 +15,7 @@ public static class AuthHelper
         await page.GetByLabel("Email")
             .FillAsync(AdminEmail);
         await page.GetByLabel("Password")
-            .FillAsync("Sifra123");
+            .FillAsync(AdminPassword);
         await page.GetByTestId("login-button").ClickAsync();
 
         await page.WaitForURLAsync(PageUrls.ProductsPage);

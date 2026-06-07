@@ -57,7 +57,8 @@ public class AdminProductsPage : PageTest
         finally
         {
             var previouslyCreatedProduct = await _api.GetProductByName(uniqueName);
-            await _api.DeleteProduct(previouslyCreatedProduct.Id);
+            if (previouslyCreatedProduct is not null)
+                await _api.DeleteProduct(previouslyCreatedProduct.Id);
         }
     }
 

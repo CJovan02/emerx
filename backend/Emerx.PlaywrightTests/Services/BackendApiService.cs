@@ -1,4 +1,5 @@
-﻿using EMerx.DTOs.Products.Response;
+﻿using EMerx.Common.Filters;
+using EMerx.DTOs.Products.Response;
 using EMerx.DTOs.Users.Response;
 using Emerx.PlaywrightTests.ApiTests.Helpers;
 using Emerx.PlaywrightTests.Common;
@@ -67,12 +68,13 @@ public class BackendApiService : IAsyncDisposable
         const int page = 1;
         const int pageSize = 1;
         await using var response =
-            await _request.GetAsync($"ProductUrls.Base?page={page}&pageSize={pageSize}?search={name}");
+            await _request.GetAsync($"{ProductUrls.Base}?page={page}&pageSize={pageSize}&search={name}");
 
         if (!response.Ok)
             return null;
 
-        return await response.JsonAsync<ProductResponse>(JsonSerializers.CaseInsensitive);
+        return (await response.JsonAsync<PageOfResponse<ProductResponse>>(JsonSerializers.CaseInsensitive)).Items
+            .FirstOrDefault();
     }
 
     /// <summary>
