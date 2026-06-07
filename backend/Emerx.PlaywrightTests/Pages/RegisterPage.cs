@@ -1,4 +1,3 @@
-using Emerx.PlaywrightTests.Constants;
 using Emerx.PlaywrightTests.Helpers;
 using Emerx.PlaywrightTests.Services;
 using Microsoft.Playwright;
@@ -10,9 +9,10 @@ namespace Emerx.PlaywrightTests.Pages;
 [TestFixture]
 public class RegisterPage : PageTest
 {
+    private BackendApiService _api;
+
     private const string BaseUrl = "http://localhost:5173";
     private const string TestPassword = "ValidPassword123!";
-    private BackendAdminApiService _backendApi;
 
     private string _email = string.Empty;
     private ILocator NameInput => Page.Locator("#name");
@@ -28,7 +28,8 @@ public class RegisterPage : PageTest
     [SetUp]
     public async Task NavigateToRegisterPage()
     {
-        _backendApi = new BackendAdminApiService(Playwright);
+        _api = new BackendApiService(Playwright);
+        await _api.ConnectAsync(GlobalSetup.AdminToken);
 
         await Page.GotoAsync($"{BaseUrl}/register");
     }
@@ -98,18 +99,14 @@ public class RegisterPage : PageTest
     {
         if (string.IsNullOrEmpty(_email)) return;
 
-        var userToken = await _backendApi.GetFirebaseTokenAsync(_email, TestPassword);
-        var mongoUserId = await _backendApi.GetCurrentUserIdAsync(userToken);
+        var userToken = await AuthHelper.GetFirebaseTokenAsync(Playwright, _email, TestPassword);
+        var mongoUserId = await _api.GetCurrentUserIdAsync(userToken);
 
         if (mongoUserId is not null)
-        {
-            var adminToken = await _backendApi.GetFirebaseTokenAsync(AuthHelper.AdminEmail, AuthHelper.AdminPassword);
-            var adminContext = await _backendApi.CreateApiContextAsync(adminToken);
-            await adminContext.DeleteAsync($"user/{mongoUserId}");
-            await adminContext.DisposeAsync();
-        }
+            await _api.DeleteUserAsync(mongoUserId);
 
         _email = string.Empty;
+        await _api.DisposeAsync();
     }
 
     private async Task Register(string email, string? password = null)
