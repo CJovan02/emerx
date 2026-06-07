@@ -5,7 +5,7 @@ namespace Emerx.PlaywrightTests.Helpers;
 
 public static class AuthHelper
 {
-    public const string AdminEmail = "admin@admin.com";
+    public const string AdminEmail = "test-admin@test.com";
     public const string AdminPassword = "Sifra123";
 
     public static async Task LoginAsAdmin(IPage page)

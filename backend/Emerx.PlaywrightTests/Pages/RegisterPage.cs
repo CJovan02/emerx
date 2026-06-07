@@ -99,11 +99,10 @@ public class RegisterPage : PageTest
     {
         if (string.IsNullOrEmpty(_email)) return;
 
-        var userToken = await AuthHelper.GetFirebaseTokenAsync(Playwright, _email, TestPassword);
-        var mongoUserId = await _api.GetCurrentUserIdAsync(userToken);
+        var user = await _api.GetUserByEmail(_email);
 
-        if (mongoUserId is not null)
-            await _api.DeleteUserAsync(mongoUserId);
+        if (user is not null)
+            await _api.DeleteUserAsync(user.Id);
 
         _email = string.Empty;
         await _api.DisposeAsync();

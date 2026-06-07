@@ -1,5 +1,6 @@
 ﻿using Emerx.PlaywrightTests.Constants;
 using Emerx.PlaywrightTests.Helpers;
+using Emerx.PlaywrightTests.Services;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -9,6 +10,8 @@ namespace Emerx.PlaywrightTests.Pages;
 [TestFixture]
 public class AdminProductsPage : PageTest
 {
+    private BackendApiService _api;
+
     private ILocator OpenCreateDrawerButton => Page.GetByTestId("open-create-drawer-button");
     private ILocator CreateProductDrawer => Page.GetByTestId("create-product-drawer");
     private ILocator CreateNameField => CreateProductDrawer.GetByLabel("Name");
@@ -21,6 +24,9 @@ public class AdminProductsPage : PageTest
     [SetUp]
     public async Task SetupAsAdmin()
     {
+        _api = new BackendApiService(Playwright);
+        await _api.ConnectAsync(GlobalSetup.AdminToken);
+
         await AuthHelper.LoginAsAdmin(Page);
 
         await Page.GotoAsync(PageUrls.AdminProductPage);
@@ -40,10 +46,19 @@ public class AdminProductsPage : PageTest
     {
         await OpenCreateDrawerButton.ClickAsync();
 
-        await FillOutCreateForm();
+        var uniqueName = $"Playwright-{Guid.NewGuid()}";
+        await FillOutCreateForm(uniqueName);
 
-        await CreateSubmitButton.ClickAsync();
-        await Expect(Page.GetByText("Successfully created product")).ToBeVisibleAsync();
+        try
+        {
+            await CreateSubmitButton.ClickAsync();
+            await Expect(Page.GetByText("Successfully created product")).ToBeVisibleAsync();
+        }
+        finally
+        {
+            var previouslyCreatedProduct = await _api.GetProductByName(uniqueName);
+            await _api.DeleteProduct(previouslyCreatedProduct.Id);
+        }
     }
 
     [Test]
@@ -83,9 +98,15 @@ public class AdminProductsPage : PageTest
         ).ToBeVisibleAsync();
     }
 
-    private async Task FillOutCreateForm(string price = "10", string stock = "100")
+    [TearDown]
+    public async Task TearDown()
     {
-        await CreateNameField.FillAsync("Playwright");
+        await _api.DisposeAsync();
+    }
+
+    private async Task FillOutCreateForm(string name = "Playwright", string price = "10", string stock = "100")
+    {
+        await CreateNameField.FillAsync(name);
         await CreateDescriptionField.FillAsync("Playwright");
         await CreateCategoryField.FillAsync("Playwright");
         await CreatePriceField.FillAsync(price);
