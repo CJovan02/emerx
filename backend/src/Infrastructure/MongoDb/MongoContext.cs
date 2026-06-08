@@ -17,6 +17,7 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
 
         var mongoSettings = MongoClientSettings.FromConnectionString(settings.ConnectionString);
         mongoSettings.ServerApi = new ServerApi(ServerApiVersion.V1);
+        mongoSettings.ConnectTimeout = new TimeSpan(0, 1, 0);
         _client = new MongoClient(mongoSettings);
 
         _database = _client.GetDatabase(settings.DatabaseName);
@@ -33,7 +34,7 @@ public class MongoContext(IOptions<MongoDbSettings> options, ILogger<MongoContex
         catch (Exception ex)
         {
             _logger.LogError(ex, "❌ MongoDb ping failed.");
-            throw ex;
+            // throw ex;
         }
     }
 

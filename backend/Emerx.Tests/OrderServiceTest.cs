@@ -156,7 +156,7 @@ public class OrderServiceTest
             Assert.That(result.IsSuccess, Is.True);
 
             Assert.That(result.Value.Id,
-                Is.EqualTo(orderId));
+                Is.EqualTo(orderId.ToString()));
         });
 
         _orderRepository.Verify(

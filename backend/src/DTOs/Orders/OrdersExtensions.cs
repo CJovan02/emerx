@@ -12,8 +12,8 @@ public static class OrdersExtensions
     {
         return new OrderResponse
         {
-            Id = order.Id,
-            UserId = order.UserId,
+            Id = order.Id.ToString(),
+            UserId = order.UserId.ToString(),
             Items = order.Items,
             Address = order.Address.ToDto()!,
             Price = order.Price,

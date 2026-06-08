@@ -79,6 +79,7 @@ const LoginPage = () => {
 				</CardContent>
 				<CardActions>
 					<Button
+						data-testid='login-button'
 						type='submit'
 						form='login-form'
 						fullWidth

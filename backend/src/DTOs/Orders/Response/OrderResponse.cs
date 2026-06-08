@@ -7,8 +7,8 @@ namespace EMerx.DTOs.Orders.Response;
 
 public sealed record OrderResponse
 {
-    [Required] public required ObjectId Id { get; init; }
-    [Required] public required ObjectId UserId { get; init; }
+    [Required] public required string Id { get; init; }
+    [Required] public required string UserId { get; init; }
     [Required] public required List<OrderItem> Items { get; init; }
     [Required] public required AddressDto Address { get; init; }
     [Required] public required decimal Price { get; init; }

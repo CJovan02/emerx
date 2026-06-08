@@ -1,6 +1,7 @@
 using EMerx.DTOs.Id;
 using EMerx.Infrastructure.CloudinaryContext;
 using EMerx.Infrastructure.MongoDb;
+using EMerx.Repositories.AuthRepository;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -17,7 +18,18 @@ builder.Services.AddSwaggerWithAuth();
 builder.Services.AddValidatorsFromAssembly(typeof(IdRequest).Assembly, includeInternalTypes: true);
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddFirebaseAuthentication(builder.Configuration);
+// We use fake auth for api-testing
+// dotnet run --launch-profile Api-Testing
+if (builder.Environment.IsEnvironment("Api-Testing"))
+{
+    builder.Services.AddFakeAuthentication();
+    builder.Services.AddScoped<IAuthRepository, TestAuthRepository>();
+}
+else
+{
+    builder.Services.AddFirebaseAuthentication(builder.Configuration);
+    builder.Services.AddScoped<IAuthRepository, FirebaseAuthRepository>();
+}
 
 builder.Services.AddCloudinaryContext();
 builder.Services
@@ -41,14 +53,18 @@ var cloudinary = app.Services.GetRequiredService<CloudinaryContext>();
 cloudinary.Connect();
 await cloudinary.PingAsync();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Api-Testing"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.MapControllers();
-app.UseHttpsRedirection();
+
+if (!app.Environment.IsEnvironment("Api-Testing"))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

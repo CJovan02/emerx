@@ -1,3 +1,4 @@
+using EMerx.Auth;
 using EMerx.Common;
 using EMerx.Common.Exceptions;
 using EMerx.ExceptionHandlers;
@@ -15,6 +16,7 @@ using EMerx.Services.Reviews;
 using EMerx.Services.Users;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -30,7 +32,6 @@ public static class ServiceCollectionExtension
             .AddScoped<IProductRepository, ProductRepository>()
             .AddScoped<IReviewRepository, ReviewRepository>()
             .AddScoped<IOrderRepository, OrderRepository>()
-            .AddScoped<IAuthRepository, AuthRepository>()
             .AddScoped<ICloudinaryRepository, CloudinaryRepository>();
     }
 
@@ -115,6 +116,14 @@ public static class ServiceCollectionExtension
         return services
             .AddExceptionHandler<FirebaseAuthExceptionHandler>()
             .AddExceptionHandler<GlobalExceptionHandler>();
+    }
+
+    public static IServiceCollection AddFakeAuthentication(this IServiceCollection services)
+    {
+        services.AddAuthentication("Test")
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+
+        return services;
     }
 
     public static IServiceCollection AddFirebaseAuthentication(this IServiceCollection services,

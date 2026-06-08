@@ -59,6 +59,7 @@ export default function AdminsManagementPage() {
 						gap={3}
 						mt={3}>
 						<Button
+							data-testid='grant-admin-button'
 							type='submit'
 							onClick={() => setFormAction('grant')}
 							sx={{
@@ -70,6 +71,7 @@ export default function AdminsManagementPage() {
 						</Button>
 
 						<Button
+							data-testid='remove-admin-button'
 							type='submit'
 							color='error'
 							onClick={() => setFormAction('remove')}

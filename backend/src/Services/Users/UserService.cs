@@ -74,7 +74,7 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         // If for some odd reason firebase user already exists (this should never happen), then we just fetch the uid in order to update the db user
         catch (FirebaseAuthException e) when (e.AuthErrorCode == AuthErrorCode.EmailAlreadyExists)
         {
-            uid = (await authRepository.GetUserByEmailAsync(registerUserRequest.Email)).Uid;
+            uid = await authRepository.GetUserUidByEmailAsync(registerUserRequest.Email);
         }
 
         // Then we update the uid
