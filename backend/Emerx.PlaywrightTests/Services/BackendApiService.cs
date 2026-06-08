@@ -38,6 +38,9 @@ public class BackendApiService : IAsyncDisposable
     /// </summary>
     public async Task ConnectAsync(string userToken)
     {
+        if (_request is not null)
+            await DisposeAsync();
+
         _idToken = userToken;
         _request = await CreateApiContextAsync(_idToken);
     }
