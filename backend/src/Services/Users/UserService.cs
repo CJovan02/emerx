@@ -167,18 +167,19 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         if (user is null)
             return Result<UserResponse>.Failure(UserErrors.NotFound(request.Id));
 
-        // error, updating on old object instead of this one, consult with Peric
         var updatedUser = new User
         {
-            Id = ObjectId.Parse(request.Id),
+            Id = user.Id,
             Email = user.Email,
             Name = updateUserRequest.Name,
             Surname = updateUserRequest.Surname,
             FirebaseUid = user.FirebaseUid,
-            Address = updateUserRequest.Address.ToEntity()
+            Address = updateUserRequest.Address?.ToEntity(),
+            Orders = user.Orders,
+            Reviews = user.Reviews
         };
 
-        await userRepository.UpdateUser(user);
-        return Result<UserResponse>.Success(user.ToResponse());
+        await userRepository.UpdateUser(updatedUser);
+        return Result<UserResponse>.Success(updatedUser.ToResponse());
     }
 }

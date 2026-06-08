@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMerx", "src\EMerx.csproj",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emerx.Tests", "Emerx.Tests\Emerx.Tests.csproj", "{C986A87A-E61A-4A6A-8E22-0274796910D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emerx.PlaywrightTests", "Emerx.PlaywrightTests\Emerx.PlaywrightTests.csproj", "{8D53E804-E17F-4D76-8F90-E367CF0DE75F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{C986A87A-E61A-4A6A-8E22-0274796910D9}.Release|x64.Build.0 = Release|Any CPU
 		{C986A87A-E61A-4A6A-8E22-0274796910D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{C986A87A-E61A-4A6A-8E22-0274796910D9}.Release|x86.Build.0 = Release|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Debug|x64.Build.0 = Debug|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Debug|x86.Build.0 = Debug|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Release|x64.Build.0 = Release|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D53E804-E17F-4D76-8F90-E367CF0DE75F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

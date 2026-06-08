@@ -54,7 +54,7 @@ export default function MyProfilePage() {
 
 	useEffect(() => {
 		if (user) {
-			reset(user);
+			reset({ name: user.name, surname: user.surname, address: user.address });
 		}
 	}, [user, reset]);
 
@@ -76,12 +76,12 @@ export default function MyProfilePage() {
 	};
 
 	const handleEdit = () => {
-		reset(user);
+		reset({ name: user.name, surname: user.surname, address: user.address });
 		setIsEditing(true);
 	};
 
 	const handleCancel = () => {
-		reset(user);
+		reset({ name: user.name, surname: user.surname, address: user.address });
 		setIsEditing(false);
 	};
 
