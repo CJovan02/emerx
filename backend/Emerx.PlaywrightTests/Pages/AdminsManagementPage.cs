@@ -1,3 +1,4 @@
+using EMerx.Auth;
 using Emerx.PlaywrightTests.Constants;
 using Emerx.PlaywrightTests.Helpers;
 using Microsoft.Playwright;
@@ -29,16 +30,19 @@ public class AdminsManagementPage : PageTest
     [Test]
     public async Task CanGrantAdminRole()
     {
-        await EmailField.FillAsync("cvetkovicjovan4@gmail.com");
+        await EmailField.FillAsync(TestUsers.User.Email);
         await GrantButton.ClickAsync();
 
         await Expect(GrantSuccessSnackbar).ToBeVisibleAsync();
+
+        // cleanup
+        await RemoveButton.ClickAsync();
     }
 
     [Test]
     public async Task CanRemoveAdminRole()
     {
-        await EmailField.FillAsync("cvetkovicjovan4@gmail.com");
+        await EmailField.FillAsync(TestUsers.User.Email);
         await RemoveButton.ClickAsync();
 
         await Expect(RemoveSuccessSnackbar).ToBeVisibleAsync();

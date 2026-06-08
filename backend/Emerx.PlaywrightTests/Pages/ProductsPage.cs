@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Emerx.PlaywrightTests.Helpers;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -13,11 +14,12 @@ public class ProductsPage : PageTest
     [SetUp]
     public async Task SetUpAuthenticated()
     {
-        await Page.GotoAsync($"{BaseUrl}/login");
-        await Page.Locator("#email").FillAsync("atest@test.com");
-        await Page.Locator("#password").FillAsync("Test123!");
-        await Page.Locator("button[type='submit']").ClickAsync();
-        await Expect(Page).ToHaveURLAsync($"{BaseUrl}/products", new() { Timeout = 10000 });
+        // await Page.GotoAsync($"{BaseUrl}/login");
+        // await Page.Locator("#email").FillAsync("atest@test.com");
+        // await Page.Locator("#password").FillAsync("Test123!");
+        // await Page.Locator("button[type='submit']").ClickAsync();
+        // await Expect(Page).ToHaveURLAsync($"{BaseUrl}/products", new() { Timeout = 10000 });
+        await AuthHelper.LoginAsAdmin(Page);
     }
 
     private ILocator SearchInput => Page.GetByPlaceholder("Search products…");

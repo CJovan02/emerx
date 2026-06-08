@@ -99,7 +99,7 @@ public class RegisterPage : PageTest
     {
         if (string.IsNullOrEmpty(_email)) return;
 
-        var user = await _api.GetUserByEmail(_email);
+        var user = await _api.GetUserByEmailAsync(_email);
 
         if (user is not null)
             await _api.DeleteUserAsync(user.Id);

@@ -1,10 +1,12 @@
 ﻿using EMerx.Common.Filters;
 using EMerx.DTOs.Products.Response;
+using EMerx.DTOs.Users.Request;
 using EMerx.DTOs.Users.Response;
 using Emerx.PlaywrightTests.ApiTests.Helpers;
 using Emerx.PlaywrightTests.Common;
 using Emerx.PlaywrightTests.Constants;
 using Emerx.PlaywrightTests.Helpers;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Playwright;
 
 namespace Emerx.PlaywrightTests.Services;
@@ -19,7 +21,7 @@ public class BackendApiService : IAsyncDisposable
 {
     private readonly IPlaywright _playwright;
 
-    private string? _adminJwt;
+    private string? _idToken;
     private IAPIRequestContext? _request;
 
     private readonly string AdminEmail = AuthHelper.AdminEmail;
@@ -30,13 +32,17 @@ public class BackendApiService : IAsyncDisposable
         _playwright = playwright;
     }
 
+    /// <summary>
+    /// Attaches userToken to every request you make with this instance of api.
+    /// In other words, it authorizes user sending request with this instance with a provided userToken.
+    /// </summary>
     public async Task ConnectAsync(string userToken)
     {
-        _adminJwt = userToken;
-        _request = await CreateApiContextAsync(_adminJwt);
+        _idToken = userToken;
+        _request = await CreateApiContextAsync(_idToken);
     }
 
-    public async Task<UserResponse> GetUserByEmail(string email)
+    public async Task<UserResponse> GetUserByEmailAsync(string email)
     {
         await using var response = await _request.GetAsync($"{UserUrls.Base}/{email}");
         if (!response.Ok)
@@ -45,6 +51,45 @@ public class BackendApiService : IAsyncDisposable
         var user = await response.JsonAsync<UserResponse>(JsonSerializers.CaseInsensitive);
 
         return user;
+    }
+
+    public async Task<UserResponse> GetUserSelfAsync(string email)
+    {
+        await using var response = await _request.GetAsync(UserUrls.Base);
+        if (!response.Ok)
+            return null;
+
+        var user = await response.JsonAsync<UserResponse>(JsonSerializers.CaseInsensitive);
+
+        return user;
+    }
+
+    public async Task<UserResponse> RegisterUserAsync(string email, string password, string name, string surname)
+    {
+        var registerRequest = new RegisterUserRequest
+        {
+            Name = name,
+            Surname = surname,
+            Email = email,
+            Password = password,
+        };
+
+        await using var response = await _request.PostAsync(UserUrls.Register, new APIRequestContextOptions
+        {
+            DataObject = registerRequest,
+        });
+
+        if (!response.Ok)
+            throw new Exception("Can't register user");
+
+        return (await response.JsonAsync<UserResponse>(JsonSerializers.CaseInsensitive));
+    }
+
+    public async Task DeleteUserSelfAsync()
+    {
+        await using var response = await _request.DeleteAsync(UserUrls.Base);
+        if (!response.Ok)
+            throw new Exception("Can't delete user");
     }
 
     // I already use helper functions in API tests. I just reused them here :)
@@ -77,6 +122,17 @@ public class BackendApiService : IAsyncDisposable
             .FirstOrDefault();
     }
 
+    private async Task<IAPIRequestContext> CreateApiContextAsync(string token) =>
+        await _playwright.APIRequest.NewContextAsync(new()
+        {
+            BaseURL = $"{ServerUrls.Backend}/",
+            ExtraHTTPHeaders = new Dictionary<string, string>
+            {
+                { "Authorization", $"Bearer {token}" },
+                { "Accept", "application/json" }
+            }
+        });
+
     /// <summary>
     /// Older api. It creates apiContext in this function and disposes it afterward.
     /// </summary>
@@ -94,16 +150,6 @@ public class BackendApiService : IAsyncDisposable
         await context.DisposeAsync();
         return json!.Value.GetProperty("id").GetString();
     }
-
-    private async Task<IAPIRequestContext> CreateApiContextAsync(string token) =>
-        await _playwright.APIRequest.NewContextAsync(new()
-        {
-            BaseURL = $"{ServerUrls.Backend}/",
-            ExtraHTTPHeaders = new Dictionary<string, string>
-            {
-                { "Authorization", $"Bearer {token}" }
-            }
-        });
 
     public async ValueTask DisposeAsync()
     {
