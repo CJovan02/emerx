@@ -24,16 +24,12 @@ type Props = {
 	open: boolean;
 	handleClose: () => void;
 	product: ProductResponse | null;
-	page: number;
-	pageSize: number;
 };
 
 export default function EditProductDrawer({
 	open,
 	handleClose,
 	product,
-	page,
-	pageSize,
 }: Props) {
 	const {
 		form,
@@ -45,7 +41,7 @@ export default function EditProductDrawer({
 		allSet,
 		setAllSet,
 		loadInitDataToForm,
-	} = useEditProductLogic(product, page, pageSize);
+	} = useEditProductLogic(product);
 	const { enqueueSnackbar } = useSnackbar();
 
 	useEffect(() => {

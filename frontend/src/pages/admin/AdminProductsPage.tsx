@@ -1,13 +1,17 @@
-import { Alert, Box, Button, Container, Stack } from '@mui/material';
+import {Alert, Box, Button, Container, Stack, TextField} from '@mui/material';
 import ProductsGrid from '../../components/admin/productsGrid.tsx';
 import useAdminProductsLogic from '../../hooks/pageLogic/admin/useAdminProductsLogic.ts';
-import { Add, Refresh } from '@mui/icons-material';
+import {Add, Refresh} from '@mui/icons-material';
 import EditProductDrawer from '../../components/admin/editProductDrawer.tsx';
 import { Spacer } from '../../shared/components/ui/spacer.tsx';
 import CreateProductDrawer from '../../components/admin/createProductDrawer.tsx';
 import DeleteProductDialog from '../../components/admin/deleteProductDialog.tsx';
+import {useEffect, useState} from "react";
+
+const SEARCH_DEBOUNCE_MS = 350;
 
 export default function AdminProductsPage() {
+	const [searchInputValue, setSearchInputValue] = useState("Wire");
 	const {
 		data,
 		page,
@@ -28,7 +32,16 @@ export default function AdminProductsPage() {
 		openAddDrawer,
 		closeAddDrawer,
 		product,
+		setSearch,
 	} = useAdminProductsLogic();
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearch(searchInputValue);
+		}, SEARCH_DEBOUNCE_MS);
+
+		return () => clearTimeout(timer);
+	}, [searchInputValue, setSearch])
 
     if (isError) {
         return (
@@ -52,31 +65,31 @@ export default function AdminProductsPage() {
             <CreateProductDrawer
                 open={addOpen}
                 handleClose={closeAddDrawer}
-                page={data ? data.totalPages - 1 : 0} // -1 because we transform from 1-based to 0-based index
-                pageSize={pageSize}
             />
 
 			<EditProductDrawer
 				open={editOpen}
 				handleClose={closeEditDrawer}
 				product={product}
-				page={page}
-				pageSize={pageSize}
 			/>
 
 			<DeleteProductDialog
 				open={deleteOpen}
 				onClose={closeDeleteDialog}
 				product={product}
-				page={page}
-				pageSize={pageSize}
 			/>
 
             <Container>
                 <Box display='flex' mb={2}>
+					<TextField
+						label="Search products"
+						value={searchInputValue}
+						onChange={e => setSearchInputValue(e.target.value)}
+						size="small"
+					/>
                     <Spacer/>
                     <Button
-												data-testid='open-create-drawer-button'
+						data-testid='open-create-drawer-button'
                         startIcon={<Add/>}
                         onClick={openAddDrawer}
                         disabled={isFetching}

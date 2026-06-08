@@ -19,15 +19,11 @@ import { ProductImageDropzoneInput } from '../../shared/components/productImageD
 type Props = {
 	open: boolean;
 	handleClose: () => void;
-	page: number;
-	pageSize: number;
 };
 
 export default function CreateProductDrawer({
 	open,
 	handleClose,
-	pageSize,
-	page,
 }: Props) {
 	const {
 		form,
@@ -36,7 +32,7 @@ export default function CreateProductDrawer({
 		isLoading,
 		submitCreateForm,
 		isSuccess,
-	} = useCreateProductLogic(page, pageSize);
+	} = useCreateProductLogic();
 	const { enqueueSnackbar } = useSnackbar();
 
 	useEffect(() => {

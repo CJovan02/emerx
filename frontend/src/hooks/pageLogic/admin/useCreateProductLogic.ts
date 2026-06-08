@@ -12,7 +12,7 @@ import type {
 import type { ErrorType } from '../../../api/axiosInstance.ts';
 import { isAxiosError } from 'axios';
 
-export function useCreateProductLogic(page: number, pageSize: number) {
+export function useCreateProductLogic() {
 	// form
 	const formSchema = z.object({
 		name: z
@@ -58,7 +58,7 @@ export function useCreateProductLogic(page: number, pageSize: number) {
 			// When we create product, we refetch the page that contained that product
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: QueryKeys.adminGetProductsPaged(page, pageSize),
+					queryKey: QueryKeys.adminGetProductsPagedAll,
 				});
 			},
 		},

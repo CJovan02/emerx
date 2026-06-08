@@ -181,6 +181,7 @@ function ProductsGrid({
 	return (
 		<Box sx={{ width: '100%' }}>
 			<DataGrid
+				data-testid="products-grid"
 				autoHeight={false}
 				rowHeight={80}
 				rows={data}

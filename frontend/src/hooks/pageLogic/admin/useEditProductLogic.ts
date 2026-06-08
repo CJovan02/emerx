@@ -15,8 +15,6 @@ import { QueryKeys } from '../../../shared/common/queryKeys.ts';
 
 export default function useEditProductLogic(
 	product: ProductResponse | null,
-	page: number,
-	pageSize: number
 ) {
 	// form
 	const formSchema = z.object({
@@ -66,7 +64,7 @@ export default function useEditProductLogic(
 			// When we change the product, we refetch the page that contained that product
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: QueryKeys.adminGetProductsPaged(page, pageSize),
+					queryKey: QueryKeys.adminGetProductsPagedAll,
 				});
 			},
 		},

@@ -8,15 +8,17 @@ export default function useAdminProductsLogic() {
 	const [pageSize, setPageSize] = useState<number>(10);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [product, setProduct] = useState<ProductResponse | null>(null);
+	const [search, setSearch] = useState<string>("");
 
 	const query = useProductGetPaged(
 		{
 			Page: page + 1, // backend uses 1-based index
 			PageSize: pageSize,
+			Search: search
 		},
 		{
 			query: {
-				queryKey: QueryKeys.adminGetProductsPaged(page, pageSize),
+				queryKey: QueryKeys.adminGetProductsPaged(page, pageSize, search),
 			},
 		}
 	);
@@ -81,6 +83,8 @@ export default function useAdminProductsLogic() {
 		closeAddDrawer,
 		openEditDrawer,
 		closeEditDrawer,
+		search,
+		setSearch,
 		setProduct,
 		setPage,
 		setPageSize,

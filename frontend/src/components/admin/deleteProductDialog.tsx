@@ -15,19 +15,15 @@ type Props = {
 	open: boolean;
 	onClose: () => void;
 	product: ProductResponse | null;
-	page: number;
-	pageSize: number;
 };
 
 export default function DeleteProductDialog({
 	product,
 	onClose,
 	open,
-	page,
-	pageSize,
 }: Props) {
 	const { deleteProduct, isError, errorMessage, isPending, isSuccess } =
-		useDeleteProductLogic(page, pageSize);
+		useDeleteProductLogic();
 	const { enqueueSnackbar } = useSnackbar();
 
 	async function onDelete() {

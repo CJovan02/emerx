@@ -1,4 +1,7 @@
+const adminGetProductsPagedName = 'adminGetProductsPaged';
+
 export const QueryKeys = {
-	adminGetProductsPaged: (page: number, pageSize: number) =>
-		['adminGetProductsPaged', { page, pageSize }] as const,
+	adminGetProductsPagedAll: [adminGetProductsPagedName],
+	adminGetProductsPaged: (page: number, pageSize: number, search: string) =>
+		[adminGetProductsPagedName, { page, pageSize, search}] as const,
 };
