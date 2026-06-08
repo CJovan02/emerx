@@ -12,6 +12,7 @@ public class AdminProductsPage : PageTest
 {
     private BackendApiService _api;
 
+    private ILocator SearchBar => Page.GetByTestId("admin-search-bar");
     private ILocator OpenCreateDrawerButton => Page.GetByTestId("open-create-drawer-button");
     private ILocator CreateProductDrawer => Page.GetByTestId("create-product-drawer");
     private ILocator CreateNameField => CreateProductDrawer.GetByLabel("Name");
@@ -20,6 +21,15 @@ public class AdminProductsPage : PageTest
     private ILocator CreatePriceField => CreateProductDrawer.GetByLabel("Price");
     private ILocator CreateStockField => CreateProductDrawer.GetByLabel("Stock");
     private ILocator CreateSubmitButton => CreateProductDrawer.GetByTestId("submit-create-product");
+
+    private ILocator UpdateProductDrawer => Page.GetByTestId("update-product-drawer");
+    private ILocator UpdateNameField => UpdateProductDrawer.GetByLabel("Name");
+    private ILocator UpdateDescriptionField => UpdateProductDrawer.GetByLabel("Description");
+    private ILocator UpdateCategoryField => UpdateProductDrawer.GetByLabel("Category");
+    private ILocator UpdatePriceField => UpdateProductDrawer.GetByLabel("Price");
+    private ILocator UpdateStockField => UpdateProductDrawer.GetByLabel("Stock");
+    private ILocator UpdateSubmitButton => UpdateProductDrawer.GetByTestId("submit-update-product");
+
 
     [SetUp]
     public async Task SetupAsAdmin()
@@ -46,7 +56,7 @@ public class AdminProductsPage : PageTest
     {
         await OpenCreateDrawerButton.ClickAsync();
 
-        var uniqueName = $"Playwright-{Guid.NewGuid()}";
+        var uniqueName = GenerateUniqueName();
         await FillOutCreateForm(uniqueName);
 
         try
@@ -99,6 +109,122 @@ public class AdminProductsPage : PageTest
         ).ToBeVisibleAsync();
     }
 
+    [Test]
+    public async Task ClickEdit_OpensEditDrawer()
+    {
+        // Arrange
+        var uniqueName = GenerateUniqueName();
+        var createdProduct = await _api.CreateProduct(uniqueName);
+
+        try
+        {
+            await SearchBar.FillAsync(uniqueName);
+            await Expect(
+                Page.GetByText(uniqueName)
+            ).ToBeVisibleAsync();
+
+            var editButton = GetEditButton(createdProduct.Id);
+
+            // Act
+            await editButton.ClickAsync();
+
+            // Assert
+            await Expect(UpdateProductDrawer).ToBeVisibleAsync();
+            await Expect(UpdateNameField).ToHaveValueAsync(createdProduct.Name);
+            await Expect(UpdateDescriptionField).ToHaveValueAsync(createdProduct.Description);
+            await Expect(UpdateCategoryField).ToHaveValueAsync(createdProduct.Category);
+            await Expect(UpdatePriceField).ToHaveValueAsync(createdProduct.Price.ToString());
+            await Expect(UpdateStockField).ToHaveValueAsync(createdProduct.Stock.ToString());
+        }
+        finally
+        {
+            await _api.DeleteProduct(createdProduct.Id);
+        }
+    }
+
+    [Test]
+    public async Task EditProduct_ValidData_EditsProduct()
+    {
+        // Arrange
+        var uniqueName = GenerateUniqueName();
+        var createdProduct = await _api.CreateProduct(uniqueName);
+
+        try
+        {
+            await SearchBar.FillAsync(uniqueName);
+            await Expect(
+                Page.GetByText(uniqueName)
+            ).ToBeVisibleAsync();
+
+            await GetEditButton(createdProduct.Id).ClickAsync();
+
+            const string newName = "Edited";
+            const string newStock = "99";
+            await UpdateNameField.FillAsync(newName);
+            await UpdateStockField.FillAsync(newStock);
+
+            // Act
+            await UpdateSubmitButton.ClickAsync();
+
+            // Assert
+            await Expect(Page.GetByText("Successfully updated product")).ToBeVisibleAsync();
+            await Expect(UpdateProductDrawer).ToBeHiddenAsync();
+            await SearchBar.FillAsync(newName);
+            await Expect(
+                Page.GetByText(newName)
+            ).ToBeVisibleAsync();
+            await Expect(Page.GetByText($"{newStock} units")).ToBeVisibleAsync();
+        }
+        finally
+        {
+            await _api.DeleteProduct(createdProduct.Id);
+        }
+    }
+
+    [Test]
+    public async Task UpdateProduct_ChangeNothing_ShowsNothingToUpdateSnackbar()
+    {
+        var uniqueName = GenerateUniqueName();
+        var createdProduct = await _api.CreateProduct(uniqueName);
+
+        try
+        {
+            await SearchBar.FillAsync(uniqueName);
+            await Expect(
+                Page.GetByText(uniqueName)
+            ).ToBeVisibleAsync();
+
+            await GetEditButton(createdProduct.Id).ClickAsync();
+
+            await UpdateSubmitButton.ClickAsync();
+
+            await Expect(
+                Page.GetByText("All set - there is noting to update.")).ToBeVisibleAsync();
+        }
+        finally
+        {
+            await _api.DeleteProduct(createdProduct.Id);
+        }
+    }
+
+    // [Test]
+    // public async Task CreateProduct_NumbersNegative_DoesNotSubmit()
+    // {
+    //     await OpenCreateDrawerButton.ClickAsync();
+    //
+    //     await FillOutCreateForm("-1", "-1");
+    //
+    //     await CreateSubmitButton.ClickAsync();
+    //
+    //     await Expect(
+    //         CreateProductDrawer.Locator("#price-helper-text")
+    //     ).ToBeVisibleAsync();
+    //
+    //     await Expect(
+    //         CreateProductDrawer.Locator("#stock-helper-text")
+    //     ).ToBeVisibleAsync();
+    // }
+
     [TearDown]
     public async Task TearDown()
     {
@@ -113,4 +239,12 @@ public class AdminProductsPage : PageTest
         await CreatePriceField.FillAsync(price);
         await CreateStockField.FillAsync(stock);
     }
+
+    private string GenerateUniqueName()
+    {
+        return $"Playwright-{Guid.NewGuid()}";
+    }
+
+    private ILocator GetEditButton(string productId) => Page.GetByTestId($"edit-product-{productId}");
+    private ILocator GetDeleteButton(string productId) => Page.GetByTestId($"delete-product-{productId}");
 }

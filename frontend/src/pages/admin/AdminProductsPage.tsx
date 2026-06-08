@@ -1,4 +1,4 @@
-import {Alert, Box, Button, Container, Stack, TextField} from '@mui/material';
+import {Alert, Box, Button, Container, Stack} from '@mui/material';
 import ProductsGrid from '../../components/admin/productsGrid.tsx';
 import useAdminProductsLogic from '../../hooks/pageLogic/admin/useAdminProductsLogic.ts';
 import {Add, Refresh} from '@mui/icons-material';
@@ -7,6 +7,7 @@ import { Spacer } from '../../shared/components/ui/spacer.tsx';
 import CreateProductDrawer from '../../components/admin/createProductDrawer.tsx';
 import DeleteProductDialog from '../../components/admin/deleteProductDialog.tsx';
 import {useEffect, useState} from "react";
+import SearchBar from "../../shared/components/ui/SearchBar.tsx";
 
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -61,11 +62,11 @@ export default function AdminProductsPage() {
     }
 
     return (
-        <>
-            <CreateProductDrawer
-                open={addOpen}
-                handleClose={closeAddDrawer}
-            />
+		<>
+			<CreateProductDrawer
+					open={addOpen}
+					handleClose={closeAddDrawer}
+			/>
 
 			<EditProductDrawer
 				open={editOpen}
@@ -81,12 +82,10 @@ export default function AdminProductsPage() {
 
             <Container>
                 <Box display='flex' mb={2}>
-					<TextField
-						label="Search products"
+					<SearchBar
 						value={searchInputValue}
-						onChange={e => setSearchInputValue(e.target.value)}
-						size="small"
-					/>
+						onChange={e => setSearchInputValue(e)}
+						placeholder="Search Products" />
                     <Spacer/>
                     <Button
 						data-testid='open-create-drawer-button'

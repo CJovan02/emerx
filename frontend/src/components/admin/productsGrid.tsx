@@ -153,6 +153,7 @@ function ProductsGrid({
 				renderCell: params => (
 					<>
 						<IconButton
+							data-testid={`edit-product-${params.row.id}`}
 							onClick={e => {
 								e.stopPropagation();
 								openDrawer(params.row);
@@ -163,6 +164,7 @@ function ProductsGrid({
 						</IconButton>
 
 						<IconButton
+							data-testid={`delete-product-${params.row.id}`}
 							onClick={e => {
 								e.stopPropagation();
 								openDeleteDialog(params.row);

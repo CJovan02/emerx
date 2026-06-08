@@ -73,6 +73,7 @@ export default function EditProductDrawer({
 
 	return (
 		<Drawer
+			data-testid="update-product-drawer"
 			open={open}
 			onClose={handleClose}
 			anchor='right'
@@ -154,6 +155,7 @@ export default function EditProductDrawer({
 								/>
 
 								<Button
+									data-testid="submit-update-product"
 									startIcon={<ArrowUpward />}
 									form='edit-product-form'
 									type='submit'

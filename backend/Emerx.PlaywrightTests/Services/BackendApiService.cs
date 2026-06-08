@@ -53,9 +53,9 @@ public class BackendApiService : IAsyncDisposable
         await UserApiHelpers.DeleteUser(_request, userId);
     }
 
-    public async Task CreateProduct()
+    public async Task<ProductResponse> CreateProduct(string productName = "Test Name")
     {
-        await ProductApiHelpers.PostProduct(_request);
+        return await ProductApiHelpers.PostProduct(_request, productName);
     }
 
     public async Task DeleteProduct(string productId)
