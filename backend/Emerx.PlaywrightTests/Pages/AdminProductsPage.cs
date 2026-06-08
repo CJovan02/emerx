@@ -30,6 +30,9 @@ public class AdminProductsPage : PageTest
     private ILocator UpdateStockField => UpdateProductDrawer.GetByLabel("Stock");
     private ILocator UpdateSubmitButton => UpdateProductDrawer.GetByTestId("submit-update-product");
 
+    private ILocator DeleteProductDialog => Page.GetByTestId("delete-product-dialog");
+    private ILocator DeleteSubmitButton => DeleteProductDialog.GetByTestId("delete-product-submit");
+    private ILocator DeleteCancelButton => DeleteProductDialog.GetByTestId("delete-product-cancel");
 
     [SetUp]
     public async Task SetupAsAdmin()
@@ -96,7 +99,7 @@ public class AdminProductsPage : PageTest
     {
         await OpenCreateDrawerButton.ClickAsync();
 
-        await FillOutCreateForm("-1", "-1");
+        await FillOutCreateForm("Playwright","-1", "-1");
 
         await CreateSubmitButton.ClickAsync();
 
@@ -207,23 +210,80 @@ public class AdminProductsPage : PageTest
         }
     }
 
-    // [Test]
-    // public async Task CreateProduct_NumbersNegative_DoesNotSubmit()
-    // {
-    //     await OpenCreateDrawerButton.ClickAsync();
-    //
-    //     await FillOutCreateForm("-1", "-1");
-    //
-    //     await CreateSubmitButton.ClickAsync();
-    //
-    //     await Expect(
-    //         CreateProductDrawer.Locator("#price-helper-text")
-    //     ).ToBeVisibleAsync();
-    //
-    //     await Expect(
-    //         CreateProductDrawer.Locator("#stock-helper-text")
-    //     ).ToBeVisibleAsync();
-    // }
+    [Test]
+    public async Task DeleteButtonClick_OpensDeleteDialog()
+    {
+        var uniqueName = GenerateUniqueName();
+        var createdProduct = await _api.CreateProduct(uniqueName);
+
+        try
+        {
+            await SearchBar.FillAsync(uniqueName);
+            await Expect(
+                Page.GetByText(uniqueName)
+            ).ToBeVisibleAsync();
+
+            await GetDeleteButton(createdProduct.Id).ClickAsync();
+
+            await Expect(DeleteProductDialog).ToBeVisibleAsync();
+            await Expect(DeleteProductDialog.GetByText(uniqueName)).ToBeVisibleAsync();
+        }
+        finally
+        {
+            await _api.DeleteProduct(createdProduct.Id);
+        }
+    }
+
+    [Test]
+    public async Task DeleteProduct_ClickCancel_ClosesDialog()
+    {
+        var uniqueName = GenerateUniqueName();
+        var createdProduct = await _api.CreateProduct(uniqueName);
+
+        try
+        {
+            await SearchBar.FillAsync(uniqueName);
+            await Expect(
+                Page.GetByText(uniqueName)
+            ).ToBeVisibleAsync();
+
+            await GetDeleteButton(createdProduct.Id).ClickAsync();
+            await DeleteCancelButton.ClickAsync();
+
+            await Expect(DeleteProductDialog).ToBeHiddenAsync();
+        }
+        finally
+        {
+            await _api.DeleteProduct(createdProduct.Id);
+        }
+    }
+
+    [Test]
+    public async Task DeleteProduct_ClickDelete_DeletesProduct()
+    {
+        var uniqueName = GenerateUniqueName();
+        var createdProduct = await _api.CreateProduct(uniqueName);
+
+        try
+        {
+            await SearchBar.FillAsync(uniqueName);
+            await Expect(
+                Page.GetByText(uniqueName)
+            ).ToBeVisibleAsync();
+
+            await GetDeleteButton(createdProduct.Id).ClickAsync();
+            await DeleteSubmitButton.ClickAsync();
+
+            await Expect(
+                Page.GetByText("No rows")
+            ).ToBeVisibleAsync();
+        }
+        finally
+        {
+            var product = await _api.GetProductByName(uniqueName);
+            Assert.That(product, Is.Null);
+        }
+    }
 
     [TearDown]
     public async Task TearDown()
