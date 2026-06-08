@@ -18,11 +18,8 @@ public class ProfilePage : PageTest
     private const string BackendUrl = "http://localhost:5016";
     private const string MockUserPassword = "MockTest123!";
 
-    private static readonly HttpClient Http = new();
-
     private string _mockUserEmail = "";
     private string _idToken = "";
-    private UserResponse _user;
     private BackendApiService _api;
 
     [SetUp]
@@ -34,7 +31,7 @@ public class ProfilePage : PageTest
         await _api.ConnectAsync("");
 
 
-        _user = await _api.RegisterUserAsync(_mockUserEmail, MockUserPassword, "Playwright", "Test");
+        await _api.RegisterUserAsync(_mockUserEmail, MockUserPassword, "Playwright", "Test");
         _idToken = await AuthHelper.GetFirebaseTokenAsync(Playwright, _mockUserEmail, MockUserPassword);
 
         // After creating new account we authorize the _api with the new user

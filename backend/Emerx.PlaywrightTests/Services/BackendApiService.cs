@@ -53,7 +53,7 @@ public class BackendApiService : IAsyncDisposable
         return user;
     }
 
-    public async Task<UserResponse> GetUserSelfAsync(string email)
+    public async Task<UserResponse?> GetUserSelfAsync()
     {
         await using var response = await _request.GetAsync(UserUrls.Base);
         if (!response.Ok)

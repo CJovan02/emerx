@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Emerx.PlaywrightTests.Helpers;
+using Emerx.PlaywrightTests.Services;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -15,38 +17,47 @@ public class ProductDetailsPage : PageTest
     private const string ProductId = "69a18f932a241fbd4433dd3b";
     private const string MockUserPassword = "MockTest123!";
 
-    private static readonly HttpClient Http = new();
-
     private string _mockUserEmail = "";
     private string _idToken = "";
+    private BackendApiService _api;
+    private static readonly HttpClient Http = new();
 
     [SetUp]
     public async Task SetUpAuthenticated()
     {
+        _api = new BackendApiService(Playwright);
         _mockUserEmail = $"playwright-{Guid.NewGuid():N}@test.com";
+        // We don't authorize here since we first need to register new account
+        await _api.ConnectAsync("");
 
-        var registerPayload = JsonSerializer.Serialize(new
-        {
-            name = "Playwright",
-            surname = "Test",
-            email = _mockUserEmail,
-            password = MockUserPassword
-        });
-        await Http.PostAsync(
-            $"{BackendUrl}/User/register",
-            new StringContent(registerPayload, Encoding.UTF8, "application/json"));
 
-        await Page.RouteAsync("**/api/**", async route =>
-        {
-            if (string.IsNullOrEmpty(_idToken))
-            {
-                var authHeader = route.Request.Headers
-                    .FirstOrDefault(h => h.Key.Equals("authorization", StringComparison.OrdinalIgnoreCase)).Value ?? "";
-                if (authHeader.StartsWith("Bearer "))
-                    _idToken = authHeader["Bearer ".Length..];
-            }
-            await route.ContinueAsync();
-        });
+        await _api.RegisterUserAsync(_mockUserEmail, MockUserPassword, "Playwright", "Test");
+        _idToken = await AuthHelper.GetFirebaseTokenAsync(Playwright, _mockUserEmail, MockUserPassword);
+
+        // After creating new account we authorize the _api with the new user
+        await _api.ConnectAsync(_idToken);
+        // var registerPayload = JsonSerializer.Serialize(new
+        // {
+        //     name = "Playwright",
+        //     surname = "Test",
+        //     email = _mockUserEmail,
+        //     password = MockUserPassword
+        // });
+        // await Http.PostAsync(
+        //     $"{BackendUrl}/User/register",
+        //     new StringContent(registerPayload, Encoding.UTF8, "application/json"));
+        //
+        // await Page.RouteAsync("**/api/**", async route =>
+        // {
+        //     if (string.IsNullOrEmpty(_idToken))
+        //     {
+        //         var authHeader = route.Request.Headers
+        //             .FirstOrDefault(h => h.Key.Equals("authorization", StringComparison.OrdinalIgnoreCase)).Value ?? "";
+        //         if (authHeader.StartsWith("Bearer "))
+        //             _idToken = authHeader["Bearer ".Length..];
+        //     }
+        //     await route.ContinueAsync();
+        // });
 
         await Page.GotoAsync($"{BaseUrl}/login");
         await Page.Locator("#email").FillAsync(_mockUserEmail);
@@ -62,16 +73,19 @@ public class ProductDetailsPage : PageTest
     {
         if (string.IsNullOrEmpty(_idToken)) return;
 
-        // userId in ReviewResponse is the MongoDB ObjectId, not the Firebase UID —
-        // resolve it via GET /User (returns the logged-in user's MongoDB profile)
-        var userReq = new HttpRequestMessage(HttpMethod.Get, $"{BackendUrl}/User");
-        userReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
-        var userResp = await Http.SendAsync(userReq);
+        var userResp = await _api.GetUserSelfAsync();
 
-        if (userResp.IsSuccessStatusCode)
+        // // userId in ReviewResponse is the MongoDB ObjectId, not the Firebase UID —
+        // // resolve it via GET /User (returns the logged-in user's MongoDB profile)
+        // var userReq = new HttpRequestMessage(HttpMethod.Get, $"{BackendUrl}/User");
+        // userReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
+        // var userResp = await Http.SendAsync(userReq);
+
+        if (userResp is not null)
         {
-            var userJson = JsonDocument.Parse(await userResp.Content.ReadAsStringAsync());
-            var mongoUserId = userJson.RootElement.GetProperty("id").GetString();
+            // var userJson = JsonDocument.Parse(await userResp.Content.ReadAsStringAsync());
+            // var mongoUserId = userJson.RootElement.GetProperty("id").GetString();
+            var mongoUserId = userResp.Id;
 
             var reviewsReq = new HttpRequestMessage(HttpMethod.Get,
                 $"{BackendUrl}/Review/getProductReviews/{ProductId}");
@@ -95,9 +109,11 @@ public class ProductDetailsPage : PageTest
             }
         }
 
-        var deleteUserReq = new HttpRequestMessage(HttpMethod.Delete, $"{BackendUrl}/User");
-        deleteUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
-        await Http.SendAsync(deleteUserReq);
+        // var deleteUserReq = new HttpRequestMessage(HttpMethod.Delete, $"{BackendUrl}/User");
+        // deleteUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _idToken);
+        // await Http.SendAsync(deleteUserReq);
+        await _api.DeleteUserSelfAsync();
+        await _api.DisposeAsync();
     }
 
     private ILocator LoadingSpinner => Page.Locator(".MuiCircularProgress-root");
