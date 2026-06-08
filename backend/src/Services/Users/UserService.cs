@@ -1,5 +1,6 @@
 using EMerx.Common.Exceptions;
 using EMerx.DTOs.Address;
+using EMerx.DTOs.Email;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users;
 using EMerx.DTOs.Users.Request;
@@ -22,6 +23,16 @@ public class UserService(IUserRepository userRepository, IAuthRepository authRep
         var user = await userRepository.GetUserById(objectId);
         if (user is null)
             return Result<UserResponse>.Failure(UserErrors.NotFound(objectId));
+
+        return Result<UserResponse>.Success(user.ToResponse());
+    }
+
+    public async Task<Result<UserResponse>> GetByEmailAsync(EmailRequest request)
+    {
+        var email = request.Email;
+        var user = await userRepository.GetUserByEmail(email);
+        if (user is null)
+            return Result<UserResponse>.Failure(UserErrors.NotFound(email));
 
         return Result<UserResponse>.Success(user.ToResponse());
     }

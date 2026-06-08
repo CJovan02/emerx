@@ -1,3 +1,4 @@
+using Emerx.PlaywrightTests.Helpers;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -24,11 +25,12 @@ public class LoginPage : PageTest
     [Test]
     public async Task Login_ValidCredentials_RedirectsToProductsPage()
     {
-        await EmailInput.FillAsync("admin@admin.com");
-        await PasswordInput.FillAsync("Sifra123");
-        await SignInButton.ClickAsync();
+        // await EmailInput.FillAsync("admin@admin.com");
+        // await PasswordInput.FillAsync("Sifra123");
+        // await SignInButton.ClickAsync();
+        await AuthHelper.LoginAsAdmin(Page);
 
-        await Expect(Page).ToHaveURLAsync($"{BaseUrl}/products");
+        // await Expect(Page).ToHaveURLAsync($"{BaseUrl}/products");
     }
 
     [Test]

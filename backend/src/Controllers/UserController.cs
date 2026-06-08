@@ -30,6 +30,19 @@ public class UserController(IUserService userService) : ControllerBase
         return result.ToActionResult();
     }
 
+    [Authorize]
+    [RequiresRole(Roles.Admin)]
+    [HttpGet("{email}")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetByEmail([FromRoute] EmailRequest request)
+    {
+        var result = await userService.GetByEmailAsync(request);
+
+        return result.ToActionResult();
+    }
+
     [HttpPost("register")]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -15,19 +15,15 @@ type Props = {
 	open: boolean;
 	onClose: () => void;
 	product: ProductResponse | null;
-	page: number;
-	pageSize: number;
 };
 
 export default function DeleteProductDialog({
 	product,
 	onClose,
 	open,
-	page,
-	pageSize,
 }: Props) {
 	const { deleteProduct, isError, errorMessage, isPending, isSuccess } =
-		useDeleteProductLogic(page, pageSize);
+		useDeleteProductLogic();
 	const { enqueueSnackbar } = useSnackbar();
 
 	async function onDelete() {
@@ -55,6 +51,7 @@ export default function DeleteProductDialog({
 
 	return (
 		<Dialog
+			data-testid="delete-product-dialog"
 			open={open}
 			onClose={onClose}>
 			<DialogTitle>
@@ -69,11 +66,13 @@ export default function DeleteProductDialog({
 			</DialogContent>
 			<DialogActions sx={{ px: 3, py: 2 }}>
 				<Button
+					data-testid="delete-product-cancel"
 					variant='outlined'
 					onClick={onClose}>
 					Cancel
 				</Button>
 				<Button
+					data-testid="delete-product-submit"
 					color='error'
 					onClick={onDelete}
 					loading={isPending}>

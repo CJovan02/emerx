@@ -6,7 +6,7 @@ import { isAxiosError } from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '../../../shared/common/queryKeys.ts';
 
-export default function useDeleteProductLogic(page: number, pageSize: number) {
+export default function useDeleteProductLogic() {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const queryClient = useQueryClient();
@@ -15,7 +15,7 @@ export default function useDeleteProductLogic(page: number, pageSize: number) {
 			onError: handleError,
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: QueryKeys.adminGetProductsPaged(page, pageSize),
+					queryKey: QueryKeys.adminGetProductsPagedAll,
 				});
 			},
 		},

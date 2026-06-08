@@ -1,3 +1,4 @@
+using EMerx.DTOs.Email;
 using EMerx.DTOs.Id;
 using EMerx.DTOs.Users.Request;
 using EMerx.DTOs.Users.Response;
@@ -10,6 +11,8 @@ namespace EMerx.Services.Users;
 public interface IUserService
 {
     Task<Result<UserResponse>> GetByIdAsync(IdRequest request);
+
+    Task<Result<UserResponse>> GetByEmailAsync(EmailRequest request);
 
     Task<Result<UserResponse>> GetByFirebaseUidAsync(string firebaseUid);
 

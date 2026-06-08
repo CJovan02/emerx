@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Emerx.PlaywrightTests.Helpers;
+using Emerx.PlaywrightTests.Services;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -8,11 +9,9 @@ namespace Emerx.PlaywrightTests.Pages;
 [TestFixture]
 public class RegisterPage : PageTest
 {
+    private BackendApiService _api;
+
     private const string BaseUrl = "http://localhost:5173";
-    private const string BackendUrl = "http://localhost:5016";
-    private const string FirebaseApiKey = "AIzaSyDxAIVCgS8yuHnqHbUaWgB2AM1_0gaikqo";
-    private const string AdminEmail = "admin@admin.com";
-    private const string AdminPassword = "Sifra123";
     private const string TestPassword = "ValidPassword123!";
 
     private string _email = string.Empty;
@@ -29,6 +28,9 @@ public class RegisterPage : PageTest
     [SetUp]
     public async Task NavigateToRegisterPage()
     {
+        _api = new BackendApiService(Playwright);
+        await _api.ConnectAsync(GlobalSetup.AdminToken);
+
         await Page.GotoAsync($"{BaseUrl}/register");
     }
 
@@ -44,7 +46,7 @@ public class RegisterPage : PageTest
     [Test]
     public async Task Register_ExistingEmail_ShowsEmailFieldError()
     {
-        await Register(AdminEmail);
+        await Register(AuthHelper.AdminEmail);
         await Expect(EmailFieldError).ToBeVisibleAsync();
         await Expect(EmailFieldError).ToHaveTextAsync("That Email is already in use.");
     }
@@ -91,71 +93,25 @@ public class RegisterPage : PageTest
         await Register("john@example.com", "UPPERCASE1!");
         await Expect(PasswordFieldError).ToHaveTextAsync("Password must contain at least one lowercase letter.");
     }
-    
+
     [TearDown]
     public async Task CleanUpCreatedUser()
     {
         if (string.IsNullOrEmpty(_email)) return;
 
-        var userToken = await GetFirebaseTokenAsync(_email, TestPassword);
-        var mongoUserId = await GetCurrentUserIdAsync(userToken);
+        var user = await _api.GetUserByEmailAsync(_email);
 
-        if (mongoUserId is not null)
-        {
-            var adminToken = await GetFirebaseTokenAsync(AdminEmail, AdminPassword);
-            var adminContext = await CreateApiContextAsync(adminToken);
-            await adminContext.DeleteAsync($"user/{mongoUserId}");
-            await adminContext.DisposeAsync();
-        }
+        if (user is not null)
+            await _api.DeleteUserAsync(user.Id);
 
         _email = string.Empty;
+        await _api.DisposeAsync();
     }
 
     private async Task Register(string email, string? password = null)
     {
         await FillForm("John", "Doe", email, password ?? TestPassword);
         await SignUpButton.ClickAsync();
-    }
-
-    private async Task<string> GetFirebaseTokenAsync(string email, string password)
-    {
-        var firebaseContext = await Playwright.APIRequest.NewContextAsync(new()
-        {
-            BaseURL = "https://identitytoolkit.googleapis.com/"
-        });
-        var response = await firebaseContext.PostAsync(
-            $"v1/accounts:signInWithPassword?key={FirebaseApiKey}",
-            new APIRequestContextOptions
-            {
-                DataObject = new { email, password, returnSecureToken = true }
-            });
-        var json = await response.JsonAsync();
-        await firebaseContext.DisposeAsync();
-        return json!.Value.GetProperty("idToken").GetString()!;
-    }
-
-    private async Task<IAPIRequestContext> CreateApiContextAsync(string token) =>
-        await Playwright.APIRequest.NewContextAsync(new()
-        {
-            BaseURL = $"{BackendUrl}/",
-            ExtraHTTPHeaders = new Dictionary<string, string>
-            {
-                { "Authorization", $"Bearer {token}" }
-            }
-        });
-
-    private async Task<string?> GetCurrentUserIdAsync(string token)
-    {
-        var context = await CreateApiContextAsync(token);
-        var response = await context.GetAsync("user");
-        if (!response.Ok)
-        {
-            await context.DisposeAsync();
-            return null;
-        }
-        var json = await response.JsonAsync();
-        await context.DisposeAsync();
-        return json!.Value.GetProperty("id").GetString();
     }
 
     private async Task FillForm(string name, string surname, string email, string password)

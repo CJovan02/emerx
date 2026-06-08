@@ -32,9 +32,9 @@ public static class ProductApiHelpers
     }
 
 
-    public static async Task<ProductResponse> PostProduct(IAPIRequestContext request)
+    public static async Task<ProductResponse> PostProduct(IAPIRequestContext request, string productName = "Test Name")
     {
-        var form = CreateProductFormData(request);
+        var form = CreateProductFormData(request, productName);
 
         await using var response = await request.PostAsync(ProductUrls.Base, new APIRequestContextOptions
         {

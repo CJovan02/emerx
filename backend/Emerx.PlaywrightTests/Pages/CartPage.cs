@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Emerx.PlaywrightTests.Helpers;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -14,10 +15,11 @@ public class CartPage : PageTest
     [SetUp]
     public async Task SetUpWithItemInCart()
     {
-        await Page.GotoAsync($"{BaseUrl}/login");
-        await Page.Locator("#email").FillAsync("atest@test.com");
-        await Page.Locator("#password").FillAsync("Test123!");
-        await Page.Locator("button[type='submit']").ClickAsync();
+        // await Page.GotoAsync($"{BaseUrl}/login");
+        // await Page.Locator("#email").FillAsync("atest@test.com");
+        // await Page.Locator("#password").FillAsync("Test123!");
+        // await Page.Locator("button[type='submit']").ClickAsync();
+        await AuthHelper.LoginAsAdmin(Page);
         await Expect(Page).ToHaveURLAsync($"{BaseUrl}/products", new() { Timeout = 10000 });
 
         await Page.GotoAsync($"{BaseUrl}/products/{ProductId}");

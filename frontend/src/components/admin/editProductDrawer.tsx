@@ -24,16 +24,12 @@ type Props = {
 	open: boolean;
 	handleClose: () => void;
 	product: ProductResponse | null;
-	page: number;
-	pageSize: number;
 };
 
 export default function EditProductDrawer({
 	open,
 	handleClose,
 	product,
-	page,
-	pageSize,
 }: Props) {
 	const {
 		form,
@@ -45,7 +41,7 @@ export default function EditProductDrawer({
 		allSet,
 		setAllSet,
 		loadInitDataToForm,
-	} = useEditProductLogic(product, page, pageSize);
+	} = useEditProductLogic(product);
 	const { enqueueSnackbar } = useSnackbar();
 
 	useEffect(() => {
@@ -77,6 +73,7 @@ export default function EditProductDrawer({
 
 	return (
 		<Drawer
+			data-testid="update-product-drawer"
 			open={open}
 			onClose={handleClose}
 			anchor='right'
@@ -158,6 +155,7 @@ export default function EditProductDrawer({
 								/>
 
 								<Button
+									data-testid="submit-update-product"
 									startIcon={<ArrowUpward />}
 									form='edit-product-form'
 									type='submit'
