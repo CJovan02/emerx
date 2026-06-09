@@ -36,6 +36,8 @@ public static class AuthHelper
             {
                 DataObject = new { email, password, returnSecureToken = true }
             });
+        if (!response.Ok)
+            throw new Exception(await response.TextAsync());
         var json = await response.JsonAsync();
         await firebaseContext.DisposeAsync();
         return json!.Value.GetProperty("idToken").GetString()!;
