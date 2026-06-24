@@ -152,7 +152,7 @@ public class ProfilePage : PageTest
         await Expect(EditButton).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.GetByText("Belgrade")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Knez Mihailova")).ToBeVisibleAsync();
-        await Expect(Page.GetByText("10")).ToBeVisibleAsync();
+        await Expect(Page.GetByText("House number: 10")).ToBeVisibleAsync();
     }
 
     [Test]
